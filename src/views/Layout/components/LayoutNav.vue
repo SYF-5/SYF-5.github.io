@@ -1,15 +1,41 @@
-<script setup>
+<script setup lang="ts">
+import { useUserStore } from '@/stores/user' 
+import { ElMessage } from 'element-plus' // 引入Element Plus的消息提示组件
 
+const userStore = useUserStore()
+
+// 登录函数
+const handleLogin = () => {
+  userStore.login({
+    id: 1, 
+    name: '周杰伦', 
+    account: 123456,
+    password: 123456
+  })
+  ElMessage.success('登录成功') // 添加登录成功提示
+}
+
+// 退出登录函数
+const handleLogout = () => {
+  userStore.logout()
+  ElMessage.success('已退出登录') // 添加退出成功提示
+}
 </script>
 
 <template>
   <nav class="app-topnav">
     <div class="container">
       <ul>
-        <template v-if="true">
-          <li><a href="javascript:;"><i class="iconfont icon-user"></i>周杰伦</a></li>
+        <!-- 根据用户登录状态显示不同内容 -->
+        <template v-if="userStore.isLogin">
+          <li><a href="javascript:;"><i class="iconfont icon-user"></i>{{ userStore.userInfo?.account }}</a></li>
           <li>
-            <el-popconfirm title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
+            <el-popconfirm 
+              title="确认退出吗?" 
+              confirm-button-text="确认" 
+              cancel-button-text="取消"
+              @confirm="handleLogout" <!-- 添加确认退出的事件处理 -->
+            >
               <template #reference>
                 <a href="javascript:;">退出登录</a>
               </template>
@@ -19,7 +45,7 @@
           <li><a href="javascript:;">会员中心</a></li>
         </template>
         <template v-else>
-          <li><a href="javascript:;">请先登录</a></li>
+          <li><a href="javascript:;" @click="handleLogin">请先登录</a></li> <!-- 添加点击登录功能 -->
           <li><a href="javascript:;">帮助中心</a></li> 
           <li><a href="javascript:;">关于我们</a></li> 
         </template>
@@ -27,7 +53,6 @@
     </div>
   </nav>
 </template>
-
 
 <style scoped lang="scss">
 .app-topnav {
