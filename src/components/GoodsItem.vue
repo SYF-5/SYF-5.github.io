@@ -1,6 +1,6 @@
-<!-- src/components/GoodsItem.vue -->
+<!-- 商品卡片组件 -->
 <template>
-  <div class="goods-item" @click="$emit('item-click', product)">
+  <div class="goods-item" @click="handleItemClick">
     <div class="goods-image">
       <img :src="product.picture" :alt="product.name">
     </div>
@@ -9,23 +9,37 @@
       <p class="goods-desc">{{ product.description }}</p>
       <div class="goods-price">
         <span class="price">¥{{ product.price }}</span>
-        <button class="add-cart-btn" @click.stop="$emit('add-to-cart', product)">+</button>
+        <button class="add-cart-btn" @click.stop="handleAddToCart">+</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import type { Product } from '@/types';
 
-defineProps<{
+const router = useRouter();
+
+const props = defineProps<{
   product: Product
 }>()
 
-defineEmits<{
-  (e: 'item-click', product: Product): void
+const emit = defineEmits<{
   (e: 'add-to-cart', product: Product): void
 }>()
+
+// 处理商品点击
+const handleItemClick = () => {
+  console.log('商品被点击:', props.product.id);
+  router.push(`/product/${props.product.id}`);
+};
+
+// 处理添加到购物车
+const handleAddToCart = () => {
+  console.log('添加到购物车:', props.product.name);
+  emit('add-to-cart', props.product);
+};
 </script>
 
 <style scoped>
@@ -80,7 +94,6 @@ defineEmits<{
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 40px;
 }
 
 .goods-price {

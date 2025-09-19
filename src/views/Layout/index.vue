@@ -11,3 +11,16 @@ import { RouterView } from 'vue-router'
   <RouterView />
   <LayoutFooter />
 </template>
+
+<style scoped>
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout-content {
+  flex: 1;
+  overflow: visible; /* 确保内容可以溢出 */
+}
+</style>

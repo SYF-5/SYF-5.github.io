@@ -48,6 +48,7 @@ const handleLogout = () => {
   background: #333;
   ul {
     display: flex;
+    padding-right: 17px;
     height: 53px;
     justify-content: flex-end;
     align-items: center;
