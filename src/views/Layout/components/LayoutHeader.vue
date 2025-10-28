@@ -15,13 +15,19 @@
         <li> <RouterLink to="/">居家</RouterLink> </li>
         <li> <RouterLink to="/">美食</RouterLink> </li>
         <li> <RouterLink to="/">服饰</RouterLink> </li>
+        <li> <RouterLink to="/">母婴</RouterLink> </li>
+        <li> <RouterLink to="/">手机</RouterLink> </li>
+        <li> <RouterLink to="/">美妆</RouterLink> </li>
+        <li> <RouterLink to="/">电脑</RouterLink> </li>
+        <li> <RouterLink to="/">饰品</RouterLink> </li>
+        <li> <RouterLink to="/">医药</RouterLink> </li>
       </ul>
       <div class="search">
         <i class="iconfont icon-search"></i>
         <input type="text" placeholder="搜一搜">
       </div>
       <!-- 头部购物车 -->
-      <a href=""><i class="iconfont icon-gouwuche1"></i></a>
+      <a href=""><i class="iconfont icon-gouwuche"  style="font-size: 24px;"></i></a>
     </div>
   </header>
 </template>
@@ -90,7 +96,6 @@
       font-size: 18px;
       margin-left: 5px;
     }
-
     input {
       width: 140px;
       padding-left: 5px;

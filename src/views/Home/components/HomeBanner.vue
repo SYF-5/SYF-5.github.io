@@ -54,7 +54,7 @@ onMounted(() => {
     </div>
     <el-carousel v-else height="500px" :interval="4000" indicator-position="outside">
       <el-carousel-item v-for="(item, index) in bannerList" :key="index">
-        <img :src="item.picture"  />
+        <img :src="item.picture" />
       </el-carousel-item>
     </el-carousel>
   </div>

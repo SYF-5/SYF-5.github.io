@@ -1,0 +1,534 @@
+{
+  "cartItems": [
+    {
+      "id": 1,
+      "name": "无线蓝牙耳机",
+      "price": 299.00,
+      "quantity": 1,
+      "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+    },
+    {
+      "id": 2,
+      "name": "智能手表",
+      "price": 899.00,
+      "quantity": 1,
+      "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+    },
+    {
+      "id": 3,
+      "name": "便携式充电宝",
+      "price": 159.00,
+      "quantity": 2,
+      "image": "https://images.unsplash.com/photo-1609592810793-a0c149f1ee66?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+    }
+  ],
+  "shipping": 15.00,
+  "discount": 30.00,
+  "products": [
+    {
+      "id": 1,
+      "name": "新鲜芹菜",
+      "price": 10.5,
+      "picture": "https://ts1.tc.mm.bing.net/th/id/R-C.d1104979d0f6299ea171c29afde7904b?rik=s4Okjwh8qyTsew&riu=http%3a%2f%2fe0.ifengimg.com%2f02%2f2019%2f0703%2f8E809A800B446248CE02C136BDE8A2F36A292163_size147_w1125_h630.jpeg&ehk=JE2uImkMzZDsyE5%2fULWN3llthNR9IRVoQ4MNv4Lzcts%3d&risl=&pid=ImgRaw&r=0",
+      "description": "新鲜采摘的芹菜，清脆爽口",
+      "category": "vegetables",
+      "stock": 50,
+      "rating": 4.5
+    },
+    {
+      "id": 2,
+      "name": "云南香蕉",
+      "price": 15.0,
+      "picture": "https://ts3.tc.mm.bing.net/th/id/OIP-C.sXxttPbh4ml0xXQWXENAOwHaFS?rs=1&pid=ImgDetMain&o=7&rm=3",
+      "description": "来自云南的优质香蕉，香甜可口",
+      "category": "fruits",
+      "stock": 30,
+      "rating": 4.8
+    },
+    {
+      "id": 3,
+      "name": "进口橙子",
+      "price": 20.0,
+      "picture": "https://ts1.tc.mm.bing.net/th/id/R-C.45a3059ba1a6ec65f00872ed9db8e5bf?rik=YAsxx%2b3bfERH6Q&riu=http%3a%2f%2fn.sinaimg.cn%2fsinacn20191219ac%2f227%2fw640h387%2f20191219%2f690e-ikyziqw5268329.jpg&ehk=0wU0GKPJQCGjA%2bL01rUHg5MwcOBlf7qTUphDbYOSfbk%3d&risl=&pid=ImgRaw&r=0",
+      "description": "进口优质橙子，汁多味甜",
+      "category": "fruits",
+      "stock": 25,
+      "rating": 4.7
+    },
+    {
+      "id": 4,
+      "name": "新鲜鸡蛋",
+      "price": 12.0,
+      "picture": "https://img.shetu66.com/2023/04/17/1681710642578187.jpg",
+      "description": "优质小米，营养丰富",
+      "category": "grains",
+      "stock": 40,
+      "rating": 4.6
+    },
+    {
+      "id": 5,
+      "name": "优质小米",
+      "price": 18.0,
+      "picture": "https://p7.itc.cn/images01/20210923/db03ff8c0d584bc9a667fe2892c98401.png",
+      "description": "农家散养鸡蛋，新鲜健康",
+      "category": "eggs",
+      "stock": 60,
+      "rating": 4.9
+    },
+    {
+      "id": 6,
+      "name": "有机花菜",
+      "price": 8.5,
+      "picture": "https://ts1.tc.mm.bing.net/th/id/R-C.9c7f06ba8d350c898af9e544a04fda3c?rik=iLm%2bPvPRnVRQgw&riu=http%3a%2f%2fy1.ifengimg.com%2f80bb61d2cf264b6f%2f2013%2f0813%2frdn_5209ce1c0d446.jpg&ehk=Eq3jSbumI%2bVVyAFn8lk5dCBQPJ0zWRWhH4Rct6%2bNuKk%3d&risl=&pid=ImgRaw&r=0",
+      "description": "有机种植花菜，无农药残留",
+      "category": "vegetables",
+      "stock": 35,
+      "rating": 4.4
+    },
+    {
+      "id": 7,
+      "name": "金枕榴莲",
+      "price": 120,
+      "picture": "https://ts2.tc.mm.bing.net/th/id/OIP-C.Zj4-rJnWfD9OeP-StnjD_wHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
+      "description": "香甜可口，入口即化",
+      "category": "vegetables",
+      "stock": 35,
+      "rating": 4.4
+    },
+    {
+      "id": 8,
+      "name": "农家鸡",
+      "price": 120,
+      "picture": "https://ts1.tc.mm.bing.net/th/id/R-C.a6d5d14c13ad32a54304a1930e0d43e8?rik=KArd55Cun%2f0XVg&riu=http%3a%2f%2fn.sinaimg.cn%2fsinakd10100%2f114%2fw571h343%2f20200408%2f24e7-iryninw2802429.jpg&ehk=ljuJ%2bJ2cHIA9VgeoPktnbyCSC2%2bvnjCRY90ZS0ZiHzA%3d&risl=&pid=ImgRaw&r=0",
+      "description": "香甜可口，入口即化",
+      "category": "vegetables",
+      "stock": 35,
+      "rating": 4.4
+    }
+  ],
+  "Banner": [
+    {
+      "picture": "https://bpic.588ku.com/templet_pic/21/11/17/b516bd9c1933b2fcb5f01af93a3a8708.jpg!/fw/750/quality/90/unsharp/true/compress/true",
+      "link": "/category/1"
+    },
+    {
+      "picture": "https://bpic.588ku.com/illus_list_pic/21/01/21/d8e45785c4edfdbb57ee9fe0b9d9a55a.jpg",
+      "link": "/category/2"
+    },
+    {
+      "picture": "https://pic.vjshi.com/2020-11-23/9963b81eaad9e319319169c453e9ed28/00002.jpg?x-oss-process=style/watermark",
+      "link": "/category/3"
+    },
+    {
+      "picture": "https://ts3.tc.mm.bing.net/th/id/OIP-C.G810MxFbyXlnzNS14LHnJwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3",
+      "link": "/category/4"
+    }
+  ],
+  "list": [
+    {
+      "id": 1,
+      "name": "居家",
+      "children": [
+        "家纺厨具",
+        "家具家电"
+      ],
+      "goods": [
+        {
+          "id": 1,
+          "name": "空调",
+          "desc": "冷暖随心，静享舒适",
+          "price": 1288.00,
+          "picture": "https://www.ssxjd.com/d/ueditor/php/upload/20200408/15863574894276.jpg"
+        },
+        {
+          "id": 2,
+          "name": "四件套",
+          "desc": "亲肤透气，安眠整晚",
+          "price": 120.00,
+          "picture": "https://ts4.tc.mm.bing.net/th/id/OIP-C.WADG0Dz44vrXcMp7Wzu_eAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 3,
+          "name": "沙发",
+          "desc": "承托有力，久坐不累",
+          "price": 500.00,
+          "picture": "https://pic1.zhimg.com/50/v2-ff9167900809985a1c64def3e186d602_hd.jpg?source=1940ef5c"
+        },
+        {
+          "id": 4,
+          "name": "收纳柜",
+          "desc": "分区合理，告别杂乱",
+          "price": 45.00,
+          "picture": "https://img.alicdn.com/bao/uploaded/i1/2031904388/O1CN01pY4e7g1iHkngdKNtq_!!2031904388.jpg"
+        },
+        {
+          "id": 5,
+          "name": "炒锅",
+          "desc": "导热迅速，轻油烟",
+          "price": 68.00,
+          "picture": "https://m.360buyimg.com/mobilecms/s750x750_jfs/t1/68971/31/18256/80057/633e2e0dEa36aacef/dcbf8ab719359a96.jpg!q80.dpg"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "美食",
+      "children": [
+        "南北干货",
+        "水果蔬菜"
+      ],
+      "goods": [
+        {
+          "id": 6,
+          "name": "进口巧克力",
+          "desc": "丝滑口感，多种口味",
+          "price": 65.00,
+          "picture": "https://img95.699pic.com/photo/60072/4235.jpg_wh860.jpg"
+        },
+        {
+          "id": 7,
+          "name": "新鲜香蕉",
+          "desc": "产地直供，新鲜送达",
+          "price": 15.00,
+          "picture": "https://ts3.tc.mm.bing.net/th/id/OIP-C.sXxttPbh4ml0xXQWXENAOwHaFS?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 7,
+          "name": "新鲜蔬菜",
+          "desc": "新鲜有机，健康蔬菜",
+          "price": 5.00,
+          "picture": "https://img95.699pic.com/photo/50112/0998.jpg_wh860.jpg"
+        },
+        {
+          "id": 7,
+          "name": "品质肉类",
+          "desc": "新鲜肉质，拒绝冷冻",
+          "price": 28.00,
+          "picture": "https://ts1.tc.mm.bing.net/th/id/R-C.405c90e6c21e8c20ab73613c24d9912b?rik=3Cy3Akfx%2f6JtAw&riu=http%3a%2f%2fwww.zxfccy.com%2fupLoad%2fnews%2fmonth_1801%2f201801032036277248.jpg&ehk=SqZWQMxbv%2bVCXo6igX%2bz0RRjq1rz4%2bjHGrI%2bO15%2bqNU%3d&risl=&pid=ImgRaw&r=0"
+        },
+        {
+          "id": 7,
+          "name": "牛奶",
+          "desc": "奶香醇厚，回味无穷",
+          "price": 10.00,
+          "picture": "https://pic2.zhimg.com/v2-47a8d19c8e5d8edf514109d0cd76e151_r.jpg"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "服饰",
+      "children": [
+        "男装女装",
+        "鞋靴箱包"
+      ],
+      "goods": [
+        {
+          "id": 8,
+          "name": "时尚连衣裙",
+          "desc": "剪裁利落，优雅气质",
+          "price": 299.00,
+          "picture": "https://img.alicdn.com/bao/uploaded/i4/817388703/O1CN01WN6fLx2EA1dWKdk3Q_!!0-item_pic.jpg"
+        },
+        {
+          "id": 9,
+          "name": "休闲裤",
+          "desc": "面料柔软，自在出行",
+          "price": 99.00,
+          "picture": "https://imgservice.suning.cn/uimg1/b2c/image/ip095vMtlLcDy1KTJDZWtw.jpg"
+        },
+        {
+          "id": 9,
+          "name": "运动鞋",
+          "desc": "回弹缓震，畅快运动",
+          "price": 199.00,
+          "picture": "https://img95.699pic.com/photo/60077/9522.jpg_wh860.jpg"
+        },
+        {
+          "id": 9,
+          "name": "通勤包",
+          "desc": "简约有容，商务伴侣",
+          "price": 119.00,
+          "picture": "https://img.alicdn.com/bao/uploaded/i2/849566063/O1CN01ByX7uR1ueu7hWqG7M_!!849566063.jpg"
+        },
+        {
+          "id": 9,
+          "name": "羽绒服",
+          "desc": "锁温保暖，无惧严寒",
+          "price": 199.00,
+          "picture": "https://cbu01.alicdn.com/img/ibank/O1CN01Dztt1U22wmb1Vrk3Q_!!2214683767185-0-cib.jpg?__r__=1691073551513"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "母婴",
+      "children": [
+        "奶粉尿裤",
+        "童装玩具"
+      ],
+      "goods": [
+        {
+          "id": 8,
+          "name": "婴儿奶粉",
+          "desc": "春营养全面，助力成长夏新款，优雅时尚",
+          "price": 299.00,
+          "picture": "https://ts4.tc.mm.bing.net/th/id/OIP-C.zY8vRBoEmWhGybbOrQiK7gHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 9,
+          "name": "纸尿裤 ",
+          "desc": "透气干爽，呵护屁屁",
+          "price": 79.00,
+          "picture": "https://img.alicdn.com/i1/839648224/O1CN01Dt7P3j2Ace5axYyGm_!!839648224.jpg"
+        },
+        {
+          "id": 9,
+          "name": "连体衣 ",
+          "desc": "穿脱方便，温和亲肤",
+          "price": 89.00,
+          "picture": "https://cbu01.alicdn.com/img/ibank/O1CN01BuKOQb1TfMwB8lla3_!!2212743172409-0-cib.jpg?__r__=1676875204567"
+        },
+        {
+          "id": 9,
+          "name": "积木玩具 ",
+          "desc": "安全益智，激发创意",
+          "price": 39.00,
+          "picture": "https://img95.699pic.com/photo/60016/5831.jpg_wh860.jpg"
+        },
+        {
+          "id": 9,
+          "name": "婴儿推车 ",
+          "desc": "推行顺滑，安睡摇篮",
+          "price": 129.00,
+          "picture": "https://img.alicdn.com/bao/uploaded/i2/2194740505/O1CN01jnl94C1FbKo8nHtSn_!!0-item_pic.jpg"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "手机",
+      "children": [
+        "新款手机",
+        "手机挂件"
+      ],
+      "goods": [
+        {
+          "id": 8,
+          "name": "手机壳",
+          "desc": "春个性防护，耐摔防刮夏新款，优雅时尚",
+          "price": 25.00,
+          "picture": "https://cbu01.alicdn.com/img/ibank/2019/953/884/12186488359_2081618356.jpg"
+        },
+        {
+          "id": 9,
+          "name": "充电宝",
+          "desc": "舒适透气大容量，随时续航，适合运动",
+          "price": 128.00,
+          "picture": "https://imgs.699pic.com/images/600/101/088.jpg!detail.v1"
+        },
+        {
+          "id": 9,
+          "name": "蓝牙耳机",
+          "desc": "舒适透气， 无线畅听，沉浸音质适合运动",
+          "price": 150.00,
+          "picture": "https://pic4.zhimg.com/v2-2e6d3e0bf68bbd21e9e72c440ab5825b_r.jpg"
+        },
+        {
+          "id": 9,
+          "name": "数据线",
+          "desc": "快充传输，坚韧耐用",
+          "price": 199.00,
+          "picture": "https://ts1.tc.mm.bing.net/th/id/R-C.cce0baf0dfc9c9feea697f9af5b4b512?rik=Hwol7fEEggoRPw&riu=http%3a%2f%2fi7.qhmsg.com%2ft01397013cd9afd080e.jpg&ehk=PC09aq97AarP3QEWVswMfikRlJA0PKOoX%2b8ICRIVeN8%3d&risl=&pid=ImgRaw&r=0"
+        },
+        {
+          "id": 9,
+          "name": "钢化膜",
+          "desc": "高清护眼，防爆防窥",
+          "price": 19.00,
+          "picture": "https://img.alicdn.com/i2/2208970970555/O1CN015l1Ulk1FyEYmSVLWY_!!2208970970555.jpg"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "美妆",
+      "children": [
+        "彩妆护肤",
+        "香氛美妆"
+      ],
+      "goods": [
+        {
+          "id": 8,
+          "name": "口红",
+          "desc": "显色持妆，提亮气色",
+          "price": 259.00,
+          "picture": "https://ts2.tc.mm.bing.net/th/id/OIP-C.AnSbIXrDcikWBnXTl_Qn8gHaFj?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 9,
+          "name": "粉底液",
+          "desc": "轻薄遮瑕，持妆贴服",
+          "price": 199.00,
+          "picture": "https://ts2.tc.mm.bing.net/th/id/OIP-C.AYXSXUF2gkKcUi2kDCVGiQHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 9,
+          "name": "精华液",
+          "desc": "深润修护，焕活肌肤",
+          "price": 98.00,
+          "picture": "https://d.ifengimg.com/q100/img1.ugc.ifeng.com/newugc/20210423/8/wemedia/683ddd4a638136e1aa684ede6f12fd2568b7ccd1_size40_w1000_h1000.jpg"
+        },
+        {
+          "id": 9,
+          "name": "淡香氛",
+          "desc": "清新留香，愉悦自我",
+          "price": 59.00,
+          "picture": "https://ts3.tc.mm.bing.net/th/id/OIP-C.UBiSUq3D1Y3hKPWkLg2CeAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 9,
+          "name": "面膜",
+          "desc": "密集补水，即刻水润",
+          "price": 20.00,
+          "picture": "https://pic2.zhimg.com/v2-b5c6d8d50d0dfe021e2a83b009a2031a_r.jpg?source=1940ef5c"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "电脑",
+      "children": [
+        "整机配件",
+        "办公外设"
+      ],
+      "goods": [
+        {
+          "id": 8,
+          "name": "笔记本电脑",
+          "desc": "轻薄高性能，随行创作",
+          "price": 5999.00,
+          "picture": "https://ts4.tc.mm.bing.net/th/id/OIP-C.MC6ragYNYDSkedQXurqfIAHaFj?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 9,
+          "name": "机械键盘",
+          "desc": "手感清脆，响应迅捷",
+          "price": 199.00,
+          "picture": "https://pic4.zhimg.com/v2-88617b29552ca8ac4b1f64873d78b798_r.jpg"
+        },
+        {
+          "id": 9,
+          "name": "显示器 ",
+          "desc": "广色域，护眼低蓝光",
+          "price": 1500.00,
+          "picture": "https://pic2.zhimg.com/v2-a435a90bb84b49a6d19d66a47f9e695d_r.jpg"
+        },
+        {
+          "id": 9,
+          "name": " 鼠标",
+          "desc": "符合人体工学，精准定位",
+          "price": 156.00,
+          "picture": "https://ts1.tc.mm.bing.net/th/id/R-C.ee85a354362c21218b565917043731ea?rik=MC1bIFvPXZgnKw&riu=http%3a%2f%2fres-sh.clpcdn.com%2fpmspic%2fItemPicture%2f20005%2f20055%2f20357%2f48781%2fYZ%2f48781_4768965.jpg&ehk=%2f1HCZCEFb4wp7HL7gXB%2f1S6nuWPPGxHSSqy0bfm1SRo%3d&risl=&pid=ImgRaw&r=0"
+        },
+        {
+          "id": 9,
+          "name": "U盘",
+          "desc": "大空间，传输稳定",
+          "price": 39.00,
+          "picture": "https://ts3.tc.mm.bing.net/th/id/OIP-C.GmU75Juo9DVqK-HWuA-QegHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "饰品",
+      "children": [
+        "时尚首饰",
+        "精品腕表"
+      ],
+      "goods": [
+        {
+          "id": 8,
+          "name": "项链",
+          "desc": "精致链坠，点缀颈间",
+          "price": 799.00,
+          "picture": "https://img.alicdn.com/bao/uploaded/i2/2214943323975/O1CN011Uxdbc1fEb9mtWiKH_!!2214943323975.jpg"
+        },
+        {
+          "id": 9,
+          "name": "手链",
+          "desc": "简约设计，腕上风情",
+          "price": 59.00,
+          "picture": "https://img.alicdn.com/imgextra/i3/2207654022855/O1CN01pKRHAC1WxdMWWglmt_!!2207654022855.jpg"
+        },
+        {
+          "id": 9,
+          "name": "耳钉",
+          "desc": "小巧点睛，闪耀耳畔",
+          "price": 59.00,
+          "picture": "https://img.alicdn.com/i3/2324319703/O1CN01Ci1QIU2LY1nXmP8lg_!!2324319703.jpg"
+        },
+        {
+          "id": 9,
+          "name": "石英表",
+          "desc": "走时精准，简约时尚",
+          "price": 599.00,
+          "picture": "https://ts4.tc.mm.bing.net/th/id/OIP-C.FRszo4AHR6_Z2VqYWAK2KgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 9,
+          "name": "时尚戒指",
+          "desc": "个性宣言，摩登搭配",
+          "price": 999.00,
+          "picture": "https://cbu01.alicdn.com/img/ibank/O1CN01RVuFNH21PW6OI7MOx_!!3383596977-0-cib.jpg"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "医药",
+      "children": [
+        "滋补保健",
+        "常备药品"
+      ],
+      "goods": [
+        {
+          "id": 8,
+          "name": "维生素C ",
+          "desc": "增强免疫，日常必备",
+          "price": 49.00,
+          "picture": "https://ts4.tc.mm.bing.net/th/id/OIP-C.0PsUWUp-nMkStWBnBFN2qQHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 9,
+          "name": "创可贴",
+          "desc": "防水护创，快速愈合",
+          "price": 10.00,
+          "picture": "https://ts3.tc.mm.bing.net/th/id/OIP-C.xbPw-9huY80WFAmMocWiqQHaFj?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 9,
+          "name": "感冒冲剂 ",
+          "desc": "缓解症状，身心舒畅",
+          "price": 13.90,
+          "picture": "https://img.alicdn.com/bao/uploaded/i4/2200669155710/O1CN01AnEMSz1s3ENhnBMsV_!!2200669155710-0-scmitem8000.jpg"
+        },
+        {
+          "id": 9,
+          "name": "枸杞",
+          "desc": "滋补养生，元气之选",
+          "price": 30.00,
+          "picture": "https://ts1.tc.mm.bing.net/th/id/OIP-C.3t2yDglSde7lPUrpR6LKbAHaE7?rs=1&pid=ImgDetMain&o=7&rm=3"
+        },
+        {
+          "id": 9,
+          "name": "体温计",
+          "desc": "精准测量，一秒读数",
+          "price": 19.00,
+          "picture": "https://cbu01.alicdn.com/img/ibank/O1CN01UKQT101yegOTl43Dl_!!2233776604-0-cib.jpg"
+        }
+      ]
+    }
+  ]
+}
