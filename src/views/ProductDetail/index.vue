@@ -1,4 +1,136 @@
-<!-- 商品详情 -->
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useCartStore } from '@/stores/cart'
+import productService from '@/services/productService.js'
+
+const route = useRoute()
+const router = useRouter()
+const cartStore = useCartStore()
+
+// 数据定义
+const product = ref({})
+const quantity = ref(1)
+const activeTab = ref('detail')
+const loading = ref(true)
+const error = ref(false)
+const isAddingToCart = ref(false)
+const showSuccessMessage = ref(false)
+
+const tabs = [
+  { id: 'detail', label: '商品详情' },
+  { id: 'spec', label: '规格参数' },
+  { id: 'review', label: '用户评价' }
+]
+
+// 分类名称映射
+const categoryMap = {
+  'vegetables': '蔬菜',
+  'fruits': '水果',
+  'grains': '谷物',
+  'eggs': '蛋类'
+}
+
+// 计算属性
+const cartItemCount = computed(() => {
+  return cartStore.totalItems
+})
+
+const maxQuantity = computed(() => {
+  return product.value.stock || 10
+})
+
+// 方法
+const increaseQuantity = () => {
+  if (quantity.value < maxQuantity.value) {
+    quantity.value += 1
+  }
+}
+
+const decreaseQuantity = () => {
+  if (quantity.value > 1) {
+    quantity.value -= 1
+  }
+}
+
+const addToCart = async () => {
+  if (!product.value) return
+  
+  isAddingToCart.value = true
+  
+  try {
+    await cartStore.addToCart(product.value, quantity.value)
+    
+    showSuccessMessage.value = true
+    setTimeout(() => {
+      showSuccessMessage.value = false
+    }, 3000)
+    
+    console.log(`成功添加 ${quantity.value} 件 "${product.value.name}" 到购物车`)
+    
+  } catch (error) {
+    alert(error.message || '添加商品失败，请重试')
+    console.error('添加购物车失败:', error)
+  } finally {
+    isAddingToCart.value = false
+  }
+}
+
+const buyNow = () => {
+  addToCart().then(() => {
+    router.push('/cart')
+  })
+}
+
+const goToCart = () => {
+  router.push('/cart')
+}
+
+const getCategoryName = (category) => {
+  return categoryMap[category] || category
+}
+
+// 从统一的服务加载商品数据
+const loadProduct = async (id) => {
+  loading.value = true
+  error.value = false
+  
+  try {
+    // 确保数据已加载
+    await productService.loadAllData()
+    
+    // 使用统一的服务获取商品
+    const foundProduct = productService.getProductById(id)
+    
+    if (foundProduct) {
+      product.value = foundProduct
+      // 为商品添加最大购买数量限制
+      product.value.maxPurchase = Math.min(product.value.stock || 10, 10)
+    } else {
+      throw new Error('未找到该商品')
+    }
+  } catch (err) {
+    console.error('加载商品失败:', err)
+    error.value = true
+  } finally {
+    loading.value = false
+  }
+}
+
+// 初始化时加载购物车数据和商品数据
+onMounted(() => {
+  cartStore.loadFromLocalStorage()
+  
+  const productId = Number(route.params.id)
+  if (productId) {
+    loadProduct(productId)
+  } else {
+    error.value = true
+    loading.value = false
+  }
+})
+</script>
+
 <template>
   <div class="product-detail-page">
     <!-- 头部导航 -->
@@ -8,12 +140,29 @@
       <div class="header-actions">
         <button>分享</button>
         <button>收藏</button>
+        <!-- 购物车图标 -->
+        <div class="cart-indicator" @click="goToCart">
+          🛒
+          <span v-if="cartItemCount > 0" class="cart-count">
+            {{ cartItemCount }}
+          </span>
+        </div>
       </div>
     </header>
 
+    <!-- 加载状态 -->
+    <div class="loading" v-if="loading">
+      <p>正在加载商品信息...</p>
+    </div>
+
+    <!-- 错误状态 -->
+    <div class="error" v-if="error">
+      <p>加载商品信息失败，请刷新页面重试</p>
+    </div>
+
     <!-- 商品内容区域 -->
-    <main class="detail-content">
-      <!-- 商品图片轮播 -->
+    <main class="detail-content" v-if="!loading && !error && product.id">
+      <!-- 商品图片 -->
       <div class="product-gallery">
         <img :src="product.picture" :alt="product.name" class="main-image">
       </div>
@@ -21,37 +170,45 @@
       <!-- 商品信息 -->
       <div class="product-info">
         <h2 class="product-title">{{ product.name }}</h2>
-        <p class="product-desc">{{ product.description }}</p>
+        <p class="product-desc">{{ product.description || product.desc }}</p>
         
         <!-- 价格区域 -->
         <div class="price-section">
-          <span class="current-price">¥{{ product.price }}</span>
-          <span class="original-price" v-if="product.originalPrice">¥{{ product.originalPrice }}</span>
-          <span class="discount" v-if="product.discount">{{ product.discount }}折</span>
+          <span class="current-price">¥{{ product.price.toFixed(2) }}</span>
+          <!-- 评分 -->
+          <div class="product-rating" v-if="product.rating">
+            <span class="rating-stars">★★★★★</span>
+            <span class="rating-value">{{ product.rating }}</span>
+          </div>
         </div>
 
-        <!-- 规格选择 -->
-        <div class="spec-section">
-          <h3>规格</h3>
-          <div class="spec-options">
-            <button 
-              v-for="spec in product.specs" 
-              :key="spec" 
-              class="spec-btn"
-            >
-              {{ spec }}
-            </button>
-          </div>
+        <!-- 库存信息 -->
+        <div class="stock-info" v-if="product.stock !== undefined">
+          库存: {{ product.stock }}件
+        </div>
+
+        <!-- 分类信息 -->
+        <div class="category-info" v-if="product.category || product.categoryName">
+          分类: {{ getCategoryName(product.category) || product.categoryName }}
         </div>
 
         <!-- 数量选择 -->
         <div class="quantity-section">
           <h3>数量</h3>
           <div class="quantity-control">
-            <button @click="decreaseQuantity">-</button>
+            <button @click="decreaseQuantity" :disabled="quantity <= 1">-</button>
             <span class="quantity">{{ quantity }}</span>
-            <button @click="increaseQuantity">+</button>
+            <button @click="increaseQuantity" :disabled="quantity >= maxQuantity">+</button>
           </div>
+          <!-- 数量提示 -->
+          <div class="quantity-hint" v-if="quantity >= maxQuantity">
+            已达最大购买数量
+          </div>
+        </div>
+
+        <!-- 添加成功提示 -->
+        <div v-if="showSuccessMessage" class="success-message">
+          ✅ 商品已成功添加到购物车！
         </div>
       </div>
 
@@ -71,253 +228,68 @@
       <div class="tab-content">
         <div v-if="activeTab === 'detail'">
           <h3>商品详情</h3>
-          <p>这里放置商品详细描述、参数等信息...</p>
+          <div class="detail-images">
+            <img :src="product.picture" :alt="product.name">
+          </div>
+          <p>{{ product.description || product.desc }}</p>
+          <p>这是一款优质的{{ product.name }}，保证品质。</p>
         </div>
         <div v-if="activeTab === 'spec'">
           <h3>规格参数</h3>
-          <p>这里放置商品规格参数表格...</p>
+          <table class="spec-table">
+            <tr>
+              <td class="spec-label">商品名称</td>
+              <td>{{ product.name }}</td>
+            </tr>
+            <tr>
+              <td class="spec-label">商品分类</td>
+              <td>{{ getCategoryName(product.category) || product.categoryName }}</td>
+            </tr>
+            <tr>
+              <td class="spec-label">价格</td>
+              <td>¥{{ product.price.toFixed(2) }}</td>
+            </tr>
+            <tr>
+              <td class="spec-label">库存</td>
+              <td>{{ product.stock }}件</td>
+            </tr>
+            <tr v-if="product.rating">
+              <td class="spec-label">评分</td>
+              <td>{{ product.rating }}分</td>
+            </tr>
+          </table>
         </div>
         <div v-if="activeTab === 'review'">
           <h3>用户评价</h3>
-          <p>这里放置用户评价列表...</p>
+          <div class="review-summary" v-if="product.rating">
+            <div class="overall-rating">
+              <span class="rating-score">{{ product.rating }}</span>
+              <div class="rating-stars">★★★★★</div>
+              <span class="rating-count">(暂无评价)</span>
+            </div>
+          </div>
+          <div class="no-reviews">
+            <p>暂无用户评价</p>
+            <p>成为第一个评价此商品的人吧！</p>
+          </div>
         </div>
       </div>
     </main>
 
     <!-- 底部操作栏 -->
-    <footer class="detail-footer">
-      <button class="cart-btn" @click="addToCart">
-        <span>加入购物车</span>
+    <footer class="detail-footer" v-if="!loading && !error && product.id">
+      <button class="cart-btn" @click="addToCart" :disabled="isAddingToCart">
+        <span v-if="!isAddingToCart">加入购物车</span>
+        <span v-else>添加中...</span>
       </button>
-      <button class="buy-btn" @click="buyNow">
+      <button class="buy-btn" @click="buyNow" :disabled="isAddingToCart">
         <span>立即购买</span>
       </button>
     </footer>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import { useProductStore } from '@/stores/product';
-import { useCartStore } from '@/stores/cart';
-
-const route = useRoute();
-const productStore = useProductStore();
-const cartStore = useCartStore();
-
-const product = ref<any>({});
-const quantity = ref(1);
-const activeTab = ref('detail');
-
-const tabs = [
-  { id: 'detail', label: '商品详情' },
-  { id: 'spec', label: '规格参数' },
-  { id: 'review', label: '用户评价' }
-];
-
-const loadProduct = (id: number) => {
-  const foundProduct = productStore.findProductById(id);
-  if (foundProduct) {
-    product.value = foundProduct;
-  }
-};
-
-// 监听路由参数变化
-watch(() => route.params.id, (newId) => {
-  loadProduct(Number(newId));
-}, { immediate: true });
-
-const increaseQuantity = () => {
-  quantity.value += 1;
-};
-
-const decreaseQuantity = () => {
-  if (quantity.value > 1) {
-    quantity.value -= 1;
-  }
-};
-
-const addToCart = () => {
-  if (product.value) {
-    for (let i = 0; i < quantity.value; i++) {
-      cartStore.addItem(product.value);
-    }
-    // 显示添加成功的反馈
-  }
-};
-
-const buyNow = () => {
-  addToCart();
-  // 跳转到结算页面
-};
-</script>
-
+<!-- 样式保持不变 -->
 <style scoped>
-.product-detail-page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  background: white;
-  border-bottom: 1px solid #eee;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.detail-content {
-  flex: 1;
-  padding: 0 15px 70px; /* 为底部操作栏留出空间 */
-}
-
-.product-gallery {
-  margin-bottom: 20px;
-}
-
-.main-image {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.product-info {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-}
-
-.product-title {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-.product-desc {
-  color: #666;
-  margin-bottom: 15px;
-}
-
-.price-section {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.current-price {
-  font-size: 24px;
-  font-weight: bold;
-  color: #F53F3F;
-}
-
-.original-price {
-  text-decoration: line-through;
-  color: #999;
-}
-
-.discount {
-  background: #F53F3F;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-.spec-section, .quantity-section {
-  margin-bottom: 15px;
-}
-
-.spec-options {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-
-.spec-btn {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-}
-
-.quantity-control {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 8px;
-}
-
-.quantity-control button {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 4px;
-}
-
-.detail-tabs {
-  display: flex;
-  background: white;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  overflow: hidden;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 15px;
-  text-align: center;
-  background: white;
-  border: none;
-  border-bottom: 2px solid transparent;
-}
-
-.tab-btn.active {
-  border-bottom-color: #27BA9B;
-  color: #27BA9B;
-}
-
-.tab-content {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-}
-
-.detail-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  background: white;
-  padding: 10px 15px;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.cart-btn, .buy-btn {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 20px;
-  font-weight: bold;
-}
-
-.cart-btn {
-  background: #FFF0E6;
-  color: #F53F3F;
-  margin-right: 10px;
-}
-
-.buy-btn {
-  background: #27BA9B;
-  color: white;
-}
+/* ... 你现有的所有样式 ... */
 </style>

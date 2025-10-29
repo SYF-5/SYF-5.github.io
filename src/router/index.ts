@@ -20,21 +20,28 @@ const router = createRouter({
         {
           path: 'category',
           component: Category
+        },
+        {
+          path: 'cart',
+          component: Cart
+        },
+        // 将商品详情页也放在Layout下，保持布局一致
+        {
+          path: 'product/:id',
+          component: ProductDetail,
+          props: true
         }
       ]
-    },
-    {
-      path: '/product/:id', // 商品详情页作为一级路由
-      component: ProductDetail,
-      props: true // 将路由参数作为props传递给组件
     },
     {
       path: '/login',
       component: Login
     },
+    // 保留一级路由的商品详情页，用于直接访问
     {
-      path: '/cart',
-      component: Cart
+      path: '/product/:id',
+      component: ProductDetail,
+      props: true
     }
   ]
 })

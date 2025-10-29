@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { useRouter } from 'vue-router'
+import productService from '@/services/productService.js'
+
+const router = useRouter()
 
 // 响应式数据存储分类数据
 const categoryList = ref([])
@@ -10,35 +13,22 @@ const loading = ref(true)
 const fetchCategoryData = async () => {
   try {
     loading.value = true
-    // 请求goods.json数据
-    const response = await axios.get('/goods.json')
     
-    // 假设返回的数据结构为 { "list": [...] }
-    if (response.data.list && response.data.list.length > 0) {
-      categoryList.value = response.data.list
+    // 使用商品服务加载数据
+    await productService.loadAllData()
+    
+    // 获取分类列表（只包含id, name, children）
+    const categories = productService.getCategories()
+    
+    if (categories && categories.length > 0) {
+      categoryList.value = categories
     } else {
       // 如果获取数据失败，使用默认数据
       categoryList.value = [
         {
           id: 1,
           name: "居家",
-          children: ["床上用品", "家具", "收纳"],
-          goods: [
-            {
-              id: 1,
-              name: "男士外套",
-              desc: "男士外套，冬季必选",
-              price: 200.00,
-              picture: "https://via.placeholder.com/95x95?text=Product"
-            },
-            {
-              id: 2,
-              name: "女士毛衣",
-              desc: "温暖舒适，时尚百搭",
-              price: 150.00,
-              picture: "https://via.placeholder.com/95x95?text=Product"
-            }
-          ]
+          children: ["床上用品", "家具", "收纳"]
         }
       ]
     }
@@ -49,21 +39,40 @@ const fetchCategoryData = async () => {
       {
         id: 1,
         name: "居家",
-        children: ["床上用品", "家具"],
-        goods: [
-          {
-            id: 1,
-            name: "默认商品",
-            desc: "商品描述",
-            price: 100.00,
-            picture: "https://via.placeholder.com/95x95?text=Default"
-          }
-        ]
+        children: ["床上用品", "家具"]
       }
     ]
   } finally {
     loading.value = false
   }
+}
+
+// 处理子分类点击事件
+const handleSubCategoryClick = (categoryId, categoryName, subCategoryName) => {
+  console.log(`点击了 ${categoryName} - ${subCategoryName}`)
+  
+  // 获取该分类下的商品
+  const categoryGoods = productService.getGoodsByCategoryId(categoryId)
+  
+  if (categoryGoods && categoryGoods.length > 0) {
+    // 跳转到该分类下的第一个商品
+    const firstProduct = categoryGoods[0]
+    router.push(`/product/${firstProduct.id}`)
+  } else {
+    // 如果没有商品，显示提示
+    alert('该分类下暂无商品')
+  }
+}
+
+// 处理商品点击事件
+const handleProductClick = (productId) => {
+  console.log(`点击了商品 ID: ${productId}`)
+  router.push(`/product/${productId}`)
+}
+
+// 获取分类的商品列表
+const getCategoryGoods = (categoryId) => {
+  return productService.getGoodsByCategoryId(categoryId) || []
 }
 
 // 组件挂载时获取数据
@@ -83,24 +92,30 @@ onMounted(() => {
       <!-- 遍历分类数据 -->
       <li v-for="category in categoryList" :key="category.id">
         <!-- 主分类 -->
-        <RouterLink to="/">{{ category.name }}</RouterLink>
+        <RouterLink to="/category">{{ category.name }}</RouterLink>
         
         <!-- 子分类 -->
-        <RouterLink 
+        <a 
           v-for="child in category.children" 
           :key="child" 
-          to="/"
+          href="javascript:;"
+          @click="handleSubCategoryClick(category.id, category.name, child)"
+          class="sub-category-link"
         >
           {{ child }}
-        </RouterLink>
+        </a>
         
         <!-- 弹层layer位置 -->
         <div class="layer">
           <h4>分类推荐 <small>根据您的购买或浏览记录推荐</small></h4>
           <ul>
-            <!-- 遍历商品数据 -->
-            <li v-for="product in category.goods" :key="product.id">
-              <RouterLink to="/">
+            <!-- 遍历该分类的商品数据 -->
+            <li v-for="product in getCategoryGoods(category.id)" :key="product.id">
+              <a 
+                href="javascript:;" 
+                @click="handleProductClick(product.id)"
+                class="product-link"
+              >
                 <img :src="product.picture" :alt="product.name" />
                 <div class="info">
                   <p class="name ellipsis-2">
@@ -109,7 +124,7 @@ onMounted(() => {
                   <p class="desc ellipsis">{{ product.desc }}</p>
                   <p class="price"><i>¥</i>{{ product.price.toFixed(2) }}</p>
                 </div>
-              </RouterLink>
+              </a>
             </li>
           </ul>
         </div>
@@ -118,6 +133,7 @@ onMounted(() => {
   </div>
 </template>
 
+<!-- 样式保持不变 -->
 <style scoped lang='scss'>
 .home-category {
   width: 250px;
@@ -148,6 +164,15 @@ onMounted(() => {
 
         &:first-child {
           font-size: 16px;
+        }
+
+        &.sub-category-link {
+          font-size: 14px;
+          cursor: pointer;
+          
+          &:hover {
+            color: #ffd04b;
+          }
         }
       }
 
@@ -196,6 +221,7 @@ onMounted(() => {
               align-items: center;
               padding: 10px;
               color: #333;
+              cursor: pointer;
 
               &:hover {
                 background: #e3f9f4;
@@ -236,7 +262,6 @@ onMounted(() => {
         }
       }
 
-      // 关键样式  hover状态下的layer盒子变成block
       &:hover {
         .layer {
           display: block;
