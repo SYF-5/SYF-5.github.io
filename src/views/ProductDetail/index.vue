@@ -16,6 +16,8 @@ const loading = ref(true)
 const error = ref(false)
 const isAddingToCart = ref(false)
 const showSuccessMessage = ref(false)
+// 添加图片加载状态
+const imageLoaded = ref(false)
 
 const tabs = [
   { id: 'detail', label: '商品详情' },
@@ -90,10 +92,51 @@ const getCategoryName = (category) => {
   return categoryMap[category] || category
 }
 
+// 图片加载完成处理
+const handleImageLoad = () => {
+  imageLoaded.value = true
+  console.log('商品图片加载成功')
+}
+
+// 图片加载错误处理
+const handleImageError = (event) => {
+  console.error('商品图片加载失败:', event)
+  imageLoaded.value = true // 即使失败也隐藏占位符
+  
+  // 设置默认错误图片
+  const img = event.target
+  img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7lm77niYfpnZ7lu7o8L3RleHQ+PC9zdmc+'
+}
+
+// 处理图片URL - 确保路径正确
+const getImageUrl = (picturePath) => {
+  if (!picturePath) {
+    console.warn('图片路径为空')
+    return ''
+  }
+  
+  // 如果已经是完整URL，直接返回
+  if (picturePath.startsWith('http')) {
+    return picturePath
+  }
+  
+  // 确保本地图片路径正确
+  if (picturePath.startsWith('/')) {
+    return picturePath
+  } else if (picturePath.startsWith('./')) {
+    return picturePath
+  } else {
+    // 如果路径没有斜杠，添加斜杠
+    return `/${picturePath}`
+  }
+}
+
 // 从统一的服务加载商品数据
 const loadProduct = async (id) => {
   loading.value = true
   error.value = false
+  // 重置图片加载状态
+  imageLoaded.value = false
   
   try {
     // 确保数据已加载
@@ -106,6 +149,11 @@ const loadProduct = async (id) => {
       product.value = foundProduct
       // 为商品添加最大购买数量限制
       product.value.maxPurchase = Math.min(product.value.stock || 30, 30)
+      
+      // 调试：打印商品信息和图片路径
+      console.log('加载的商品数据:', product.value)
+      console.log('商品图片路径:', product.value.picture)
+      console.log('处理后的图片路径:', getImageUrl(product.value.picture))
     } else {
       throw new Error('未找到该商品')
     }
@@ -162,9 +210,18 @@ onMounted(() => {
 
     <!-- 商品内容区域 -->
     <main class="detail-content" v-if="!loading && !error && product.id">
-      <!-- 商品图片 -->
+      <!-- 商品图片 - 使用懒加载 -->
       <div class="product-gallery">
-        <img :src="product.picture" :alt="product.name" class="main-image">
+        <!-- 使用懒加载指令替换原来的 :src -->
+        <img 
+          v-lazy="getImageUrl(product.picture)" 
+          :alt="product.name" 
+          class="main-image"
+          @load="handleImageLoad"
+          @error="handleImageError"
+        />
+        <!-- 添加加载占位符 -->
+        <div v-if="!imageLoaded" class="loading-placeholder"></div>
       </div>
 
       <!-- 商品信息 -->
@@ -175,7 +232,7 @@ onMounted(() => {
         <!-- 价格和数量区域 -->
         <div class="price-quantity-section">
           <div class="price-rating">
-            <span class="current-price">¥{{ product.price.toFixed(2) }}</span>
+            <span class="current-price">¥{{ product.price?.toFixed(2) }}</span>
             <!-- 评分 -->
             <div class="product-rating" v-if="product.rating">
               <span class="rating-stars">★★★★★</span>
@@ -240,11 +297,11 @@ onMounted(() => {
             </tr>
             <tr>
               <td class="spec-label">价格</td>
-              <td>¥{{ product.price.toFixed(2) }}</td>
+              <td>¥{{ product.price?.toFixed(2) }}</td>
             </tr>
             <tr>
               <td class="spec-label">库存</td>
-              <td>10件</td>
+              <td>{{ product.stock || 10 }}件</td>
             </tr>
             <tr v-if="product.rating">
               <td class="spec-label">评分</td>
@@ -424,6 +481,8 @@ onMounted(() => {
   padding: 24px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  position: relative;
+  min-height: 400px; /* 确保有足够的高度显示占位符 */
 }
 
 .main-image {
@@ -437,6 +496,28 @@ onMounted(() => {
 
 .main-image:hover {
   transform: scale(1.02);
+}
+
+/* 加载占位符样式 */
+.loading-placeholder {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 16px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* 商品信息区域优化 */
@@ -895,6 +976,10 @@ onMounted(() => {
   .main-image {
     max-height: 300px;
   }
+  
+  .product-gallery {
+    min-height: 300px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -927,6 +1012,11 @@ onMounted(() => {
   .quantity {
     width: 70px;
     height: 40px;
+  }
+  
+  .product-gallery {
+    min-height: 250px;
+    padding: 16px;
   }
 }
 </style>

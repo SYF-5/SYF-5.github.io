@@ -10,6 +10,9 @@ import '@/styles/element/common.scss'
 import '@/assets/iconfont/iconfont.css'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
+// 导入懒加载指令
+import { setupLazyLoadDirective } from '@/directives/lazyLoad';
+
 const pinia = createPinia();
 const app = createApp(App);
 
@@ -19,4 +22,7 @@ pinia.use(piniaPluginPersistedstate)
 app.use(ElementPlus);
 app.use(pinia);
 app.use(router);
+
+// 注册懒加载指令
+setupLazyLoadDirective(app);
 app.mount('#app');

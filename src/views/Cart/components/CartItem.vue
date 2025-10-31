@@ -1,7 +1,17 @@
 <template>
   <div class="cart-item">
     <div class="item-image">
-      <img :src="item.picture" :alt="item.name" @error="handleImageError" />
+      <!-- 使用懒加载 -->
+      <div class="image-container">
+        <img 
+          v-lazy="item.picture" 
+          :alt="item.name" 
+          @load="handleImageLoad(item.id)"
+          @error="handleImageError" 
+        />
+        <!-- 加载占位符 -->
+        <div v-if="!imageLoadedStates[item.id]" class="loading-placeholder"></div>
+      </div>
     </div>
     
     <div class="item-details">
@@ -33,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import {  reactive, onMounted } from 'vue'
 
 defineProps<{
   item: any
@@ -46,6 +57,9 @@ defineEmits<{
   (e: 'update-quantity', quantity: number): void
 }>()
 
+// 图片加载状态管理
+const imageLoadedStates = reactive<{[key: number]: boolean}>({})
+
 // 分类名称映射
 const categoryMap = {
   'vegetables': '蔬菜',
@@ -58,12 +72,31 @@ const getCategoryName = (category: string) => {
   return categoryMap[category as keyof typeof categoryMap] || category
 }
 
+// 图片加载完成处理
+const handleImageLoad = (itemId: number) => {
+  imageLoadedStates[itemId] = true
+}
+
 // 处理图片加载错误
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   // 设置默认图片
-  img.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'
+  img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7lm77niYc8L3RleHQ+PC9zdmc+'
+  
+  // 标记为已加载，隐藏占位符
+  const itemId = Object.keys(imageLoadedStates).find(key => 
+    imageLoadedStates[Number(key)] === false
+  )
+  if (itemId) {
+    imageLoadedStates[Number(itemId)] = true
+  }
 }
+
+// 初始化图片加载状态
+onMounted(() => {
+  // 这里可以通过父组件传递的item来初始化状态
+  // 在实际使用中，父组件应该确保每个item都有id
+})
 </script>
 
 <style scoped>
@@ -83,11 +116,41 @@ const handleImageError = (event: Event) => {
   margin-right: 20px;
 }
 
+.image-container {
+  position: relative;
+  width: 100px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .item-image img {
   width: 100%;
-  height: 80px;
+  height: 100%;
   object-fit: cover;
   border-radius: 8px;
+}
+
+/* 加载占位符 */
+.loading-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .item-details {
@@ -202,6 +265,11 @@ const handleImageError = (event: Event) => {
     margin-right: 0;
     margin-bottom: 15px;
     text-align: left;
+  }
+  
+  .image-container {
+    width: 100%;
+    height: 150px;
   }
 }
 </style>

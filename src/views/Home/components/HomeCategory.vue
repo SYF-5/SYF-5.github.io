@@ -8,6 +8,8 @@ const router = useRouter()
 // 响应式数据存储分类数据
 const categoryList = ref([])
 const loading = ref(true)
+// 添加图片加载状态管理
+const imageLoadedStates = ref({})
 
 // 获取分类数据
 const fetchCategoryData = async () => {
@@ -70,9 +72,21 @@ const handleProductClick = (productId) => {
   router.push(`/product/${productId}`)
 }
 
+// 图片加载完成处理
+const handleImageLoad = (productId) => {
+  imageLoadedStates.value[productId] = true
+}
+
 // 获取分类的商品列表
 const getCategoryGoods = (categoryId) => {
-  return productService.getGoodsByCategoryId(categoryId) || []
+  const goods = productService.getGoodsByCategoryId(categoryId) || []
+  // 为每个商品初始化加载状态
+  goods.forEach(product => {
+    if (!imageLoadedStates.value[product.id]) {
+      imageLoadedStates.value[product.id] = false
+    }
+  })
+  return goods
 }
 
 // 组件挂载时获取数据
@@ -116,7 +130,16 @@ onMounted(() => {
                 @click="handleProductClick(product.id)"
                 class="product-link"
               >
-                <img :src="product.picture" :alt="product.name" />
+                <!-- 使用懒加载 -->
+                <div class="image-container">
+                  <img 
+                    v-lazy="product.picture" 
+                    :alt="product.name" 
+                    @load="handleImageLoad(product.id)"
+                  />
+                  <!-- 加载占位符 -->
+                  <div v-if="!imageLoadedStates[product.id]" class="loading-placeholder"></div>
+                </div>
                 <div class="info">
                   <p class="name ellipsis-2">
                     {{ product.name }}
@@ -133,7 +156,6 @@ onMounted(() => {
   </div>
 </template>
 
-<!-- 样式保持不变 -->
 <style scoped lang='scss'>
 .home-category {
   width: 250px;
@@ -227,11 +249,29 @@ onMounted(() => {
                 background: #e3f9f4;
               }
 
-              img {
+              .image-container {
+                position: relative;
                 width: 95px;
                 height: 95px;
-                object-fit: cover;
-                border-radius: 4px;
+                
+                img {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                  border-radius: 4px;
+                }
+
+                .loading-placeholder {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                  background-size: 200% 100%;
+                  animation: loading 1.5s infinite;
+                  border-radius: 4px;
+                }
               }
 
               .info {
@@ -268,6 +308,15 @@ onMounted(() => {
         }
       }
     }
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }
 </style>
