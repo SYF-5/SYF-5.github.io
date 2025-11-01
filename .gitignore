@@ -9,8 +9,10 @@ lerna-debug.log*
 
 # Dependencies
 node_modules/
-/dist
-/dist-ssr
+
+# 注释掉或删除 dist 相关的忽略规则，确保 dist 文件夹能被提交
+# /dist
+# /dist-ssr
 *.local
 
 # Editor directories and files
