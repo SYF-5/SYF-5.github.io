@@ -4,26 +4,26 @@ import { resolve } from 'path';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
-import viteCompression from 'vite-plugin-compression';
 
 export default defineConfig({
-  // 关键修改：用户站点使用根路径
-  base: process.env.NODE_ENV === 'production'
-    ? '/'  // 用户站点直接使用根路径
-    : '/', // 开发环境也用根路径
+  base: '/',
 
   plugins: [
     vue(),
     AutoImport({
+      // 关键：明确指定只导入这些API，避免自动引入uuid
+      imports: [
+        'vue',
+        'vue-router',
+        'pinia',
+      ],
       resolvers: [ElementPlusResolver()],
+      dts: true,
     }),
     Components({
       resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
+      dts: true,
     }),
-    // 暂时保持压缩插件注释，部署成功后再启用
-    // viteCompression({
-    //   threshold: 10240,
-    // }),
   ],
   resolve: {
     alias: {
@@ -41,35 +41,20 @@ export default defineConfig({
     }
   },
   build: {
-    // 增加警告限制
-    chunkSizeWarningLimit: 2000,
-    // 添加构建优化
-    minify: 'esbuild',
-    target: 'es2015',
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
+      // 关键：明确排除uuid，即使有依赖也不打包
+      external: ['uuid'],
       output: {
         manualChunks: {
-          // 优化分块策略
           'element-plus': ['element-plus'],
           'vue-vendor': ['vue', 'vue-router', 'pinia'],
-          'utils': ['axios', 'uuid'],
-        },
-        // 优化文件名
-        chunkFileNames: 'js/[name]-[hash].js',
-        entryFileNames: 'js/[name]-[hash].js',
-        assetFileNames: '[ext]/[name]-[hash].[ext]'
+        }
       }
     }
   },
   server: {
     host: true,
-    port: 3000,
-    // 添加开发服务器优化
-    open: true
-  },
-  // 添加预览服务器配置
-  preview: {
-    host: true,
-    port: 3001
+    port: 3000
   }
 });
