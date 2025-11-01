@@ -36,7 +36,7 @@
       "id": 53,
       "name": "新鲜鸡蛋",
       "price": 12.0,
-      "picture": "images/53.jpg",
+      "picture": "images/53.webp",
       "description": "优质小米，营养丰富",
       "category": "grains",
       "stock": 40,
@@ -56,7 +56,7 @@
       "id": 55,
       "name": "有机花菜",
       "price": 8.5,
-      "picture": "images/55.jpg",
+      "picture": "images/55.webp",
       "description": "有机种植花菜，无农药残留",
       "category": "vegetables",
       "stock": 35,
@@ -136,7 +136,7 @@
           "name": "收纳柜",
           "desc": "分区合理，告别杂乱",
           "price": 45.00,
-          "picture": "images/04.jpg"
+          "picture": "images/04.webp"
         },
         {
           "id": 5,
@@ -188,7 +188,7 @@
           "name": "牛奶",
           "desc": "奶香醇厚，回味无穷",
           "price": 10.00,
-          "picture": "images/10.jpg"
+          "picture": "images/10.webp"
         }
       ]
     },
@@ -226,7 +226,7 @@
           "name": "通勤包",
           "desc": "简约有容，商务伴侣",
           "price": 119.00,
-          "picture": "images/14.jpg"
+          "picture": "images/14.webp"
         },
         {
           "id": 15,
@@ -392,7 +392,7 @@
           "name": "机械键盘",
           "desc": "手感清脆，响应迅捷",
           "price": 199.00,
-          "picture": "images/32.jpg"
+          "picture": "images/32.webp"
         },
         {
           "id": 33,
@@ -430,21 +430,21 @@
           "name": "项链",
           "desc": "精致链坠，点缀颈间",
           "price": 799.00,
-          "picture": "images/36.jpg"
+          "picture": "images/36.webp"
         },
         {
           "id": 37,
           "name": "手链",
           "desc": "简约设计，腕上风情",
           "price": 59.00,
-          "picture": "images/37.jpg"
+          "picture": "images/37.webp"
         },
         {
           "id": 38,
           "name": "耳钉",
           "desc": "小巧点睛，闪耀耳畔",
           "price": 59.00,
-          "picture": "images/38.jpg"
+          "picture": "images/38.webp"
         },
         {
           "id": 39,
@@ -489,7 +489,7 @@
           "name": "感冒冲剂 ",
           "desc": "缓解症状，身心舒畅",
           "price": 13.90,
-          "picture": "images/43.jpg"
+          "picture": "images/43.webp"
         },
         {
           "id": 44,
