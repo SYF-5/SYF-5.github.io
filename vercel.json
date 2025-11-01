@@ -1,6 +1,13 @@
 {
   "env": {
-    "ENABLE_VC_TOOLBAR": "false"
+    "ENABLE_VC_TOOLBAR": "false",
+    "VERCEL_ANALYTICS": "false",
+    "VERCEL_SPEED_INSIGHTS": "false"
+  },
+  "functions": {
+    "**/*.html": {
+      "includeFiles": "**/*.html"
+    }
   },
   "rewrites": [
     {
@@ -10,7 +17,7 @@
   ],
   "headers": [
     {
-      "source": "/assets/:path*",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -19,7 +26,7 @@
       ]
     },
     {
-      "source": "/:path*.css",
+      "source": "/(.*).css",
       "headers": [
         {
           "key": "Cache-Control",
@@ -28,7 +35,7 @@
       ]
     },
     {
-      "source": "/:path*.js",
+      "source": "/(.*).js",
       "headers": [
         {
           "key": "Cache-Control",
