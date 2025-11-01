@@ -5,9 +5,11 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import viteCompression from 'vite-plugin-compression';
-// 移除这行：import viteImagemin from 'vite-plugin-imagemin';
 
 export default defineConfig({
+  // 添加基础路径配置
+  base: './',
+
   plugins: [
     vue(),
     AutoImport({
@@ -16,10 +18,10 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
     }),
-    viteCompression({
-      threshold: 10240,
-    }),
-    // 移除整个 viteImagemin 插件配置
+    // 可选：暂时注释掉压缩插件以简化构建
+    // viteCompression({
+    //   threshold: 10240,
+    // }),
   ],
   resolve: {
     alias: {
@@ -37,21 +39,21 @@ export default defineConfig({
     }
   },
   build: {
-    chunkSizeWarningLimit: 1000,
+    // 降低警告限制或保持原样
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('element-plus')) {
-              return 'vendor-element';
-            }
-            if (id.includes('vue')) {
-              return 'vendor-vue';
-            }
-            return 'vendor-other';
-          }
+        manualChunks: {
+          // 简化分块策略
+          'element-plus': ['element-plus'],
+          'vue-vendor': ['vue', 'vue-router', 'pinia'],
         }
       }
     }
+  },
+  // 添加服务器配置（仅开发环境）
+  server: {
+    host: true,
+    port: 3000
   }
 });
