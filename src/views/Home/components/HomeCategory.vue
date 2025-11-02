@@ -68,9 +68,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import productService from '@/services/productService.js'
 
-// 定义类型
+// 定义本地类型
 interface Product {
   id: number
   name: string
@@ -86,17 +86,10 @@ interface Category {
   children: string[]
 }
 
-interface GoodsJsonData {
-  Banner?: any[]
-  Category?: Category[]
-  Goods?: Product[]
-}
-
 const router = useRouter()
 
 // 响应式数据存储分类数据
 const categoryList = ref<Category[]>([])
-const allProducts = ref<Product[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 // 添加图片加载状态管理
@@ -109,36 +102,23 @@ const fetchCategoryData = async (): Promise<void> => {
     error.value = null
     console.log('开始获取分类数据...')
     
-    // 使用axios获取数据
-    const response = await axios.get<GoodsJsonData>('/goods.json')
-    console.log('获取到的分类数据:', response.data)
+    // 使用现有的 productService
+    await productService.loadAllData()
     
-    if (response.data && response.data.Category) {
-      categoryList.value = response.data.Category
-      console.log('成功设置分类数据:', categoryList.value)
+    // 获取分类数据
+    const categories = productService.getCategories()
+    console.log('获取到的分类数据:', categories)
+    
+    if (categories && categories.length > 0) {
+      categoryList.value = categories
+      console.log('成功设置分类数据:', categoryList.value.length, '个分类')
     } else {
-      console.warn('分类数据格式不正确')
-      error.value = '分类数据格式不正确，请联系管理员'
+      console.warn('没有获取到分类数据')
+      error.value = '暂无分类数据'
     }
-    
-    // 同时获取商品数据用于弹层显示
-    if (response.data && response.data.Goods) {
-      allProducts.value = response.data.Goods
-      console.log('成功设置商品数据:', allProducts.value.length, '个商品')
-    }
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('获取分类数据失败:', err)
-    if (axios.isAxiosError(err)) {
-      if (err.response) {
-        error.value = `服务器错误: ${err.response.status} - ${err.response.statusText}`
-      } else if (err.request) {
-        error.value = '网络连接失败，请检查网络连接'
-      } else {
-        error.value = `请求配置错误: ${err.message}`
-      }
-    } else {
-      error.value = '未知错误，请稍后重试'
-    }
+    error.value = '数据加载失败，请稍后重试'
   } finally {
     loading.value = false
   }
@@ -174,7 +154,7 @@ const handleSubCategoryClick = (categoryId: number, categoryName: string, subCat
   console.log(`点击了 ${categoryName} - ${subCategoryName}`)
   
   // 获取该分类下的商品
-  const categoryGoods = getCategoryGoods(categoryId)
+  const categoryGoods = productService.getGoodsByCategoryId(categoryId)
   
   if (categoryGoods && categoryGoods.length > 0) {
     // 跳转到该分类下的第一个商品
@@ -199,20 +179,14 @@ const handleImageLoad = (productId: number): void => {
 
 // 获取分类的商品列表
 const getCategoryGoods = (categoryId: number): Product[] => {
-  // 从所有商品中筛选出属于该分类的商品
-  const goods = allProducts.value.filter(product => product.categoryId === categoryId)
-  
-  // 如果没有找到对应分类的商品，返回空数组
-  if (goods.length === 0) {
-    console.log(`分类 ${categoryId} 下暂无商品`)
-    return []
-  }
+  // 从 productService 获取该分类的商品
+  const goods = productService.getGoodsByCategoryId(categoryId) || []
   
   // 限制显示数量，最多显示6个商品
   const displayGoods = goods.slice(0, 6)
   
-  // 为每个商品初始化加载状态
-  displayGoods.forEach(product => {
+  // 为每个商品初始化加载状态 - 修复类型问题
+  displayGoods.forEach((product: Product) => {
     if (!imageLoadedStates.value[product.id]) {
       imageLoadedStates.value[product.id] = false
     }
@@ -223,6 +197,7 @@ const getCategoryGoods = (categoryId: number): Product[] => {
 
 // 组件挂载时获取数据
 onMounted(() => {
+  console.log('侧边列表组件已挂载')
   fetchCategoryData()
 })
 </script>

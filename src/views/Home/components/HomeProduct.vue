@@ -72,22 +72,18 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import GoodsItem from '@/components/GoodsItem.vue'
+// 直接导入，让 TypeScript 通过声明文件处理类型
+import productService from '@/services/productService.js'
 
-// 定义商品接口
+// 定义本地类型
 interface Product {
   id: number
   name: string
   price: number
   picture: string
   desc: string
-}
-
-interface GoodsJsonData {
-  Banner?: any[]
-  Category?: any[]
-  Goods?: Product[]
+  categoryId?: number
 }
 
 const router = useRouter()
@@ -96,17 +92,11 @@ const router = useRouter()
 const loading = ref(false)
 const error = ref<string | null>(null)
 const productList = ref<Product[]>([])
-const cartItems = ref<Product[]>([])
 
 // 计算属性
 const featuredProducts = computed(() => {
   return productList.value.slice(0, 4)
 })
-
-// 商品 key 生成器
-const getProductKey = (product: Product): string => {
-  return product?.id?.toString() || Math.random().toString(36).substr(2, 9)
-}
 
 // 获取商品数据
 const fetchProducts = async (): Promise<void> => {
@@ -115,36 +105,31 @@ const fetchProducts = async (): Promise<void> => {
   try {
     console.log('开始获取商品数据...')
     
-    // 使用 axios 获取数据
-    const response = await axios.get<GoodsJsonData>('/goods.json')
-    console.log('获取到的商品数据:', response.data)
+    // 使用现有的 productService
+    await productService.loadAllData()
     
-    if (response.data && response.data.Goods) {
-      productList.value = response.data.Goods
+    // 获取所有商品
+    const products = productService.getAllProducts()
+    console.log('获取到的商品数据:', products)
+    
+    if (products && products.length > 0) {
+      productList.value = products
       console.log('成功设置商品数据:', productList.value.length, '个商品')
     } else {
-      console.warn('商品数据格式不正确')
-      error.value = '商品数据格式不正确，请联系管理员'
+      console.warn('没有获取到商品数据')
+      error.value = '暂无商品数据'
     }
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('获取商品数据失败:', err)
-    if (axios.isAxiosError(err)) {
-      if (err.response) {
-        // 服务器响应了错误状态码
-        error.value = `服务器错误: ${err.response.status} - ${err.response.statusText}`
-      } else if (err.request) {
-        // 请求发送了但没有收到响应
-        error.value = '网络连接失败，请检查网络连接'
-      } else {
-        // 其他错误
-        error.value = `请求配置错误: ${err.message}`
-      }
-    } else {
-      error.value = '未知错误，请稍后重试'
-    }
+    error.value = '数据加载失败，请稍后重试'
   } finally {
     loading.value = false
   }
+}
+
+// 商品 key 生成器
+const getProductKey = (product: Product): string => {
+  return product?.id?.toString() || Math.random().toString(36).substr(2, 9)
 }
 
 // 分类数据
@@ -172,7 +157,6 @@ const goToProductDetail = (product: Product): void => {
 // 添加到购物车
 const addToCart = (product: Product): void => {
   console.log('添加到购物车:', product.name)
-  cartItems.value.push(product)
   // 可以添加购物车提示
   alert(`已添加 ${product.name} 到购物车`)
 }
@@ -185,6 +169,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 保持原有的 CSS 样式不变 */
 .home {
   padding-bottom: 50px;
   width: 1240px;

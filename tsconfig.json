@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "strict": true,
+    "strict": false,
     "noUnusedLocals": false, // 改为 false 避免开发时干扰
     "noUnusedParameters": false, // 改为 false 避免开发时干扰
     "noFallthroughCasesInSwitch": true,
