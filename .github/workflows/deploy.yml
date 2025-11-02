@@ -2,9 +2,8 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
 
-# 设置 GITHUB_TOKEN 的权限
 permissions:
   contents: write
   pages: write
@@ -14,25 +13,38 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
+    - name: Checkout code
+      uses: actions/checkout@v3
+
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: npm install
-      
+
     - name: Build project
       run: npm run build
-      
-    - name: List build files (调试)
-      run: ls -la dist/
-      
+
+    - name: Inspect build output
+      run: |
+        ls -la dist/
+        echo "=== Checking index.html ==="
+        if [ -f "dist/index.html" ]; then
+          echo "index.html exists."
+          # 可选：检查 index.html 中引用的资源路径
+          grep -o 'src="[^"]*"' dist/index.html | head -5
+        else
+          echo "ERROR: index.html not found!"
+          exit 1
+        fi
+
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./dist
+        # 明确指定发布分支
+        publish_branch: gh-pages
