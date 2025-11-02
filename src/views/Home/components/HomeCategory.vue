@@ -1,144 +1,14 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import productService from '@/services/productService.js'
-
-const router = useRouter()
-
-// 响应式数据存储分类数据
-const categoryList = ref([])
-const loading = ref(true)
-// 添加图片加载状态管理
-const imageLoadedStates = ref({})
-
-// 图片路径处理函数
-const getImageUrl = (path) => {
-  if (!path) return '/assets/logo-BhwB2m9l.png'
-  
-  // 如果路径已经是绝对路径，直接返回
-  if (path.startsWith('/') || path.startsWith('http')) {
-    return path
-  }
-  
-  // 处理相对路径
-  if (path.startsWith('images/')) {
-    return '/' + path
-  }
-  
-  // 临时使用现有图片作为备用
-  const availableImages = [
-    '/assets/222-qdFkonWe.jpg',
-    '/assets/logo-BhwB2m9l.png', 
-    '/assets/qrcode-orqZiaKR.jpg',
-    '/assets/Banner-1.jpg',
-    '/assets/Banner-2.jpg'
-  ]
-  
-  // 根据商品ID选择图片，确保一致性
-  const index = Math.abs((path.length || 0)) % availableImages.length
-  return availableImages[index]
-}
-
-// 图片加载失败处理
-const handleImageError = (event) => {
-  console.error('商品图片加载失败:', event)
-  imageLoaded.value = true // 即使失败也隐藏占位符
-  
-  // 设置默认错误图片 - 移除类型断言
-  const img = event.target
-  img.src = '/assets/logo-BhwB2m9l.png'
-}
-
-// 获取分类数据
-const fetchCategoryData = async () => {
-  try {
-    loading.value = true
-    
-    // 使用商品服务加载数据
-    await productService.loadAllData()
-    
-    // 获取分类列表（只包含id, name, children）
-    const categories = productService.getCategories()
-    
-    if (categories && categories.length > 0) {
-      categoryList.value = categories
-    } else {
-      // 如果获取数据失败，使用默认数据
-      categoryList.value = [
-        {
-          id: 1,
-          name: "居家",
-          children: ["床上用品", "家具", "收纳"]
-        }
-      ]
-    }
-  } catch (error) {
-    console.error('获取分类数据失败:', error)
-    // 错误处理：使用默认数据
-    categoryList.value = [
-      {
-        id: 1,
-        name: "居家",
-        children: ["床上用品", "家具"]
-      }
-    ]
-  } finally {
-    loading.value = false
-  }
-}
-
-// 处理子分类点击事件
-const handleSubCategoryClick = (categoryId, categoryName, subCategoryName) => {
-  console.log(`点击了 ${categoryName} - ${subCategoryName}`)
-  
-  // 获取该分类下的商品
-  const categoryGoods = productService.getGoodsByCategoryId(categoryId)
-  
-  if (categoryGoods && categoryGoods.length > 0) {
-    // 跳转到该分类下的第一个商品
-    const firstProduct = categoryGoods[0]
-    router.push(`/product/${firstProduct.id}`)
-  } else {
-    // 如果没有商品，显示提示
-    alert('该分类下暂无商品')
-  }
-}
-
-// 处理商品点击事件
-const handleProductClick = (productId) => {
-  console.log(`点击了商品 ID: ${productId}`)
-  router.push(`/product/${productId}`)
-}
-
-// 图片加载完成处理
-const handleImageLoad = (productId) => {
-  imageLoadedStates.value[productId] = true
-}
-
-// 获取分类的商品列表
-const getCategoryGoods = (categoryId) => {
-  const goods = productService.getGoodsByCategoryId(categoryId) || []
-  // 为每个商品初始化加载状态
-  goods.forEach(product => {
-    if (!imageLoadedStates.value[product.id]) {
-      imageLoadedStates.value[product.id] = false
-    }
-  })
-  return goods
-}
-
-// 组件挂载时获取数据
-onMounted(() => {
-  fetchCategoryData()
-})
-</script>
-
 <template>
   <div class="home-category">
     <ul class="menu">
       <!-- 加载状态 -->
       <li v-if="loading" class="loading">
-        加载中...
+        分类加载中...
+      </li>
+      
+      <!-- 空状态 -->
+      <li v-else-if="categoryList.length === 0" class="empty">
+        暂无分类数据
       </li>
       
       <!-- 遍历分类数据 -->
@@ -195,6 +65,168 @@ onMounted(() => {
   </div>
 </template>
 
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+
+// 定义类型
+interface Product {
+  id: number
+  name: string
+  price: number
+  picture: string
+  desc: string
+  categoryId?: number
+}
+
+interface Category {
+  id: number
+  name: string
+  children: string[]
+}
+
+interface GoodsJsonData {
+  Banner?: any[]
+  Category?: Category[]
+  Goods?: Product[]
+}
+
+const router = useRouter()
+
+// 响应式数据存储分类数据
+const categoryList = ref<Category[]>([])
+const allProducts = ref<Product[]>([])
+const loading = ref(true)
+const error = ref<string | null>(null)
+// 添加图片加载状态管理
+const imageLoadedStates = ref<Record<number, boolean>>({})
+
+// 获取分类数据
+const fetchCategoryData = async (): Promise<void> => {
+  try {
+    loading.value = true
+    error.value = null
+    console.log('开始获取分类数据...')
+    
+    // 使用axios获取数据
+    const response = await axios.get<GoodsJsonData>('/goods.json')
+    console.log('获取到的分类数据:', response.data)
+    
+    if (response.data && response.data.Category) {
+      categoryList.value = response.data.Category
+      console.log('成功设置分类数据:', categoryList.value)
+    } else {
+      console.warn('分类数据格式不正确')
+      error.value = '分类数据格式不正确，请联系管理员'
+    }
+    
+    // 同时获取商品数据用于弹层显示
+    if (response.data && response.data.Goods) {
+      allProducts.value = response.data.Goods
+      console.log('成功设置商品数据:', allProducts.value.length, '个商品')
+    }
+  } catch (err) {
+    console.error('获取分类数据失败:', err)
+    if (axios.isAxiosError(err)) {
+      if (err.response) {
+        error.value = `服务器错误: ${err.response.status} - ${err.response.statusText}`
+      } else if (err.request) {
+        error.value = '网络连接失败，请检查网络连接'
+      } else {
+        error.value = `请求配置错误: ${err.message}`
+      }
+    } else {
+      error.value = '未知错误，请稍后重试'
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+// 图片路径处理函数
+const getImageUrl = (path: string): string => {
+  if (!path) return '/src/assets/images/222.jpg'
+  
+  // 如果路径已经是绝对路径，直接返回
+  if (path.startsWith('/') || path.startsWith('http')) {
+    return path
+  }
+  
+  // 处理相对路径
+  if (path.startsWith('images/')) {
+    return '/' + path
+  }
+  
+  // 使用默认图片
+  return '/src/assets/images/222.jpg'
+}
+
+// 图片加载失败处理
+const handleImageError = (event: Event): void => {
+  console.error('商品图片加载失败:', event)
+  const img = event.target as HTMLImageElement
+  img.src = '/src/assets/images/222.jpg'
+}
+
+// 处理子分类点击事件
+const handleSubCategoryClick = (categoryId: number, categoryName: string, subCategoryName: string): void => {
+  console.log(`点击了 ${categoryName} - ${subCategoryName}`)
+  
+  // 获取该分类下的商品
+  const categoryGoods = getCategoryGoods(categoryId)
+  
+  if (categoryGoods && categoryGoods.length > 0) {
+    // 跳转到该分类下的第一个商品
+    const firstProduct = categoryGoods[0]
+    router.push(`/product/${firstProduct.id}`)
+  } else {
+    // 如果没有商品，显示提示
+    alert('该分类下暂无商品')
+  }
+}
+
+// 处理商品点击事件
+const handleProductClick = (productId: number): void => {
+  console.log(`点击了商品 ID: ${productId}`)
+  router.push(`/product/${productId}`)
+}
+
+// 图片加载完成处理
+const handleImageLoad = (productId: number): void => {
+  imageLoadedStates.value[productId] = true
+}
+
+// 获取分类的商品列表
+const getCategoryGoods = (categoryId: number): Product[] => {
+  // 从所有商品中筛选出属于该分类的商品
+  const goods = allProducts.value.filter(product => product.categoryId === categoryId)
+  
+  // 如果没有找到对应分类的商品，返回空数组
+  if (goods.length === 0) {
+    console.log(`分类 ${categoryId} 下暂无商品`)
+    return []
+  }
+  
+  // 限制显示数量，最多显示6个商品
+  const displayGoods = goods.slice(0, 6)
+  
+  // 为每个商品初始化加载状态
+  displayGoods.forEach(product => {
+    if (!imageLoadedStates.value[product.id]) {
+      imageLoadedStates.value[product.id] = false
+    }
+  })
+  
+  return displayGoods
+}
+
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchCategoryData()
+})
+</script>
+
 <style scoped lang='scss'>
 .home-category {
   width: 250px;
@@ -209,7 +241,7 @@ onMounted(() => {
       height: 55px;
       line-height: 55px;
 
-      &.loading {
+      &.loading, &.empty {
         color: #fff;
         text-align: center;
         padding-left: 0;

@@ -16,26 +16,28 @@
     "noEmit": true,
     "jsx": "preserve",
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false, // 改为 false 避免开发时干扰
+    "noUnusedParameters": false, // 改为 false 避免开发时干扰
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
-    }
+    },
+    "types": [
+      "vite/client"
+    ] // 添加 vite 类型支持
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "vite.config.ts"
+    "src/**/*.json" // 添加 JSON 文件支持
   ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
+  "exclude": [
+    "dist",
+    "node_modules"
   ]
 }

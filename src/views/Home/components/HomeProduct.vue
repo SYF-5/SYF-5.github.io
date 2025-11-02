@@ -1,15 +1,15 @@
 <template>
   <div class="home">
-    <!-- 横幅区域 - 限制宽度并居中 -->
+    <!-- 横幅区域 -->
     <div class="banner-container">
       <div class="banner">
         <img src="/src/assets/images/222.jpg" alt="小兔鲜促销横幅">
       </div>
     </div>
     
-    <!-- 主要内容容器 - 限制宽度并居中 -->
+    <!-- 主要内容容器 -->
     <div class="main-container">
-      <!-- 分类导航占位 -->
+      <!-- 分类导航 -->
       <div class="category-nav">
         <div class="category-item" v-for="category in categories" :key="category">
           <span class="category-icon">{{ getCategoryIcon(category) }}</span>
@@ -27,6 +27,12 @@
       <div v-else-if="error" class="error-state">
         <p>{{ error }}</p>
         <button @click="fetchProducts" class="retry-btn">重试</button>
+      </div>
+      
+      <!-- 空状态 -->
+      <div v-else-if="productList.length === 0" class="empty-state">
+        <p>暂无商品数据</p>
+        <button @click="fetchProducts" class="retry-btn">重新加载</button>
       </div>
       
       <!-- 正常显示内容 -->
@@ -64,44 +70,88 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
-import { useProductStore } from '@/stores/product'
-import { useCartStore } from '@/stores/cart'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Product } from '@/types/cart'
+import axios from 'axios'
 import GoodsItem from '@/components/GoodsItem.vue'
 
-const productStore = useProductStore()
-const cartStore = useCartStore()
-const router = useRouter()
-
-// 使用计算属性获取 store 状态
-const loading = computed(() => productStore.loading)
-const error = computed(() => productStore.error)
-const productList = computed(() => productStore.productList as Product[])
-const featuredProducts = computed(() => {
-  const products = productStore.featuredProducts()
-  return Array.isArray(products) ? products : []
-})
-
-// 安全的 key 生成器
-const getProductKey = (product: any) => {
-  return product?.id || Math.random().toString(36).substr(2, 9)
+// 定义商品接口
+interface Product {
+  id: number
+  name: string
+  price: number
+  picture: string
+  desc: string
 }
 
-// 组件挂载时获取商品数据
-onMounted(() => {
-  // 如果商品列表为空，才获取数据
-  if (productList.value.length === 0) {
-    productStore.fetchProducts()
-  }
+interface GoodsJsonData {
+  Banner?: any[]
+  Category?: any[]
+  Goods?: Product[]
+}
+
+const router = useRouter()
+
+// 响应式数据
+const loading = ref(false)
+const error = ref<string | null>(null)
+const productList = ref<Product[]>([])
+const cartItems = ref<Product[]>([])
+
+// 计算属性
+const featuredProducts = computed(() => {
+  return productList.value.slice(0, 4)
 })
 
-// 硬编码的分类数据
+// 商品 key 生成器
+const getProductKey = (product: Product): string => {
+  return product?.id?.toString() || Math.random().toString(36).substr(2, 9)
+}
+
+// 获取商品数据
+const fetchProducts = async (): Promise<void> => {
+  loading.value = true
+  error.value = null
+  try {
+    console.log('开始获取商品数据...')
+    
+    // 使用 axios 获取数据
+    const response = await axios.get<GoodsJsonData>('/goods.json')
+    console.log('获取到的商品数据:', response.data)
+    
+    if (response.data && response.data.Goods) {
+      productList.value = response.data.Goods
+      console.log('成功设置商品数据:', productList.value.length, '个商品')
+    } else {
+      console.warn('商品数据格式不正确')
+      error.value = '商品数据格式不正确，请联系管理员'
+    }
+  } catch (err) {
+    console.error('获取商品数据失败:', err)
+    if (axios.isAxiosError(err)) {
+      if (err.response) {
+        // 服务器响应了错误状态码
+        error.value = `服务器错误: ${err.response.status} - ${err.response.statusText}`
+      } else if (err.request) {
+        // 请求发送了但没有收到响应
+        error.value = '网络连接失败，请检查网络连接'
+      } else {
+        // 其他错误
+        error.value = `请求配置错误: ${err.message}`
+      }
+    } else {
+      error.value = '未知错误，请稍后重试'
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+// 分类数据
 const categories = ['蔬菜', '水果', '肉类', '粮油', '奶制品', '零食']
 
 // 获取分类图标
-const getCategoryIcon = (category: string) => {
+const getCategoryIcon = (category: string): string => {
   const icons: Record<string, string> = {
     '蔬菜': '🥬',
     '水果': '🍎',
@@ -114,42 +164,42 @@ const getCategoryIcon = (category: string) => {
 }
 
 // 跳转到商品详情页
-const goToProductDetail = (product: Product) => {
-  productStore.setCurrentProduct(product)
+const goToProductDetail = (product: Product): void => {
+  console.log('跳转到商品详情:', product.id)
   router.push(`/product/${product.id}`)
 }
 
 // 添加到购物车
-const addToCart = (product: Product) => {
-  cartStore.addToCart(product)
+const addToCart = (product: Product): void => {
+  console.log('添加到购物车:', product.name)
+  cartItems.value.push(product)
+  // 可以添加购物车提示
+  alert(`已添加 ${product.name} 到购物车`)
 }
 
-// 重新获取数据的方法
-const fetchProducts = () => {
-  productStore.fetchProducts()
-}
+// 组件挂载时获取数据
+onMounted(() => {
+  console.log('HomePage 组件已挂载')
+  fetchProducts()
+})
 </script>
 
 <style scoped>
 .home {
   padding-bottom: 50px;
-  /* 与轮播图组件保持一致，设置固定宽度并居中 */
   width: 1240px;
   margin: 0 auto;
-  /* 去除首页的左右内边距 */
   padding-left: 0;
   padding-right: 0;
   box-sizing: border-box;
   padding-right: 16px;
 }
 
-/* 横幅容器 - 与轮播图组件保持一致 */
 .banner-container {
   width: 100%;
   margin-bottom: 20px;
 }
 
-/* 横幅区域 */
 .banner {
   width: 100%;
   height: 200px;
@@ -162,19 +212,16 @@ const fetchProducts = () => {
   object-fit: cover;
 }
 
-/* 主要内容容器 - 与轮播图组件保持一致 */
 .main-container {
   width: 100%;
   box-sizing: border-box;
 }
 
-/* 分类导航 - 保持内部边距 */
 .category-nav {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 15px;
   margin-bottom: 30px;
-  /* 在内部添加边距 */
   padding: 0 20px;
 }
 
@@ -204,10 +251,8 @@ const fetchProducts = () => {
   color: #333;
 }
 
-/* 商品区域 - 保持内部边距 */
 .product-section {
   margin-bottom: 40px;
-  /* 在内部添加边距 */
   padding: 0 20px;
 }
 
@@ -238,7 +283,6 @@ const fetchProducts = () => {
   gap: 20px;
 }
 
-/* 加载状态样式 */
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -263,11 +307,16 @@ const fetchProducts = () => {
   100% { transform: rotate(360deg); }
 }
 
-/* 错误状态样式 */
 .error-state {
   text-align: center;
   padding: 40px;
   color: #ff4757;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #666;
 }
 
 .retry-btn {
