@@ -2,12 +2,20 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import legacy from "@vitejs/plugin-legacy"
 
 export default defineConfig({
   base: './', // 强制使用相对路径
-  plugins: [vue()],
+  plugins: [
+    legacy({
+      targets: ["chrome 80", "defaults", "not IE 11"]
+    }),
+    vue(),
+
+  ],
 
   build: {
+    target: ["es2015", "chrome63"],
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
