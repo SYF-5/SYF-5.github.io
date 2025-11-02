@@ -1,3 +1,4 @@
+// router/index.ts
 import { createRouter, createWebHashHistory } from "vue-router";
 import Login from "@/views/Login/index.vue";
 import Layout from "@/views/Layout/index.vue";
@@ -7,7 +8,7 @@ import ProductDetail from "@/views/ProductDetail/index.vue"
 import Cart from "@/views/Cart/index.vue"
 
 const router = createRouter({
-  // 关键修改：使用 hash 模式替代 history 模式
+  // 关键：必须使用 hash 模式
   history: createWebHashHistory(),
   routes: [
     {
