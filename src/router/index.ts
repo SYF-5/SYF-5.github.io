@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import Login from "@/views/Login/index.vue";
 import Layout from "@/views/Layout/index.vue";
 import Home from "@/views/Home/index.vue"
@@ -7,8 +7,8 @@ import ProductDetail from "@/views/ProductDetail/index.vue"
 import Cart from "@/views/Cart/index.vue"
 
 const router = createRouter({
-  // 关键修改：使用 createWebHistory 并设置正确的 base
-  history: createWebHistory(import.meta.env.BASE_URL),
+  // 关键修改：使用 hash 模式替代 history 模式
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/',
@@ -37,7 +37,6 @@ const router = createRouter({
       path: '/login',
       component: Login
     }
-    // 移除重复的 /product/:id 路由
   ]
 })
 
