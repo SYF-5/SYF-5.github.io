@@ -7,6 +7,7 @@ import ProductDetail from "@/views/ProductDetail/index.vue"
 import Cart from "@/views/Cart/index.vue"
 
 const router = createRouter({
+  // 关键修改：使用 createWebHistory 并设置正确的 base
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
@@ -25,7 +26,6 @@ const router = createRouter({
           path: 'cart',
           component: Cart
         },
-        // 将商品详情页也放在Layout下，保持布局一致
         {
           path: 'product/:id',
           component: ProductDetail,
@@ -36,13 +36,8 @@ const router = createRouter({
     {
       path: '/login',
       component: Login
-    },
-    // 保留一级路由的商品详情页，用于直接访问
-    {
-      path: '/product/:id',
-      component: ProductDetail,
-      props: true
     }
+    // 移除重复的 /product/:id 路由
   ]
 })
 

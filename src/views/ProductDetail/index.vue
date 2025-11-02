@@ -98,21 +98,17 @@ const handleImageLoad = () => {
   console.log('商品图片加载成功')
 }
 
-// 图片加载错误处理
+// 图片加载失败处理
 const handleImageError = (event) => {
-  console.error('商品图片加载失败:', event)
-  imageLoaded.value = true // 即使失败也隐藏占位符
-  
-  // 设置默认错误图片
-  const img = event.target
-  img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7lm77niYfpnZ7lu7o8L3RleHQ+PC9zdmc+'
+  console.warn('图片加载失败:', event.target.src)
+  event.target.src = '/assets/logo-BhwB2m9l.png'
 }
 
 // 处理图片URL - 确保路径正确
 const getImageUrl = (picturePath) => {
   if (!picturePath) {
     console.warn('图片路径为空')
-    return ''
+    return '/assets/logo-BhwB2m9l.png'
   }
   
   // 如果已经是完整URL，直接返回
@@ -123,12 +119,15 @@ const getImageUrl = (picturePath) => {
   // 确保本地图片路径正确
   if (picturePath.startsWith('/')) {
     return picturePath
-  } else if (picturePath.startsWith('./')) {
-    return picturePath
-  } else {
-    // 如果路径没有斜杠，添加斜杠
-    return `/${picturePath}`
   }
+  
+  // 关键修复：处理 images/ 开头的路径
+  if (picturePath.startsWith('images/')) {
+    return '/' + picturePath
+  }
+  
+  // 如果路径没有斜杠，添加斜杠
+  return `/${picturePath}`
 }
 
 // 从统一的服务加载商品数据
@@ -358,6 +357,7 @@ onMounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
 }
@@ -848,6 +848,7 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.95);
   padding: 20px 24px;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   z-index: 100;
   gap: 16px;

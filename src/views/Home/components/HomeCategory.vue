@@ -11,6 +11,44 @@ const loading = ref(true)
 // 添加图片加载状态管理
 const imageLoadedStates = ref({})
 
+// 图片路径处理函数
+const getImageUrl = (path) => {
+  if (!path) return '/assets/logo-BhwB2m9l.png'
+  
+  // 如果路径已经是绝对路径，直接返回
+  if (path.startsWith('/') || path.startsWith('http')) {
+    return path
+  }
+  
+  // 处理相对路径
+  if (path.startsWith('images/')) {
+    return '/' + path
+  }
+  
+  // 临时使用现有图片作为备用
+  const availableImages = [
+    '/assets/222-qdFkonWe.jpg',
+    '/assets/logo-BhwB2m9l.png', 
+    '/assets/qrcode-orqZiaKR.jpg',
+    '/assets/Banner-1.jpg',
+    '/assets/Banner-2.jpg'
+  ]
+  
+  // 根据商品ID选择图片，确保一致性
+  const index = Math.abs((path.length || 0)) % availableImages.length
+  return availableImages[index]
+}
+
+// 图片加载失败处理
+const handleImageError = (event) => {
+  console.error('商品图片加载失败:', event)
+  imageLoaded.value = true // 即使失败也隐藏占位符
+  
+  // 设置默认错误图片 - 移除类型断言
+  const img = event.target
+  img.src = '/assets/logo-BhwB2m9l.png'
+}
+
 // 获取分类数据
 const fetchCategoryData = async () => {
   try {
@@ -130,12 +168,13 @@ onMounted(() => {
                 @click="handleProductClick(product.id)"
                 class="product-link"
               >
-                <!-- 使用懒加载 -->
+                <!-- 使用处理后的图片路径 -->
                 <div class="image-container">
                   <img 
-                    v-lazy="product.picture" 
+                    :src="getImageUrl(product.picture)" 
                     :alt="product.name" 
                     @load="handleImageLoad(product.id)"
+                    @error="handleImageError"
                   />
                   <!-- 加载占位符 -->
                   <div v-if="!imageLoadedStates[product.id]" class="loading-placeholder"></div>
@@ -145,7 +184,7 @@ onMounted(() => {
                     {{ product.name }}
                   </p>
                   <p class="desc ellipsis">{{ product.desc }}</p>
-                  <p class="price"><i>¥</i>{{ product.price.toFixed(2) }}</p>
+                  <p class="price"><i>¥</i>{{ product.price?.toFixed(2) }}</p>
                 </div>
               </a>
             </li>

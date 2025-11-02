@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>直接 Vue 测试</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app">{{ message }}</div>
+
+  <script>
+    console.log('🚀 开始直接 Vue 测试');
+
+    const { createApp } = Vue;
+
+    const app = createApp({
+      data() {
+        return {
+          message: '✅ 直接 Vue 测试成功！'
+        }
+      },
+      mounted() {
+        console.log('✅ Vue 应用已挂载');
+        this.message = '✅ Vue 应用运行正常！时间: ' + new Date().toLocaleTimeString();
+      }
+    });
+
+    console.log('准备挂载 Vue 应用...');
+    app.mount('#app');
+    console.log('Vue 应用挂载指令完成');
+  </script>
+</body>
+
+</html>

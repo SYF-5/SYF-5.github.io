@@ -1,60 +1,65 @@
 <template>
   <div class="home">
-    <!-- 横幅区域 -->
-    <div class="banner">
-      <img src="/src/assets/images/222.jpg" alt="小兔鲜促销横幅">
-    </div>
-    
-    <!-- 分类导航占位 -->
-    <div class="category-nav">
-      <div class="category-item" v-for="category in categories" :key="category">
-        <span class="category-icon">{{ getCategoryIcon(category) }}</span>
-        <span class="category-name">{{ category }}</span>
+    <!-- 横幅区域 - 限制宽度并居中 -->
+    <div class="banner-container">
+      <div class="banner">
+        <img src="/src/assets/images/222.jpg" alt="小兔鲜促销横幅">
       </div>
     </div>
     
-    <!-- 加载状态 -->
-    <div v-if="loading" class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>商品加载中...</p>
-    </div>
-    
-    <!-- 错误状态 -->
-    <div v-else-if="error" class="error-state">
-      <p>{{ error }}</p>
-      <button @click="fetchProducts" class="retry-btn">重试</button>
-    </div>
-    
-    <!-- 正常显示内容 -->
-    <template v-else>
-      <!-- 新鲜好物区域 -->
-      <div class="product-section">
-        <h2 class="section-title">新鲜好物</h2>
-        <div class="products-grid">
-          <GoodsItem 
-            v-for="product in featuredProducts" 
-            :key="getProductKey(product)" 
-            :product="product"
-            @item-click="goToProductDetail(product)"
-            @add-to-cart="addToCart(product)"
-          />
+    <!-- 主要内容容器 - 限制宽度并居中 -->
+    <div class="main-container">
+      <!-- 分类导航占位 -->
+      <div class="category-nav">
+        <div class="category-item" v-for="category in categories" :key="category">
+          <span class="category-icon">{{ getCategoryIcon(category) }}</span>
+          <span class="category-name">{{ category }}</span>
         </div>
       </div>
       
-      <!-- 热门商品区域 -->
-      <div class="product-section">
-        <h2 class="section-title">热门商品</h2>
-        <div class="products-grid">
-          <GoodsItem 
-            v-for="product in productList.slice(4)" 
-            :key="getProductKey(product)" 
-            :product="product"
-            @item-click="goToProductDetail(product)"
-            @add-to-cart="addToCart(product)"
-          />
-        </div>
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>商品加载中...</p>
       </div>
-    </template>
+      
+      <!-- 错误状态 -->
+      <div v-else-if="error" class="error-state">
+        <p>{{ error }}</p>
+        <button @click="fetchProducts" class="retry-btn">重试</button>
+      </div>
+      
+      <!-- 正常显示内容 -->
+      <template v-else>
+        <!-- 新鲜好物区域 -->
+        <div class="product-section">
+          <h2 class="section-title">新鲜好物</h2>
+          <div class="products-grid">
+            <GoodsItem 
+              v-for="product in featuredProducts" 
+              :key="getProductKey(product)" 
+              :product="product"
+              @item-click="goToProductDetail(product)"
+              @add-to-cart="addToCart(product)"
+            />
+          </div>
+        </div>
+        
+        <!-- 热门商品区域 -->
+        <div class="product-section">
+          <h2 class="section-title">热门商品</h2>
+          <div class="products-grid">
+            <GoodsItem 
+              v-for="product in productList.slice(4)" 
+              :key="getProductKey(product)" 
+              :product="product"
+              @item-click="goToProductDetail(product)"
+              @add-to-cart="addToCart(product)"
+            />
+          </div>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -64,6 +69,7 @@ import { useProductStore } from '@/stores/product'
 import { useCartStore } from '@/stores/cart'
 import { useRouter } from 'vue-router'
 import type { Product } from '@/types/cart'
+import GoodsItem from '@/components/GoodsItem.vue'
 
 const productStore = useProductStore()
 const cartStore = useCartStore()
@@ -125,30 +131,51 @@ const fetchProducts = () => {
 </script>
 
 <style scoped>
-/* 保持原有的样式不变 */
 .home {
   padding-bottom: 50px;
+  /* 与轮播图组件保持一致，设置固定宽度并居中 */
+  width: 1240px;
+  margin: 0 auto;
+  /* 去除首页的左右内边距 */
+  padding-left: 0;
+  padding-right: 0;
+  box-sizing: border-box;
+  padding-right: 16px;
 }
 
+/* 横幅容器 - 与轮播图组件保持一致 */
+.banner-container {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* 横幅区域 */
 .banner {
   width: 100%;
   height: 200px;
   overflow: hidden;
-  margin-bottom: 20px;
 }
 
 .banner img {
   width: 100%;
   height: 100%;
-object-fit: cover;
+  object-fit: cover;
 }
 
+/* 主要内容容器 - 与轮播图组件保持一致 */
+.main-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 分类导航 - 保持内部边距 */
 .category-nav {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 15px;
-  padding: 0 20px;
   margin-bottom: 30px;
+  /* 在内部添加边距 */
+  padding: 0 20px;
 }
 
 .category-item {
@@ -177,8 +204,10 @@ object-fit: cover;
   color: #333;
 }
 
+/* 商品区域 - 保持内部边距 */
 .product-section {
   margin-bottom: 40px;
+  /* 在内部添加边距 */
   padding: 0 20px;
 }
 
@@ -256,6 +285,19 @@ object-fit: cover;
   background: #1fa588;
 }
 
+/* 响应式设计 */
+@media (max-width: 1240px) {
+  .home {
+    width: 100%;
+    padding: 0 15px;
+  }
+  
+  .category-nav,
+  .product-section {
+    padding: 0 15px;
+  }
+}
+
 @media (max-width: 1024px) {
   .products-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -263,6 +305,15 @@ object-fit: cover;
 }
 
 @media (max-width: 768px) {
+  .home {
+    padding: 0 12px;
+  }
+  
+  .category-nav,
+  .product-section {
+    padding: 0 12px;
+  }
+  
   .category-nav {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -270,15 +321,36 @@ object-fit: cover;
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  
+  .banner {
+    height: 150px;
+  }
 }
 
 @media (max-width: 480px) {
+  .home {
+    padding: 0 10px;
+  }
+  
+  .category-nav,
+  .product-section {
+    padding: 0 10px;
+  }
+  
   .category-nav {
     grid-template-columns: repeat(2, 1fr);
   }
   
   .products-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .section-title {
+    font-size: 20px;
+  }
+  
+  .banner {
+    height: 120px;
   }
 }
 </style>

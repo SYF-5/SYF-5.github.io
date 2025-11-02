@@ -124,5 +124,13 @@ onMounted(() => {
       color: white;
     }
   }
+  
+}
+</style>
+<style lang='scss'>
+/* 非作用域样式，用于覆盖 Element Plus 样式 */
+.home-banner .el-carousel__indicators--outside {
+  text-align: center;
+  transform: none;
 }
 </style>

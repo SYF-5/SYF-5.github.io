@@ -124,6 +124,7 @@ export default {
     0 4px 20px rgba(0, 0, 0, 0.08),
     0 1px 3px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
