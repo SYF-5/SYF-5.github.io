@@ -38,16 +38,12 @@
                 @click="handleProductClick(product.id)"
                 class="product-link"
               >
-                <!-- 使用处理后的图片路径 -->
                 <div class="image-container">
                   <img 
                     :src="getImageUrl(product.picture)" 
                     :alt="product.name" 
-                    @load="handleImageLoad(product.id)"
-                    @error="(event) => handleImageError(event, product.id)"
+                    @error="handleImageError"
                   />
-                  <!-- 加载占位符 -->
-                  <div v-if="!imageLoadedStates[product.id]" class="loading-placeholder"></div>
                 </div>
                 <div class="info">
                   <p class="name ellipsis-2">
@@ -65,131 +61,78 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import productService from '@/services/productService.js'
 
-// 定义本地类型
-interface Product {
-  id: number
-  name: string
-  price: number
-  picture: string
-  desc: string
-}
-
-interface Category {
-  id: number
-  name: string
-  children: string[]
-}
-
 const router = useRouter()
 
 // 响应式数据
-const categoryList = ref<Category[]>([])
+const categoryList = ref([])
 const loading = ref(true)
-const error = ref<string | null>(null)
-const imageLoadedStates = ref<Record<number, boolean>>({})
 
 // 获取分类数据
-const fetchCategoryData = async (): Promise<void> => {
+const fetchCategoryData = async () => {
   try {
     loading.value = true
-    error.value = null
     console.log('开始获取分类数据...')
     
     await productService.loadAllData()
     
+    // 获取分类数据
     const categories = productService.getCategories()
     console.log('获取到的分类数据:', categories)
     
     if (categories && categories.length > 0) {
       categoryList.value = categories
       console.log('成功设置分类数据:', categoryList.value.length, '个分类')
-    } else {
-      console.warn('没有获取到分类数据')
-      error.value = '暂无分类数据'
     }
-  } catch (err: unknown) {
+  } catch (err) {
     console.error('获取分类数据失败:', err)
-    error.value = '数据加载失败，请稍后重试'
   } finally {
     loading.value = false
   }
 }
 
-// 图片路径处理函数 - 修正版本
-const getImageUrl = (path: string): string => {
-  if (!path) {
-    // 使用默认图片（在public目录）
-    return '/images/222.jpg'
-  }
+// 图片路径处理
+const getImageUrl = (path) => {
+  if (!path) return '/images/222.jpg'
   
-  // 如果已经是完整URL，直接返回
   if (path.startsWith('http') || path.startsWith('//')) {
     return path
   }
   
-  // 处理相对路径 - 假设商品图片都在public/images目录下
-  if (path.startsWith('images/')) {
-    // 转换为绝对路径（指向public目录）
-    return '/' + path
+  let finalPath = path
+  if (!finalPath.startsWith('/')) {
+    finalPath = '/' + finalPath
   }
   
-  // 其他情况也尝试从public目录加载
-  if (!path.startsWith('/')) {
-    return '/' + path
-  }
-  
-  return path
+  return finalPath
 }
 
 // 图片加载失败处理
-const handleImageError = (event: Event, productId: number): void => {
-  console.error(`商品 ${productId} 图片加载失败:`, event)
-  const img = event.target as HTMLImageElement
-  img.src = '/images/222.jpg' // 使用public目录下的默认图片
+const handleImageError = (event) => {
+  console.error('图片加载失败:', event)
+  const img = event.target
+  img.src = '/images/222.jpg'
 }
 
-// 处理子分类点击事件
-const handleSubCategoryClick = (categoryId: number, categoryName: string, subCategoryName: string): void => {
+// 处理子分类点击
+const handleSubCategoryClick = (categoryId, categoryName, subCategoryName) => {
   console.log(`点击了 ${categoryName} - ${subCategoryName}`)
-  
-  const categoryGoods = productService.getGoodsByCategoryId(categoryId)
-  
-  if (categoryGoods && categoryGoods.length > 0) {
-    const firstProduct = categoryGoods[0]
-    router.push(`/product/${firstProduct.id}`)
-  } else {
-    alert('该分类下暂无商品')
-  }
 }
 
-// 处理商品点击事件
-const handleProductClick = (productId: number): void => {
+// 处理商品点击
+const handleProductClick = (productId) => {
   console.log(`点击了商品 ID: ${productId}`)
   router.push(`/product/${productId}`)
 }
 
-// 图片加载完成处理
-const handleImageLoad = (productId: number): void => {
-  imageLoadedStates.value[productId] = true
-}
-
 // 获取分类的商品列表
-const getCategoryGoods = (categoryId: number): Product[] => {
+const getCategoryGoods = (categoryId) => {
   const goods = productService.getGoodsByCategoryId(categoryId) || []
-  const displayGoods = goods.slice(0, 6)
-  
-  displayGoods.forEach((product: Product) => {
-    if (!imageLoadedStates.value[product.id]) {
-      imageLoadedStates.value[product.id] = false
-    }
-  })
-  
-  return displayGoods
+  return goods.slice(0, 6) // 限制显示6个商品
 }
 
 onMounted(() => {
@@ -292,7 +235,6 @@ onMounted(() => {
               }
 
               .image-container {
-                position: relative;
                 width: 95px;
                 height: 95px;
                 
@@ -300,18 +242,6 @@ onMounted(() => {
                   width: 100%;
                   height: 100%;
                   object-fit: cover;
-                  border-radius: 4px;
-                }
-
-                .loading-placeholder {
-                  position: absolute;
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  height: 100%;
-                  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-                  background-size: 200% 100%;
-                  animation: loading 1.5s infinite;
                   border-radius: 4px;
                 }
               }
@@ -350,15 +280,6 @@ onMounted(() => {
         }
       }
     }
-  }
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
   }
 }
 </style>

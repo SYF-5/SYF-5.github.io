@@ -11,7 +11,7 @@
     <div class="main-container">
       <!-- 分类导航 -->
       <div class="category-nav">
-        <div class="category-item" v-for="category in categories" :key="category">
+        <div class="category-item" v-for="category in categories" :key="category" @click="handleCategoryClick(category)">
           <span class="category-icon">{{ getCategoryIcon(category) }}</span>
           <span class="category-name">{{ category }}</span>
         </div>
@@ -35,7 +35,7 @@
         <div class="product-section">
           <h2 class="section-title">新鲜好物</h2>
           <div class="products-grid">
-            <div class="product-item" v-for="product in featuredProducts" :key="product.id">
+            <div class="product-item" v-for="product in featuredProducts" :key="product.id" @click="goToProductDetail(product)">
               <div class="product-image">
                 <img 
                   :src="getProductImageUrl(product)" 
@@ -47,6 +47,7 @@
                 <h3>{{ product.name }}</h3>
                 <p class="desc">{{ product.desc || product.description }}</p>
                 <p class="price">¥{{ product.price?.toFixed(2) }}</p>
+                <button class="add-cart-btn" @click.stop="addToCart(product)">加入购物车</button>
               </div>
             </div>
           </div>
@@ -56,7 +57,7 @@
         <div class="product-section">
           <h2 class="section-title">热门商品</h2>
           <div class="products-grid">
-            <div class="product-item" v-for="product in remainingProducts" :key="product.id">
+            <div class="product-item" v-for="product in remainingProducts" :key="product.id" @click="goToProductDetail(product)">
               <div class="product-image">
                 <img 
                   :src="getProductImageUrl(product)" 
@@ -68,6 +69,7 @@
                 <h3>{{ product.name }}</h3>
                 <p class="desc">{{ product.desc || product.description }}</p>
                 <p class="price">¥{{ product.price?.toFixed(2) }}</p>
+                <button class="add-cart-btn" @click.stop="addToCart(product)">加入购物车</button>
               </div>
             </div>
           </div>
@@ -79,7 +81,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import productService from '@/services/productService.js'
+
+const router = useRouter()
 
 // 响应式数据
 const loading = ref(false)
@@ -95,7 +100,7 @@ const remainingProducts = computed(() => {
   return productList.value.slice(4)
 })
 
-// 分类数据
+// 分类数据 - 使用你提供的分类
 const categories = ['蔬菜', '水果', '肉类', '粮油', '奶制品', '零食']
 
 // 获取商品数据
@@ -108,11 +113,11 @@ const fetchProducts = async () => {
     await productService.loadAllData()
     const products = productService.getAllProducts()
     
-    console.log('获取到的商品:', products)
+    console.log('获取到的真实商品:', products)
     
     if (products && products.length > 0) {
       productList.value = products
-      console.log('成功设置商品列表，数量:', products.length)
+      console.log('成功设置真实商品列表，数量:', products.length)
     } else {
       error.value = '暂无商品数据'
       console.log('没有获取到商品数据')
@@ -125,11 +130,15 @@ const fetchProducts = async () => {
   }
 }
 
-// 商品图片URL处理 - 使用在线图片确保显示
+// 商品图片URL处理
 const getProductImageUrl = (product) => {
-  // 如果有本地图片路径，尝试加载
-  if (product.picture && product.picture.startsWith('images/')) {
-    return '/' + product.picture
+  // 优先使用本地图片
+  if (product.picture) {
+    // 处理相对路径
+    if (product.picture.startsWith('images/')) {
+      return '/' + product.picture
+    }
+    return product.picture
   }
   
   // 使用在线图片作为后备
@@ -142,6 +151,25 @@ const handleImageError = (event) => {
   console.log('图片加载失败，使用在线图片')
   const productId = event.target.alt || 'default'
   event.target.src = `https://picsum.photos/300/200?random=${productId}`
+}
+
+// 分类点击处理
+const handleCategoryClick = (category) => {
+  console.log('点击分类:', category)
+  // 这里可以添加分类筛选逻辑
+}
+
+// 跳转到商品详情
+const goToProductDetail = (product) => {
+  console.log('跳转到商品详情:', product.id)
+  router.push(`/product/${product.id}`)
+}
+
+// 添加到购物车
+const addToCart = (product) => {
+  console.log('添加到购物车:', product.name)
+  // 这里可以调用购物车store
+  alert(`已添加 ${product.name} 到购物车`)
 }
 
 const getCategoryIcon = (category) => {
@@ -260,6 +288,7 @@ onMounted(() => {
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .product-item:hover {
@@ -308,7 +337,23 @@ onMounted(() => {
   font-size: 18px;
   font-weight: bold;
   color: #ff4444;
-  margin: 0;
+  margin: 0 0 10px 0;
+}
+
+.add-cart-btn {
+  width: 100%;
+  padding: 8px 12px;
+  background: #27BA9B;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.add-cart-btn:hover {
+  background: #1fa588;
 }
 
 .loading-state {
