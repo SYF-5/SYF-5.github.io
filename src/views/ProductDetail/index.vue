@@ -81,37 +81,40 @@ const handleImageLoad = () => {
   imageLoaded.value = true
 }
 
-// 修复：图片加载失败处理
+// 优化：图片加载失败处理
 const handleImageError = (event) => {
   console.warn('图片加载失败:', event.target.src)
-  // 使用在线图片作为备用
-  event.target.src = `https://picsum.photos/600/400?random=${product.value.id || 1}`
+  // 使用本地默认图片作为备用
+  event.target.src = './images/222.jpg'
 }
 
-// 修复：处理图片URL - 关键修复
+// 优化：处理图片URL并支持懒加载
 const getImageUrl = (picturePath) => {
   if (!picturePath) {
-    return `https://picsum.photos/600/400?random=${product.value.id || 1}`
+    return './images/222.jpg'
   }
   
   // 如果已经是完整URL，直接返回
-  if (picturePath.startsWith('http')) {
+  if (picturePath.startsWith('http') || picturePath.startsWith('//')) {
     return picturePath
   }
   
-  let finalPath = picturePath
-  
-  // 关键修复：处理 images/ 开头的路径
-  if (finalPath.startsWith('images/')) {
-    finalPath = '/' + finalPath
+  // 处理绝对路径，改为相对路径
+  if (picturePath.startsWith('/')) {
+    return `.${picturePath}`
   }
   
-  // 如果路径没有斜杠，添加斜杠
-  if (!finalPath.startsWith('/')) {
-    finalPath = '/' + finalPath
+  // 对于只有文件名的情况，添加正确的路径前缀
+  if (!picturePath.includes('/')) {
+    return `./images/${picturePath}`
   }
   
-  return finalPath
+  // 如果以list-开头，确保路径正确
+  if (picturePath.startsWith('list-')) {
+    return `./images/${picturePath}`
+  }
+  
+  return `./${picturePath}`
 }
 
 // 修复：从统一的服务加载商品数据并确保数据完整性
@@ -192,11 +195,12 @@ onMounted(() => {
       <!-- 修复：商品图片使用修复后的路径处理 -->
       <div class="product-gallery">
         <img 
-          :src="getImageUrl(product.picture)" 
+          v-lazy="getImageUrl(product.picture)" 
           :alt="product.name" 
           class="main-image"
           @load="handleImageLoad"
           @error="handleImageError"
+          style="width: 100%; height: auto; opacity: 1; transition: opacity 0.3s;"
         />
         <div v-if="!imageLoaded" class="loading-placeholder">
           <p>图片加载中...</p>

@@ -19,21 +19,35 @@ try {
   const app = createApp(App)
   console.log('✅ Vue 应用实例创建成功')
 
-  // 简化配置，先确保核心功能正常
-  // 暂时注释掉懒加载，排除可能的兼容性问题
-  /*
+  // 启用图片懒加载功能
   try {
-    const VueLazyload = await import('vue-lazyload')
-    app.use(VueLazyload.default, {
-      error: '/assets/logo-BhwB2m9l.png',
-      loading: '/assets/logo-BhwB2m9l.png',
-      attempt: 1
+    import('vue-lazyload').then(({ default: VueLazyload }) => {
+      app.use(VueLazyload, {
+        error: './images/222.jpg',
+        loading: './images/222.jpg',
+        attempt: 3,
+        preLoad: 1.3,
+        listenEvents: ['scroll', 'wheel', 'mousewheel', 'resize', 'animationend', 'transitionend', 'touchmove'],
+        adapter: {
+          loaded({ el }) {
+            // 图片加载成功的处理
+            el.style.opacity = '1'
+          },
+          loading({ el }) {
+            // 图片加载中的处理
+            el.style.opacity = '0.5'
+          },
+          error({ el }) {
+            // 图片加载失败的处理
+            console.warn('图片加载失败:', el.src)
+          }
+        }
+      })
+      console.log('✅ Vue Lazyload 配置完成')
     })
-    console.log('✅ Vue Lazyload 配置完成')
   } catch (error) {
     console.warn('❌ Vue Lazyload 加载失败，继续无懒加载模式:', error)
   }
-  */
 
   app.use(createPinia())
   console.log('✅ Pinia 安装完成')

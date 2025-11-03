@@ -15,27 +15,37 @@ const cartStore = useCartStore()
 const router = useRouter()
 const isAddingToCart = ref(false)
 
-// 简化的图片URL处理
+// 优化的图片URL处理
 const getImageUrl = (path) => {
-  if (!path) return '/images/222.jpg'
+  if (!path) return './images/222.jpg'
   
   // 如果已经是完整URL，直接返回
   if (path.startsWith('http') || path.startsWith('//')) {
     return path
   }
   
-  // 确保以 / 开头
-  if (!path.startsWith('/')) {
-    return '/' + path
+  // 处理绝对路径，改为相对路径
+  if (path.startsWith('/')) {
+    return `.${path}`
   }
   
-  return path
+  // 对于只有文件名的情况，添加正确的路径前缀
+  if (!path.includes('/')) {
+    return `./images/${path}`
+  }
+  
+  // 如果以list-开头，确保路径正确
+  if (path.startsWith('list-')) {
+    return `./images/${path}`
+  }
+  
+  return `./${path}`
 }
 
 // 图片加载失败处理
 const handleImageError = (event) => {
   console.warn('图片加载失败:', event.target.src)
-  event.target.src = '/images/222.jpg'
+  event.target.src = './images/222.jpg'
 }
 
 // 添加到购物车
@@ -64,10 +74,10 @@ const handleItemClick = () => {
   <div class="goods-item" @click="handleItemClick">
     <div class="goods-image">
       <img 
-        :src="getImageUrl(product.picture)" 
+        v-lazy="getImageUrl(product.picture)" 
         :alt="product.name" 
         @error="handleImageError"
-        loading="lazy"
+        style="width: 100%; height: auto; opacity: 1; transition: opacity 0.3s;"
       />
     </div>
     <div class="goods-info">

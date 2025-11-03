@@ -1,13 +1,14 @@
 <template>
   <div class="cart-item">
     <div class="item-image">
-      <!-- 使用懒加载 -->
+      <!-- 使用v-lazy实现图片懒加载 -->
       <div class="image-container">
         <img 
-          :src="item.picture" 
+          v-lazy="getImageUrl(item.picture)" 
           :alt="item.name" 
           @load="handleImageLoad(item.id)"
           @error="handleImageError" 
+          style="width: 100%; height: auto; opacity: 1; transition: opacity 0.3s;"
         />
         <!-- 加载占位符 -->
         <div v-if="!imageLoadedStates[item.id]" class="loading-placeholder"></div>
@@ -77,11 +78,41 @@ const handleImageLoad = (itemId: number) => {
   imageLoadedStates[itemId] = true
 }
 
+// 图片路径处理函数
+const getImageUrl = (picturePath: string) => {
+  if (!picturePath) {
+    return './images/222.jpg'
+  }
+  
+  // 如果已经是完整URL，直接返回
+  if (picturePath.startsWith('http') || picturePath.startsWith('//')) {
+    return picturePath
+  }
+  
+  // 处理相对路径
+  if (picturePath.startsWith('/')) {
+    // 如果是绝对路径，改为相对路径
+    return `.${picturePath}`
+  }
+  
+  // 对于只有文件名的情况，添加正确的路径前缀
+  if (!picturePath.includes('/')) {
+    return `./images/${picturePath}`
+  }
+  
+  // 如果以list-开头，确保路径正确
+  if (picturePath.startsWith('list-')) {
+    return `./images/${picturePath}`
+  }
+  
+  return `./${picturePath}`
+}
+
 // 处理图片加载错误
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   // 设置默认图片
-  img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7lm77niYc8L3RleHQ+PC9zdmc+'
+  img.src = './images/222.jpg'
   
   // 标记为已加载，隐藏占位符
   const itemId = Object.keys(imageLoadedStates).find(key => 
