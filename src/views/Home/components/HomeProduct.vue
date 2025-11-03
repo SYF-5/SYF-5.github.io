@@ -3,11 +3,7 @@
     <!-- 横幅区域 -->
     <div class="banner-container">
       <div class="banner">
-        <img 
-          src="@/assets/images/222.jpg" 
-          alt="小兔鲜促销横幅"
-          loading="lazy"
-        >
+        <img src="@/assets/images/222.jpg" alt="小兔鲜促销横幅">
       </div>
     </div>
     
@@ -33,24 +29,26 @@
         <button @click="fetchProducts" class="retry-btn">重试</button>
       </div>
       
-      <!-- 空状态 -->
-      <div v-else-if="productList.length === 0" class="empty-state">
-        <p>暂无商品数据</p>
-        <button @click="fetchProducts" class="retry-btn">重新加载</button>
-      </div>
-      
       <!-- 正常显示内容 -->
       <template v-else>
         <!-- 新鲜好物区域 -->
         <div class="product-section">
           <h2 class="section-title">新鲜好物</h2>
           <div class="products-grid">
-            <GoodsItem 
-              v-for="product in featuredProducts" 
-              :key="getProductKey(product)" 
-              :product="product"
-              @item-click="goToProductDetail(product)"
-            />
+            <div class="product-item" v-for="product in featuredProducts" :key="product.id">
+              <div class="product-image">
+                <img 
+                  :src="getProductImageUrl(product)" 
+                  :alt="product.name"
+                  @error="handleImageError"
+                >
+              </div>
+              <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="desc">{{ product.desc || product.description }}</p>
+                <p class="price">¥{{ product.price?.toFixed(2) }}</p>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -58,12 +56,20 @@
         <div class="product-section">
           <h2 class="section-title">热门商品</h2>
           <div class="products-grid">
-            <GoodsItem 
-              v-for="product in productList.slice(4, 12)" 
-              :key="getProductKey(product)" 
-              :product="product"
-              @item-click="goToProductDetail(product)"
-            />
+            <div class="product-item" v-for="product in remainingProducts" :key="product.id">
+              <div class="product-image">
+                <img 
+                  :src="getProductImageUrl(product)" 
+                  :alt="product.name"
+                  @error="handleImageError"
+                >
+              </div>
+              <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="desc">{{ product.desc || product.description }}</p>
+                <p class="price">¥{{ product.price?.toFixed(2) }}</p>
+              </div>
+            </div>
           </div>
         </div>
       </template>
@@ -71,138 +77,94 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
-import GoodsItem from '@/components/GoodsItem.vue'
+<script setup>
+import { ref, computed, onMounted } from 'vue'
 import productService from '@/services/productService.js'
-
-// 定义本地类型
-interface Product {
-  id: number
-  name: string
-  price: number
-  picture: string
-  desc: string
-  description?: string
-  category?: string
-}
-
-const router = useRouter()
 
 // 响应式数据
 const loading = ref(false)
-const error = ref<string | null>(null)
-const productList = ref<Product[]>([])
+const error = ref(null)
+const productList = ref([])
 
 // 计算属性
 const featuredProducts = computed(() => {
   return productList.value.slice(0, 4)
 })
 
-// 添加节流控制
-let isFetching = false
+const remainingProducts = computed(() => {
+  return productList.value.slice(4)
+})
 
-// 获取商品数据 - 添加性能优化
-const fetchProducts = async (): Promise<void> => {
-  if (isFetching) return
-  
-  isFetching = true
+// 分类数据
+const categories = ['蔬菜', '水果', '肉类', '粮油', '奶制品', '零食']
+
+// 获取商品数据
+const fetchProducts = async () => {
+  console.log('开始获取商品数据...')
   loading.value = true
   error.value = null
   
   try {
-    console.log('开始获取商品数据...')
-    
-    // 添加超时控制
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('请求超时')), 10000)
-    })
-    
-    const fetchPromise = productService.loadAllData()
-    
-    await Promise.race([fetchPromise, timeoutPromise])
-    
-    // 只获取 products 数据
+    await productService.loadAllData()
     const products = productService.getAllProducts()
-    console.log('获取到的商品数据:', products)
+    
+    console.log('获取到的商品:', products)
     
     if (products && products.length > 0) {
-      // 限制显示的商品数量以提高性能
-      productList.value = products.slice(0, 16)
-      console.log('成功设置商品数据:', productList.value.length, '个商品')
+      productList.value = products
+      console.log('成功设置商品列表，数量:', products.length)
     } else {
-      console.warn('没有获取到商品数据')
       error.value = '暂无商品数据'
+      console.log('没有获取到商品数据')
     }
-  } catch (err: unknown) {
-    console.error('获取商品数据失败:', err)
-    error.value = err instanceof Error ? err.message : '数据加载失败，请稍后重试'
+  } catch (err) {
+    console.error('获取商品失败:', err)
+    error.value = '数据加载失败: ' + err.message
   } finally {
     loading.value = false
-    isFetching = false
   }
 }
 
-const getProductKey = (product: Product): string => {
-  return `product-${product?.id}-${Math.random().toString(36).substr(2, 9)}`
+// 商品图片URL处理 - 使用在线图片确保显示
+const getProductImageUrl = (product) => {
+  // 如果有本地图片路径，尝试加载
+  if (product.picture && product.picture.startsWith('images/')) {
+    return '/' + product.picture
+  }
+  
+  // 使用在线图片作为后备
+  const productId = product.id || 1
+  return `https://picsum.photos/300/200?random=${productId}`
 }
 
-const categories = ['蔬菜', '水果', '肉类', '粮油', '奶制品', '零食']
+// 图片加载失败处理
+const handleImageError = (event) => {
+  console.log('图片加载失败，使用在线图片')
+  const productId = event.target.alt || 'default'
+  event.target.src = `https://picsum.photos/300/200?random=${productId}`
+}
 
-const getCategoryIcon = (category: string): string => {
-  const icons: Record<string, string> = {
-    '蔬菜': '🥬',
-    '水果': '🍎',
-    '肉类': '🥩',
-    '粮油': '🍚',
-    '奶制品': '🥛',
-    '零食': '🍪'
+const getCategoryIcon = (category) => {
+  const icons = {
+    '蔬菜': '🥬', '水果': '🍎', '肉类': '🥩', 
+    '粮油': '🍚', '奶制品': '🥛', '零食': '🍪'
   }
   return icons[category] || '🛒'
 }
 
-const goToProductDetail = (product: Product): void => {
-  console.log('跳转到商品详情:', product.id)
-  router.push(`/product/${product.id}`)
-}
-
-// 添加组件卸载清理
-onUnmounted(() => {
-  isFetching = false
-})
-
 onMounted(() => {
-  console.log('HomePage 组件已挂载')
+  console.log('首页组件挂载')
   fetchProducts()
 })
 </script>
 
 <style scoped>
-/* 其他样式保持不变，添加图片优化样式 */
-.banner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #f5f5f5; /* 添加背景色避免空白 */
-}
-
-/* 添加图片加载优化 */
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-
-/* 其他原有样式保持不变 */
 .home {
   padding-bottom: 50px;
   width: 1240px;
   margin: 0 auto;
-  padding-left: 0;
-  padding-right: 0;
+  padding: 0 16px;
   box-sizing: border-box;
-  padding-right: 16px;
 }
 
 .banner-container {
@@ -214,11 +176,17 @@ onMounted(() => {
   width: 100%;
   height: 200px;
   overflow: hidden;
+  border-radius: 8px;
+}
+
+.banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .main-container {
   width: 100%;
-  box-sizing: border-box;
 }
 
 .category-nav {
@@ -226,7 +194,6 @@ onMounted(() => {
   grid-template-columns: repeat(6, 1fr);
   gap: 15px;
   margin-bottom: 30px;
-  padding: 0 20px;
 }
 
 .category-item {
@@ -253,11 +220,11 @@ onMounted(() => {
 .category-name {
   font-size: 14px;
   color: #333;
+  font-weight: 500;
 }
 
 .product-section {
   margin-bottom: 40px;
-  padding: 0 20px;
 }
 
 .section-title {
@@ -279,6 +246,69 @@ onMounted(() => {
   width: 5px;
   background: #27BA9B;
   border-radius: 3px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.product-item {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-item:hover .product-image img {
+  transform: scale(1.05);
+}
+
+.product-info {
+  padding: 15px;
+}
+
+.product-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+.desc {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 10px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4444;
+  margin: 0;
 }
 
 .loading-state {
@@ -311,12 +341,6 @@ onMounted(() => {
   color: #ff4757;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #666;
-}
-
 .retry-btn {
   margin-top: 16px;
   padding: 8px 16px;
@@ -333,19 +357,11 @@ onMounted(() => {
 }
 
 /* 响应式设计 */
-@media (max-width: 1240px) {
+@media (max-width: 1024px) {
   .home {
     width: 100%;
-    padding: 0 15px;
   }
   
-  .category-nav,
-  .product-section {
-    padding: 0 15px;
-  }
-}
-
-@media (max-width: 1024px) {
   .products-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -353,11 +369,6 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .home {
-    padding: 0 12px;
-  }
-  
-  .category-nav,
-  .product-section {
     padding: 0 12px;
   }
   
@@ -379,25 +390,12 @@ onMounted(() => {
     padding: 0 10px;
   }
   
-  .category-nav,
-  .product-section {
-    padding: 0 10px;
-  }
-  
   .category-nav {
     grid-template-columns: repeat(2, 1fr);
   }
   
   .products-grid {
     grid-template-columns: 1fr;
-  }
-  
-  .section-title {
-    font-size: 20px;
-  }
-  
-  .banner {
-    height: 120px;
   }
 }
 </style>
