@@ -121,8 +121,15 @@ class ProductService {
   fixImagePath(path) {
     if (!path) return '/images/222.jpg'
 
+    console.log('原始图片路径:', path)
+
     // 如果已经是完整路径，直接返回
-    if (path.startsWith('http') || path.startsWith('//') || path.startsWith('/')) {
+    if (path.startsWith('http') || path.startsWith('//')) {
+      return path
+    }
+
+    // 处理以 / 开头的绝对路径
+    if (path.startsWith('/')) {
       return path
     }
 
@@ -131,8 +138,8 @@ class ProductService {
       return '/' + path
     }
 
-    // 其他情况添加 /images/ 前缀
-    return '/images/' + path
+    // 其他情况直接返回，让前端处理
+    return path
   }
 
   // 设置默认数据

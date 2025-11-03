@@ -3,8 +3,11 @@
     <!-- 横幅区域 -->
     <div class="banner-container">
       <div class="banner">
-        <!-- 横幅图片在 src/assets/images 目录 -->
-        <img src="@/assets/images/222.jpg" alt="小兔鲜促销横幅">
+        <img 
+          src="@/assets/images/222.jpg" 
+          alt="小兔鲜促销横幅"
+          loading="lazy"
+        >
       </div>
     </div>
     
@@ -47,7 +50,6 @@
               :key="getProductKey(product)" 
               :product="product"
               @item-click="goToProductDetail(product)"
-
             />
           </div>
         </div>
@@ -57,7 +59,7 @@
           <h2 class="section-title">热门商品</h2>
           <div class="products-grid">
             <GoodsItem 
-              v-for="product in productList.slice(4)" 
+              v-for="product in productList.slice(4, 12)" 
               :key="getProductKey(product)" 
               :product="product"
               @item-click="goToProductDetail(product)"
@@ -70,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import GoodsItem from '@/components/GoodsItem.vue'
 import productService from '@/services/productService.js'
@@ -98,21 +100,36 @@ const featuredProducts = computed(() => {
   return productList.value.slice(0, 4)
 })
 
-// 获取商品数据 - 只使用 products 数据
+// 添加节流控制
+let isFetching = false
+
+// 获取商品数据 - 添加性能优化
 const fetchProducts = async (): Promise<void> => {
+  if (isFetching) return
+  
+  isFetching = true
   loading.value = true
   error.value = null
+  
   try {
     console.log('开始获取商品数据...')
     
-    await productService.loadAllData()
+    // 添加超时控制
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('请求超时')), 10000)
+    })
+    
+    const fetchPromise = productService.loadAllData()
+    
+    await Promise.race([fetchPromise, timeoutPromise])
     
     // 只获取 products 数据
     const products = productService.getAllProducts()
-    console.log('获取到的商品数据（来自products）:', products)
+    console.log('获取到的商品数据:', products)
     
     if (products && products.length > 0) {
-      productList.value = products
+      // 限制显示的商品数量以提高性能
+      productList.value = products.slice(0, 16)
       console.log('成功设置商品数据:', productList.value.length, '个商品')
     } else {
       console.warn('没有获取到商品数据')
@@ -120,14 +137,15 @@ const fetchProducts = async (): Promise<void> => {
     }
   } catch (err: unknown) {
     console.error('获取商品数据失败:', err)
-    error.value = '数据加载失败，请稍后重试'
+    error.value = err instanceof Error ? err.message : '数据加载失败，请稍后重试'
   } finally {
     loading.value = false
+    isFetching = false
   }
 }
 
 const getProductKey = (product: Product): string => {
-  return product?.id?.toString() || Math.random().toString(36).substr(2, 9)
+  return `product-${product?.id}-${Math.random().toString(36).substr(2, 9)}`
 }
 
 const categories = ['蔬菜', '水果', '肉类', '粮油', '奶制品', '零食']
@@ -149,7 +167,10 @@ const goToProductDetail = (product: Product): void => {
   router.push(`/product/${product.id}`)
 }
 
-// 移除 addToCart 方法，因为 GoodsItem 内部已经处理
+// 添加组件卸载清理
+onUnmounted(() => {
+  isFetching = false
+})
 
 onMounted(() => {
   console.log('HomePage 组件已挂载')
@@ -158,7 +179,22 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 保持原有的 CSS 样式不变 */
+/* 其他样式保持不变，添加图片优化样式 */
+.banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #f5f5f5; /* 添加背景色避免空白 */
+}
+
+/* 添加图片加载优化 */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* 其他原有样式保持不变 */
 .home {
   padding-bottom: 50px;
   width: 1240px;
@@ -178,12 +214,6 @@ onMounted(() => {
   width: 100%;
   height: 200px;
   overflow: hidden;
-}
-
-.banner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .main-container {
@@ -249,12 +279,6 @@ onMounted(() => {
   width: 5px;
   background: #27BA9B;
   border-radius: 3px;
-}
-
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
 }
 
 .loading-state {

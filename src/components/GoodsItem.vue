@@ -1,14 +1,19 @@
 <template>
   <div class="goods-item" @click="handleItemClick">
     <div class="goods-image">
-      <img :src="getImageUrl(product.picture)" :alt="product.name" @error="handleImageError">
+      <img 
+        :src="getImageUrl(product.picture)" 
+        :alt="product.name" 
+        @error="handleImageError"
+        loading="lazy"
+      >
+      <div v-if="imageLoading" class="image-loading">加载中...</div>
     </div>
     <div class="goods-info">
       <h3 class="goods-name">{{ product.name }}</h3>
       <p class="goods-desc">{{ product.desc || product.description }}</p>
       <div class="goods-price">
         <span class="price">¥{{ product.price?.toFixed(2) }}</span>
-        <!-- 使用原生按钮或确保阻止事件冒泡 -->
         <button 
           class="add-cart-btn" 
           @click.stop="handleAddToCart"
@@ -39,34 +44,53 @@ const props = defineProps({
 const cartStore = useCartStore()
 const router = useRouter()
 const isAddingToCart = ref(false)
+const imageLoading = ref(true)
 
-// 图片路径处理函数
+// 图片路径处理函数 - 增强版本
 const getImageUrl = (path) => {
-  if (!path) return '/images/222.jpg'
+  if (!path) {
+    console.log('图片路径为空，使用默认图片')
+    return '/images/222.jpg'
+  }
+  
+  console.log('处理图片路径:', path)
   
   // 如果已经是完整URL，直接返回
   if (path.startsWith('http') || path.startsWith('//')) {
     return path
   }
   
-  // 处理相对路径
-  if (path.startsWith('images/')) {
-    return '/' + path
-  }
+  let finalPath = path
   
   // 确保以 / 开头
-  if (!path.startsWith('/')) {
-    return '/' + path
+  if (!finalPath.startsWith('/')) {
+    finalPath = '/' + finalPath
   }
   
-  return path
+  // 如果是开发环境，添加基础URL
+  if (process.env.NODE_ENV === 'development') {
+    // 在开发环境中，确保路径正确指向public目录
+    if (!finalPath.startsWith('/images/') && !finalPath.includes('assets')) {
+      finalPath = '/images' + finalPath
+    }
+  }
+  
+  console.log('最终图片路径:', finalPath)
+  return finalPath
 }
 
 // 图片加载失败处理
 const handleImageError = (event) => {
-  console.error('商品图片加载失败:', event)
+  console.error('商品图片加载失败:', props.product.name, '路径:', event.target.src)
   const img = event.target
+  // 尝试使用默认图片
   img.src = '/images/222.jpg'
+  imageLoading.value = false
+}
+
+// 图片加载成功处理
+const handleImageLoad = () => {
+  imageLoading.value = false
 }
 
 // 处理添加购物车
@@ -76,10 +100,8 @@ const handleAddToCart = async () => {
   isAddingToCart.value = true
   
   try {
-    // 使用 Pinia store 添加商品到购物车
     await cartStore.addToCart(props.product, 1)
     
-    // 使用 Element Plus 消息提示
     ElMessage({
       message: `"${props.product.name}" 已成功添加到购物车`,
       type: 'success',
@@ -88,11 +110,8 @@ const handleAddToCart = async () => {
       offset: 80
     })
     
-    console.log(`成功添加 "${props.product.name}" 到购物车`)
-    
   } catch (error) {
     console.error('添加购物车失败:', error)
-    // 错误提示
     ElMessage({
       message: '添加商品失败，请重试',
       type: 'error',
@@ -106,13 +125,11 @@ const handleAddToCart = async () => {
 
 // 原有的点击商品跳转详情功能
 const handleItemClick = () => {
-  // 跳转到商品详情页
   router.push(`/product/${props.product.id}`)
 }
 </script>
 
 <style scoped>
-/* 保持原有的样式不变 */
 .goods-item {
   position: relative;
   background: #fff;
@@ -132,8 +149,9 @@ const handleItemClick = () => {
   position: relative;
   width: 100%;
   height: 0;
-  padding-bottom: 75%; /* 4:3 宽高比 */
+  padding-bottom: 75%;
   overflow: hidden;
+  background: #f5f5f5;
 }
 
 .goods-image img {
@@ -148,6 +166,15 @@ const handleItemClick = () => {
 
 .goods-item:hover .goods-image img {
   transform: scale(1.05);
+}
+
+.image-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #999;
+  font-size: 14px;
 }
 
 .goods-info {
