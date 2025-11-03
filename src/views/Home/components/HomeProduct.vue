@@ -3,7 +3,8 @@
     <!-- 横幅区域 -->
     <div class="banner-container">
       <div class="banner">
-        <img src="/src/assets/images/222.jpg" alt="小兔鲜促销横幅">
+        <!-- 横幅图片在 src/assets/images 目录 -->
+        <img src="@/assets/images/222.jpg" alt="小兔鲜促销横幅">
       </div>
     </div>
     
@@ -46,7 +47,7 @@
               :key="getProductKey(product)" 
               :product="product"
               @item-click="goToProductDetail(product)"
-              @add-to-cart="addToCart(product)"
+
             />
           </div>
         </div>
@@ -60,7 +61,6 @@
               :key="getProductKey(product)" 
               :product="product"
               @item-click="goToProductDetail(product)"
-              @add-to-cart="addToCart(product)"
             />
           </div>
         </div>
@@ -73,7 +73,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import GoodsItem from '@/components/GoodsItem.vue'
-// 直接导入，让 TypeScript 通过声明文件处理类型
 import productService from '@/services/productService.js'
 
 // 定义本地类型
@@ -83,7 +82,8 @@ interface Product {
   price: number
   picture: string
   desc: string
-  categoryId?: number
+  description?: string
+  category?: string
 }
 
 const router = useRouter()
@@ -98,19 +98,18 @@ const featuredProducts = computed(() => {
   return productList.value.slice(0, 4)
 })
 
-// 获取商品数据
+// 获取商品数据 - 只使用 products 数据
 const fetchProducts = async (): Promise<void> => {
   loading.value = true
   error.value = null
   try {
     console.log('开始获取商品数据...')
     
-    // 使用现有的 productService
     await productService.loadAllData()
     
-    // 获取所有商品
+    // 只获取 products 数据
     const products = productService.getAllProducts()
-    console.log('获取到的商品数据:', products)
+    console.log('获取到的商品数据（来自products）:', products)
     
     if (products && products.length > 0) {
       productList.value = products
@@ -127,15 +126,12 @@ const fetchProducts = async (): Promise<void> => {
   }
 }
 
-// 商品 key 生成器
 const getProductKey = (product: Product): string => {
   return product?.id?.toString() || Math.random().toString(36).substr(2, 9)
 }
 
-// 分类数据
 const categories = ['蔬菜', '水果', '肉类', '粮油', '奶制品', '零食']
 
-// 获取分类图标
 const getCategoryIcon = (category: string): string => {
   const icons: Record<string, string> = {
     '蔬菜': '🥬',
@@ -148,20 +144,13 @@ const getCategoryIcon = (category: string): string => {
   return icons[category] || '🛒'
 }
 
-// 跳转到商品详情页
 const goToProductDetail = (product: Product): void => {
   console.log('跳转到商品详情:', product.id)
   router.push(`/product/${product.id}`)
 }
 
-// 添加到购物车
-const addToCart = (product: Product): void => {
-  console.log('添加到购物车:', product.name)
-  // 可以添加购物车提示
-  alert(`已添加 ${product.name} 到购物车`)
-}
+// 移除 addToCart 方法，因为 GoodsItem 内部已经处理
 
-// 组件挂载时获取数据
 onMounted(() => {
   console.log('HomePage 组件已挂载')
   fetchProducts()

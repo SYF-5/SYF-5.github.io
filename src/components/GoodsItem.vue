@@ -1,13 +1,13 @@
 <template>
   <div class="goods-item" @click="handleItemClick">
     <div class="goods-image">
-      <img :src="product.picture" :alt="product.name">
+      <img :src="getImageUrl(product.picture)" :alt="product.name" @error="handleImageError">
     </div>
     <div class="goods-info">
       <h3 class="goods-name">{{ product.name }}</h3>
-      <p class="goods-desc">{{ product.description }}</p>
+      <p class="goods-desc">{{ product.desc || product.description }}</p>
       <div class="goods-price">
-        <span class="price">¥{{ product.price }}</span>
+        <span class="price">¥{{ product.price?.toFixed(2) }}</span>
         <!-- 使用原生按钮或确保阻止事件冒泡 -->
         <button 
           class="add-cart-btn" 
@@ -39,6 +39,35 @@ const props = defineProps({
 const cartStore = useCartStore()
 const router = useRouter()
 const isAddingToCart = ref(false)
+
+// 图片路径处理函数
+const getImageUrl = (path) => {
+  if (!path) return '/images/222.jpg'
+  
+  // 如果已经是完整URL，直接返回
+  if (path.startsWith('http') || path.startsWith('//')) {
+    return path
+  }
+  
+  // 处理相对路径
+  if (path.startsWith('images/')) {
+    return '/' + path
+  }
+  
+  // 确保以 / 开头
+  if (!path.startsWith('/')) {
+    return '/' + path
+  }
+  
+  return path
+}
+
+// 图片加载失败处理
+const handleImageError = (event) => {
+  console.error('商品图片加载失败:', event)
+  const img = event.target
+  img.src = '/images/222.jpg'
+}
 
 // 处理添加购物车
 const handleAddToCart = async () => {
@@ -83,6 +112,7 @@ const handleItemClick = () => {
 </script>
 
 <style scoped>
+/* 保持原有的样式不变 */
 .goods-item {
   position: relative;
   background: #fff;

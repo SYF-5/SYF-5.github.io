@@ -44,7 +44,7 @@
                     :src="getImageUrl(product.picture)" 
                     :alt="product.name" 
                     @load="handleImageLoad(product.id)"
-                    @error="handleImageError"
+                    @error="(event) => handleImageError(event, product.id)"
                   />
                   <!-- 加载占位符 -->
                   <div v-if="!imageLoadedStates[product.id]" class="loading-placeholder"></div>
@@ -77,7 +77,6 @@ interface Product {
   price: number
   picture: string
   desc: string
-  categoryId?: number
 }
 
 interface Category {
@@ -88,11 +87,10 @@ interface Category {
 
 const router = useRouter()
 
-// 响应式数据存储分类数据
+// 响应式数据
 const categoryList = ref<Category[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
-// 添加图片加载状态管理
 const imageLoadedStates = ref<Record<number, boolean>>({})
 
 // 获取分类数据
@@ -102,10 +100,8 @@ const fetchCategoryData = async (): Promise<void> => {
     error.value = null
     console.log('开始获取分类数据...')
     
-    // 使用现有的 productService
     await productService.loadAllData()
     
-    // 获取分类数据
     const categories = productService.getCategories()
     console.log('获取到的分类数据:', categories)
     
@@ -124,44 +120,49 @@ const fetchCategoryData = async (): Promise<void> => {
   }
 }
 
-// 图片路径处理函数
+// 图片路径处理函数 - 修正版本
 const getImageUrl = (path: string): string => {
-  if (!path) return '/src/assets/images/222.jpg'
+  if (!path) {
+    // 使用默认图片（在public目录）
+    return '/images/222.jpg'
+  }
   
-  // 如果路径已经是绝对路径，直接返回
-  if (path.startsWith('/') || path.startsWith('http')) {
+  // 如果已经是完整URL，直接返回
+  if (path.startsWith('http') || path.startsWith('//')) {
     return path
   }
   
-  // 处理相对路径
+  // 处理相对路径 - 假设商品图片都在public/images目录下
   if (path.startsWith('images/')) {
+    // 转换为绝对路径（指向public目录）
     return '/' + path
   }
   
-  // 使用默认图片
-  return '/src/assets/images/222.jpg'
+  // 其他情况也尝试从public目录加载
+  if (!path.startsWith('/')) {
+    return '/' + path
+  }
+  
+  return path
 }
 
 // 图片加载失败处理
-const handleImageError = (event: Event): void => {
-  console.error('商品图片加载失败:', event)
+const handleImageError = (event: Event, productId: number): void => {
+  console.error(`商品 ${productId} 图片加载失败:`, event)
   const img = event.target as HTMLImageElement
-  img.src = '/src/assets/images/222.jpg'
+  img.src = '/images/222.jpg' // 使用public目录下的默认图片
 }
 
 // 处理子分类点击事件
 const handleSubCategoryClick = (categoryId: number, categoryName: string, subCategoryName: string): void => {
   console.log(`点击了 ${categoryName} - ${subCategoryName}`)
   
-  // 获取该分类下的商品
   const categoryGoods = productService.getGoodsByCategoryId(categoryId)
   
   if (categoryGoods && categoryGoods.length > 0) {
-    // 跳转到该分类下的第一个商品
     const firstProduct = categoryGoods[0]
     router.push(`/product/${firstProduct.id}`)
   } else {
-    // 如果没有商品，显示提示
     alert('该分类下暂无商品')
   }
 }
@@ -179,13 +180,9 @@ const handleImageLoad = (productId: number): void => {
 
 // 获取分类的商品列表
 const getCategoryGoods = (categoryId: number): Product[] => {
-  // 从 productService 获取该分类的商品
   const goods = productService.getGoodsByCategoryId(categoryId) || []
-  
-  // 限制显示数量，最多显示6个商品
   const displayGoods = goods.slice(0, 6)
   
-  // 为每个商品初始化加载状态 - 修复类型问题
   displayGoods.forEach((product: Product) => {
     if (!imageLoadedStates.value[product.id]) {
       imageLoadedStates.value[product.id] = false
@@ -195,7 +192,6 @@ const getCategoryGoods = (categoryId: number): Product[] => {
   return displayGoods
 }
 
-// 组件挂载时获取数据
 onMounted(() => {
   console.log('侧边列表组件已挂载')
   fetchCategoryData()

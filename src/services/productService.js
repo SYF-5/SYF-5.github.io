@@ -2,14 +2,14 @@ import axios from 'axios'
 
 class ProductService {
   constructor() {
-    this.allProducts = [] // 统一的所有商品列表
-    this.categories = [] // 只包含分类信息（id, name, children）
+    this.products = [] // products.json 中的商品数据
+    this.categories = [] // list 中的分类数据
     this.categoryGoodsMap = {} // 分类ID到商品列表的映射
     this.loaded = false
     this.productMap = {} // 商品ID到商品对象的映射
   }
 
-  // 加载所有数据并统一处理
+  // 加载所有数据并分离处理
   async loadAllData() {
     if (this.loaded) return
 
@@ -18,9 +18,9 @@ class ProductService {
 
       // 尝试多个可能的路径
       const possiblePaths = [
-        '/goods.json',           // 生产环境路径
-        './goods.json',          // 相对路径
-        'goods.json'             // 直接文件名
+        '/goods.json',
+        './goods.json',
+        'goods.json'
       ]
 
       let response = null
@@ -48,15 +48,15 @@ class ProductService {
       console.log('从以下路径获取数据成功:', successfulPath)
 
       // 重置所有数据
-      this.allProducts = []
+      this.products = []
       this.categories = []
       this.categoryGoodsMap = {}
       this.productMap = {}
 
-      // 1. 处理分类信息 - 只提取 id, name, children
+      // 1. 处理分类信息 - 使用 list 数据
       if (data.list && Array.isArray(data.list)) {
         data.list.forEach(category => {
-          // 只提取分类的基本信息
+          // 提取分类的基本信息
           const categoryInfo = {
             id: category.id,
             name: category.name,
@@ -66,191 +66,164 @@ class ProductService {
 
           // 存储该分类的商品列表
           if (category.goods && Array.isArray(category.goods)) {
-            this.categoryGoodsMap[category.id] = category.goods
+            // 处理商品图片路径
+            const goodsWithCorrectedPaths = category.goods.map(product => ({
+              ...product,
+              picture: this.fixImagePath(product.picture),
+              categoryId: category.id,
+              categoryName: category.name,
+              dataSource: 'list'
+            }))
 
-            // 同时将这些商品添加到统一商品列表中
-            category.goods.forEach(product => {
-              const enrichedProduct = {
-                ...product,
-                categoryId: category.id,
-                categoryName: category.name,
-                dataSource: 'list'
-              }
+            this.categoryGoodsMap[category.id] = goodsWithCorrectedPaths
 
-              // 避免重复添加（如果ID已存在）
-              if (!this.productMap[product.id]) {
-                this.allProducts.push(enrichedProduct)
-                this.productMap[product.id] = enrichedProduct
-              }
+            // 为每个商品添加分类信息
+            goodsWithCorrectedPaths.forEach(product => {
+              this.productMap[product.id] = product
             })
           }
         })
       }
 
-      // 2. 添加 products 数组中的商品
+      // 2. 单独存储 products 数组中的商品 - 用于商品列表
       if (data.products && Array.isArray(data.products)) {
-        data.products.forEach(product => {
-          const enrichedProduct = {
-            ...product,
-            dataSource: 'products'
-          }
+        this.products = data.products.map(product => ({
+          ...product,
+          picture: this.fixImagePath(product.picture),
+          dataSource: 'products'
+        }))
 
-          // 如果商品ID不存在，添加到统一列表
+        // 同时添加到商品映射中（如果ID不冲突）
+        this.products.forEach(product => {
           if (!this.productMap[product.id]) {
-            this.allProducts.push(enrichedProduct)
-            this.productMap[product.id] = enrichedProduct
+            this.productMap[product.id] = product
           }
         })
       }
 
       this.loaded = true
-      console.log('从 goods.json 加载数据完成', {
+      console.log('数据加载完成', {
         categories: this.categories.length,
-        totalProducts: this.allProducts.length
+        products: this.products.length,
+        totalProductsInMap: Object.keys(this.productMap).length
       })
 
     } catch (error) {
       console.error('加载商品数据失败:', error)
       console.log('使用默认数据...')
 
-      // 设置详细的默认数据，而不是空数组
-      this.categories = [
-        {
-          id: 1,
-          name: "蔬菜",
-          children: ["叶菜类", "根茎类", "瓜果类", "菌菇类"]
-        },
-        {
-          id: 2,
-          name: "水果",
-          children: ["浆果类", "柑橘类", "热带水果", "核果类"]
-        },
-        {
-          id: 3,
-          name: "肉类",
-          children: ["猪肉", "牛肉", "禽肉", "羊肉"]
-        },
-        {
-          id: 4,
-          name: "水产",
-          children: ["鱼类", "虾类", "贝类", "蟹类"]
-        },
-        {
-          id: 5,
-          name: "粮油",
-          children: ["大米", "面粉", "食用油", "杂粮"]
-        },
-        {
-          id: 6,
-          name: "奶制品",
-          children: ["牛奶", "酸奶", "奶酪", "黄油"]
-        }
-      ]
+      // 设置默认数据
+      this.setDefaultData()
+    }
+  }
 
-      this.allProducts = [
+  // 修正图片路径
+  fixImagePath(path) {
+    if (!path) return '/images/222.jpg'
+
+    // 如果已经是完整路径，直接返回
+    if (path.startsWith('http') || path.startsWith('//') || path.startsWith('/')) {
+      return path
+    }
+
+    // 处理 images/ 开头的路径
+    if (path.startsWith('images/')) {
+      return '/' + path
+    }
+
+    // 其他情况添加 /images/ 前缀
+    return '/images/' + path
+  }
+
+  // 设置默认数据
+  setDefaultData() {
+    this.categories = [
+      {
+        id: 1,
+        name: "居家",
+        children: ["家纺厨具", "家具家电"]
+      },
+      {
+        id: 2,
+        name: "美食",
+        children: ["南北干货", "水果蔬菜"]
+      },
+      {
+        id: 3,
+        name: "服饰",
+        children: ["男装女装", "鞋靴箱包"]
+      }
+    ]
+
+    this.products = [
+      {
+        id: 50,
+        name: "新鲜芹菜",
+        price: 10.5,
+        picture: "/images/50.jpg", // 使用 public 目录路径
+        desc: "新鲜采摘的芹菜，清脆爽口",
+        category: "vegetables"
+      },
+      {
+        id: 51,
+        name: "云南香蕉",
+        price: 15.0,
+        picture: "/images/51.webp", // 使用 public 目录路径
+        desc: "来自云南的优质香蕉，香甜可口",
+        category: "fruits"
+      }
+    ]
+
+    // 设置分类商品映射
+    this.categoryGoodsMap = {
+      1: [
         {
           id: 1,
-          name: '新鲜西红柿',
-          price: 12.8,
-          picture: '/src/assets/images/222.jpg',
-          desc: '新鲜采摘，营养丰富',
-          categoryId: 1
+          name: "空调",
+          desc: "冷暖随心，静享舒适",
+          price: 1288.00,
+          picture: "/images/01.jpg" // 使用 public 目录路径
         },
         {
           id: 2,
-          name: '进口香蕉',
-          price: 8.5,
-          picture: '/src/assets/images/222.jpg',
-          desc: '香甜可口，产地直供',
-          categoryId: 2
-        },
-        {
-          id: 3,
-          name: '优质土豆',
-          price: 6.8,
-          picture: '/src/assets/images/222.jpg',
-          desc: '农家种植，口感绵软',
-          categoryId: 1
-        },
-        {
-          id: 4,
-          name: '红富士苹果',
-          price: 15.2,
-          picture: '/src/assets/images/222.jpg',
-          desc: '脆甜多汁，新鲜直达',
-          categoryId: 2
-        },
-        {
-          id: 5,
-          name: '新鲜黄瓜',
-          price: 4.5,
-          picture: '/src/assets/images/222.jpg',
-          desc: '清脆爽口',
-          categoryId: 1
-        },
+          name: "四件套",
+          desc: "亲肤透气，安眠整晚",
+          price: 120.00,
+          picture: "/images/02.jpg" // 使用 public 目录路径
+        }
+      ],
+      2: [
         {
           id: 6,
-          name: '精品猪肉',
-          price: 32.8,
-          picture: '/src/assets/images/222.jpg',
-          desc: '肉质鲜嫩',
-          categoryId: 3
+          name: "进口巧克力",
+          desc: "丝滑口感，多种口味",
+          price: 65.00,
+          picture: "/images/06.jpg" // 使用 public 目录路径
         },
         {
           id: 7,
-          name: '鲜活鲤鱼',
-          price: 18.8,
-          picture: '/src/assets/images/222.jpg',
-          desc: '现捞现卖',
-          categoryId: 4
-        },
-        {
-          id: 8,
-          name: '东北大米',
-          price: 68.8,
-          picture: '/src/assets/images/222.jpg',
-          desc: '香软可口',
-          categoryId: 5
-        },
-        {
-          id: 9,
-          name: '纯牛奶',
-          price: 12.8,
-          picture: '/src/assets/images/222.jpg',
-          desc: '营养丰富',
-          categoryId: 6
-        },
-        {
-          id: 10,
-          name: '酸奶',
-          price: 8.5,
-          picture: '/src/assets/images/222.jpg',
-          desc: '酸甜可口',
-          categoryId: 6
+          name: "新鲜香蕉",
+          desc: "产地直供，新鲜送达",
+          price: 15.00,
+          picture: "/images/07.webp" // 使用 public 目录路径
         }
       ]
+    }
 
-      // 建立分类商品映射
-      this.categoryGoodsMap = {
-        1: [this.allProducts[0], this.allProducts[2], this.allProducts[4]], // 西红柿、土豆、黄瓜
-        2: [this.allProducts[1], this.allProducts[3]], // 香蕉、苹果
-        3: [this.allProducts[5]], // 猪肉
-        4: [this.allProducts[6]], // 鲤鱼
-        5: [this.allProducts[7]], // 大米
-        6: [this.allProducts[8], this.allProducts[9]] // 牛奶、酸奶
-      }
-
-      // 建立商品映射
-      this.allProducts.forEach(product => {
+    // 构建 productMap
+    Object.values(this.categoryGoodsMap).forEach(goods => {
+      goods.forEach(product => {
         this.productMap[product.id] = product
       })
+    })
 
-      this.loaded = true
-      console.log('使用默认数据完成，包含:', {
-        categories: this.categories.length,
-        products: this.allProducts.length
-      })
-    }
+    this.products.forEach(product => {
+      if (!this.productMap[product.id]) {
+        this.productMap[product.id] = product
+      }
+    })
+
+    this.loaded = true
   }
 
   // 根据ID获取商品
@@ -259,30 +232,24 @@ class ProductService {
     return this.productMap[productId] || null
   }
 
-  // 获取所有分类（只包含id, name, children）
+  // 获取所有分类（来自 list）
   getCategories() {
     return this.categories
   }
 
-  // 获取分类下的商品
+  // 获取分类下的商品（来自 list）
   getGoodsByCategoryId(categoryId) {
     return this.categoryGoodsMap[categoryId] || []
   }
 
-  // 获取所有商品
+  // 获取所有商品（来自 products）
   getAllProducts() {
-    return this.allProducts
+    return this.products
   }
 
-  // 获取新品列表（从 products 数组中获取）
+  // 获取新品列表（来自 products）
   getNewProducts() {
-    return this.allProducts.filter(product => product.dataSource === 'products')
-  }
-
-  // 根据分类名称获取商品
-  getProductsByCategoryName(categoryName) {
-    const category = this.categories.find(cat => cat.name === categoryName)
-    return category ? this.getGoodsByCategoryId(category.id) : []
+    return this.products
   }
 
   // 检查数据是否已加载
