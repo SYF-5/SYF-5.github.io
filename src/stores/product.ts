@@ -16,8 +16,8 @@ export const useProductStore = defineStore('product', () => {
     try {
       console.log('开始获取商品数据...')
 
-      // 方法1: 使用类型断言
-      const response = await request.get('/goods.json')
+      // 使用相对路径，确保在不同环境下都能正确访问
+      const response = await request.get('./goods.json')
       const data = response.data as ProductsResponse // 类型断言
       console.log('获取到的数据:', data)
 

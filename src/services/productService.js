@@ -14,7 +14,8 @@ class ProductService {
     try {
       console.log('开始加载商品数据...')
 
-      const response = await axios.get('/goods.json')
+      // 使用相对路径，确保在不同环境下都能正确访问
+      const response = await axios.get('./goods.json')
       const data = response.data
 
       console.log('成功加载JSON数据:', data)
