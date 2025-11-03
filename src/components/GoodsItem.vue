@@ -2,16 +2,19 @@
   <div class="goods-item" @click="handleItemClick">
     <div class="goods-image">
       <img 
-        :src="getImageUrl(product.picture)" 
+        :src="effectiveImageUrl" 
         :alt="product.name" 
+        @load="handleImageLoad"
         @error="handleImageError"
         loading="lazy"
-      >
-      <div v-if="imageLoading" class="image-loading">加载中...</div>
+      />
+      <div v-if="imageLoading" class="image-loading">
+        <div class="loading-spinner-small"></div>
+      </div>
     </div>
     <div class="goods-info">
       <h3 class="goods-name">{{ product.name }}</h3>
-      <p class="goods-desc">{{ product.desc || product.description }}</p>
+      <p class="goods-desc">{{ product.desc || product.description || '暂无描述' }}</p>
       <div class="goods-price">
         <span class="price">¥{{ product.price?.toFixed(2) }}</span>
         <button 
@@ -28,12 +31,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useCartStore } from '@/stores/cart'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 
-// 接收商品数据
 const props = defineProps({
   product: {
     type: Object,
@@ -45,55 +47,62 @@ const cartStore = useCartStore()
 const router = useRouter()
 const isAddingToCart = ref(false)
 const imageLoading = ref(true)
+const imageError = ref(false)
 
-// 图片路径处理函数 - 增强版本
-const getImageUrl = (path) => {
-  if (!path) {
-    console.log('图片路径为空，使用默认图片')
+// 计算有效的图片URL
+const effectiveImageUrl = computed(() => {
+  if (imageError.value) {
     return '/images/222.jpg'
   }
   
-  console.log('处理图片路径:', path)
+  const path = props.product.picture
+  if (!path) return '/images/222.jpg'
   
-  // 如果已经是完整URL，直接返回
+  // 简单的路径处理
   if (path.startsWith('http') || path.startsWith('//')) {
     return path
   }
   
   let finalPath = path
-  
-  // 确保以 / 开头
   if (!finalPath.startsWith('/')) {
     finalPath = '/' + finalPath
   }
   
-  // 如果是开发环境，添加基础URL
-  if (process.env.NODE_ENV === 'development') {
-    // 在开发环境中，确保路径正确指向public目录
-    if (!finalPath.startsWith('/images/') && !finalPath.includes('assets')) {
-      finalPath = '/images' + finalPath
-    }
-  }
-  
-  console.log('最终图片路径:', finalPath)
   return finalPath
-}
+})
 
-// 图片加载失败处理
-const handleImageError = (event) => {
-  console.error('商品图片加载失败:', props.product.name, '路径:', event.target.src)
-  const img = event.target
-  // 尝试使用默认图片
-  img.src = '/images/222.jpg'
-  imageLoading.value = false
-}
-
-// 图片加载成功处理
+// 图片加载成功
 const handleImageLoad = () => {
   imageLoading.value = false
+  imageError.value = false
 }
 
-// 处理添加购物车
+// 图片加载失败
+const handleImageError = (event) => {
+  console.warn(`图片加载失败: ${props.product.name}`, event.target.src)
+  imageLoading.value = false
+  imageError.value = true
+  // 不修改 src，让 computed 属性处理
+}
+
+// 临时的图片URL处理 - 使用在线图片
+const getImageUrl = (path) => {
+  // 使用 picsum 随机图片服务
+  const randomId = Math.floor(Math.random() * 1000)
+  return `https://picsum.photos/300/200?random=${randomId}`
+}
+
+// 组件挂载时设置加载状态
+onMounted(() => {
+  // 设置一个超时，防止图片永远加载中
+  setTimeout(() => {
+    if (imageLoading.value) {
+      imageLoading.value = false
+    }
+  }, 3000)
+})
+
+// 添加到购物车
 const handleAddToCart = async () => {
   if (!props.product) return
   
@@ -103,27 +112,24 @@ const handleAddToCart = async () => {
     await cartStore.addToCart(props.product, 1)
     
     ElMessage({
-      message: `"${props.product.name}" 已成功添加到购物车`,
+      message: `"${props.product.name}" 已添加到购物车`,
       type: 'success',
-      duration: 2000,
-      showClose: true,
-      offset: 80
+      duration: 2000
     })
     
   } catch (error) {
     console.error('添加购物车失败:', error)
     ElMessage({
-      message: '添加商品失败，请重试',
+      message: '添加失败，请重试',
       type: 'error',
-      duration: 2000,
-      showClose: true
+      duration: 2000
     })
   } finally {
     isAddingToCart.value = false
   }
 }
 
-// 原有的点击商品跳转详情功能
+// 跳转到详情页
 const handleItemClick = () => {
   router.push(`/product/${props.product.id}`)
 }
@@ -151,7 +157,7 @@ const handleItemClick = () => {
   height: 0;
   padding-bottom: 75%;
   overflow: hidden;
-  background: #f5f5f5;
+  background: #f8f8f8;
 }
 
 .goods-image img {
@@ -170,11 +176,23 @@ const handleItemClick = () => {
 
 .image-loading {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #999;
-  font-size: 14px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f8f8;
+}
+
+.loading-spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e0e0e0;
+  border-top: 2px solid #27BA9B;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 .goods-info {
