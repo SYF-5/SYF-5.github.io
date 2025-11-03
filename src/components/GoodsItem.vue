@@ -1,16 +1,74 @@
+<script setup>
+import { ref } from 'vue'
+import { useCartStore } from '@/stores/cart'
+import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const props = defineProps({
+  product: {
+    type: Object,
+    required: true
+  }
+})
+
+const cartStore = useCartStore()
+const router = useRouter()
+const isAddingToCart = ref(false)
+
+// 简化的图片URL处理
+const getImageUrl = (path) => {
+  if (!path) return '/images/222.jpg'
+  
+  // 如果已经是完整URL，直接返回
+  if (path.startsWith('http') || path.startsWith('//')) {
+    return path
+  }
+  
+  // 确保以 / 开头
+  if (!path.startsWith('/')) {
+    return '/' + path
+  }
+  
+  return path
+}
+
+// 图片加载失败处理
+const handleImageError = (event) => {
+  console.warn('图片加载失败:', event.target.src)
+  event.target.src = '/images/222.jpg'
+}
+
+// 添加到购物车
+const handleAddToCart = async () => {
+  if (!props.product) return
+  
+  isAddingToCart.value = true
+  
+  try {
+    await cartStore.addToCart(props.product, 1)
+    ElMessage.success(`"${props.product.name}" 已添加到购物车`)
+  } catch (error) {
+    ElMessage.error('添加失败，请重试')
+  } finally {
+    isAddingToCart.value = false
+  }
+}
+
+// 跳转到详情页
+const handleItemClick = () => {
+  router.push(`/product/${props.product.id}`)
+}
+</script>
+
 <template>
   <div class="goods-item" @click="handleItemClick">
     <div class="goods-image">
       <img 
-        :src="effectiveImageUrl" 
+        :src="getImageUrl(product.picture)" 
         :alt="product.name" 
-        @load="handleImageLoad"
         @error="handleImageError"
         loading="lazy"
       />
-      <div v-if="imageLoading" class="image-loading">
-        <div class="loading-spinner-small"></div>
-      </div>
     </div>
     <div class="goods-info">
       <h3 class="goods-name">{{ product.name }}</h3>
@@ -30,111 +88,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useCartStore } from '@/stores/cart'
-import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
-
-const props = defineProps({
-  product: {
-    type: Object,
-    required: true
-  }
-})
-
-const cartStore = useCartStore()
-const router = useRouter()
-const isAddingToCart = ref(false)
-const imageLoading = ref(true)
-const imageError = ref(false)
-
-// 计算有效的图片URL
-const effectiveImageUrl = computed(() => {
-  if (imageError.value) {
-    return '/images/222.jpg'
-  }
-  
-  const path = props.product.picture
-  if (!path) return '/images/222.jpg'
-  
-  // 简单的路径处理
-  if (path.startsWith('http') || path.startsWith('//')) {
-    return path
-  }
-  
-  let finalPath = path
-  if (!finalPath.startsWith('/')) {
-    finalPath = '/' + finalPath
-  }
-  
-  return finalPath
-})
-
-// 图片加载成功
-const handleImageLoad = () => {
-  imageLoading.value = false
-  imageError.value = false
-}
-
-// 图片加载失败
-const handleImageError = (event) => {
-  console.warn(`图片加载失败: ${props.product.name}`, event.target.src)
-  imageLoading.value = false
-  imageError.value = true
-  // 不修改 src，让 computed 属性处理
-}
-
-// 临时的图片URL处理 - 使用在线图片
-const getImageUrl = (path) => {
-  // 使用 picsum 随机图片服务
-  const randomId = Math.floor(Math.random() * 1000)
-  return `https://picsum.photos/300/200?random=${randomId}`
-}
-
-// 组件挂载时设置加载状态
-onMounted(() => {
-  // 设置一个超时，防止图片永远加载中
-  setTimeout(() => {
-    if (imageLoading.value) {
-      imageLoading.value = false
-    }
-  }, 3000)
-})
-
-// 添加到购物车
-const handleAddToCart = async () => {
-  if (!props.product) return
-  
-  isAddingToCart.value = true
-  
-  try {
-    await cartStore.addToCart(props.product, 1)
-    
-    ElMessage({
-      message: `"${props.product.name}" 已添加到购物车`,
-      type: 'success',
-      duration: 2000
-    })
-    
-  } catch (error) {
-    console.error('添加购物车失败:', error)
-    ElMessage({
-      message: '添加失败，请重试',
-      type: 'error',
-      duration: 2000
-    })
-  } finally {
-    isAddingToCart.value = false
-  }
-}
-
-// 跳转到详情页
-const handleItemClick = () => {
-  router.push(`/product/${props.product.id}`)
-}
-</script>
-
+<!-- 样式保持不变 -->
 <style scoped>
 .goods-item {
   position: relative;
