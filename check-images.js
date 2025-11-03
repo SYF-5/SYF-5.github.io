@@ -27,7 +27,7 @@ files.forEach(file => {
 
 // 检查必要的图片文件
 const requiredImages = [
-  '222.jpg',
+  'cx.svg',
   '50.jpg', '51.webp', '52.jpg', '53.webp', '54.webp', '55.webp', '56.webp', '57.jpg',
   'Banner-1.jpg', 'Banner-2.jpg', 'Banner-3.webp', 'Banner-4.webp',
   '01.jpg', '02.jpg', '03.jpg', '04.webp', '05.jpg', '06.jpg', '07.webp', '08.jpg', '09.jpg', '10.webp',

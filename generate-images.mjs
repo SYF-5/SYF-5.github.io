@@ -15,7 +15,7 @@ if (!fs.existsSync(imagesDir)) {
 
 // 需要生成的图片列表
 const imagesToGenerate = [
-  '222.jpg',
+  'cx.svg',
   '50.jpg', '51.webp', '52.jpg', '53.webp', '54.webp', '55.webp', '56.webp', '57.jpg',
   'Banner-1.jpg', 'Banner-2.jpg', 'Banner-3.webp', 'Banner-4.webp'
 ]
@@ -42,8 +42,8 @@ function generatePlaceholderImage(filename, width = 300, height = 300) {
     fs.writeFileSync(path.join(imagesDir, infoFile), `占位图片: ${filename}\n请替换为实际图片文件`)
     console.log(`✅ 创建占位说明: ${infoFile}`)
 
-    // 如果是 222.jpg，创建一个简单的 SVG 作为占位图
-    if (filename === '222.jpg') {
+    // 如果是 cx.svg，创建一个简单的 SVG 作为占位图
+  if (filename === 'cx.svg') {
       const svgContent = `
 <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="#27BA9B"/>

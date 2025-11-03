@@ -85,13 +85,13 @@ const handleImageLoad = () => {
 const handleImageError = (event) => {
   console.warn('图片加载失败:', event.target.src)
   // 使用本地默认图片作为备用
-  event.target.src = './images/222.jpg'
+  event.target.src = './images/cx.svg'
 }
 
 // 优化：处理图片URL并支持懒加载
 const getImageUrl = (picturePath) => {
   if (!picturePath) {
-    return './images/222.jpg'
+    return './images/cx.svg'
   }
   
   // 如果已经是完整URL，直接返回

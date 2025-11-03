@@ -23,8 +23,8 @@ try {
   try {
     import('vue-lazyload').then(({ default: VueLazyload }) => {
       app.use(VueLazyload, {
-        error: './images/222.jpg',
-        loading: './images/222.jpg',
+        error: './images/cx.svg',
+    loading: './images/cx.svg',
         attempt: 3,
         preLoad: 1.3,
         listenEvents: ['scroll', 'wheel', 'mousewheel', 'resize', 'animationend', 'transitionend', 'touchmove'],

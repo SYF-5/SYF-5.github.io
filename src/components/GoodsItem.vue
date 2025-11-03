@@ -17,7 +17,7 @@ const isAddingToCart = ref(false)
 
 // 优化的图片URL处理
 const getImageUrl = (path) => {
-  if (!path) return './images/222.jpg'
+  if (!path) return './images/cx.svg'
   
   // 如果已经是完整URL，直接返回
   if (path.startsWith('http') || path.startsWith('//')) {
@@ -45,7 +45,7 @@ const getImageUrl = (path) => {
 // 图片加载失败处理
 const handleImageError = (event) => {
   console.warn('图片加载失败:', event.target.src)
-  event.target.src = './images/222.jpg'
+  event.target.src = './images/cx.svg'
 }
 
 // 添加到购物车

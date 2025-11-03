@@ -81,7 +81,7 @@ const handleImageLoad = (itemId: number) => {
 // 图片路径处理函数
 const getImageUrl = (picturePath: string) => {
   if (!picturePath) {
-    return './images/222.jpg'
+    return './images/cx.svg'
   }
   
   // 如果已经是完整URL，直接返回
@@ -112,7 +112,7 @@ const getImageUrl = (picturePath: string) => {
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   // 设置默认图片
-  img.src = './images/222.jpg'
+  img.src = './images/cx.svg'
   
   // 标记为已加载，隐藏占位符
   const itemId = Object.keys(imageLoadedStates).find(key => 

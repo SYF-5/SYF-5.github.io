@@ -124,7 +124,7 @@ const fetchCategoryData = async (): Promise<void> => {
 const getImageUrl = (path: string): string => {
   if (!path) {
     // 使用默认图片（在public目录）
-    return '/images/222.jpg'
+    return '/images/cx.svg'
   }
   
   // 如果已经是完整URL，直接返回
@@ -150,7 +150,7 @@ const getImageUrl = (path: string): string => {
 const handleImageError = (event: Event, productId: number): void => {
   console.error(`商品 ${productId} 图片加载失败:`, event)
   const img = event.target as HTMLImageElement
-  img.src = '/images/222.jpg' // 使用public目录下的默认图片
+  img.src = '/images/cx.svg' // 使用public目录下的默认图片
 }
 
 // 处理子分类点击事件
