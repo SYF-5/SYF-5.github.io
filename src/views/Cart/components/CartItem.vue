@@ -4,7 +4,7 @@
       <!-- 使用懒加载 -->
       <div class="image-container">
         <img 
-          v-lazy="item.picture" 
+          :src="item.picture" 
           :alt="item.name" 
           @load="handleImageLoad(item.id)"
           @error="handleImageError" 

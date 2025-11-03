@@ -16,7 +16,6 @@ const loading = ref(true)
 const error = ref(false)
 const isAddingToCart = ref(false)
 const showSuccessMessage = ref(false)
-// 添加图片加载状态
 const imageLoaded = ref(false)
 
 const tabs = [
@@ -24,14 +23,6 @@ const tabs = [
   { id: 'spec', label: '规格参数' },
   { id: 'review', label: '用户评价' }
 ]
-
-// 分类名称映射
-const categoryMap = {
-  'vegetables': '蔬菜',
-  'fruits': '水果',
-  'grains': '谷物',
-  'eggs': '蛋类'
-}
 
 // 计算属性
 const cartItemCount = computed(() => {
@@ -68,11 +59,8 @@ const addToCart = async () => {
       showSuccessMessage.value = false
     }, 3000)
     
-    console.log(`成功添加 ${quantity.value} 件 "${product.value.name}" 到购物车`)
-    
   } catch (error) {
     alert(error.message || '添加商品失败，请重试')
-    console.error('添加购物车失败:', error)
   } finally {
     isAddingToCart.value = false
   }
@@ -88,27 +76,22 @@ const goToCart = () => {
   router.push('/cart')
 }
 
-const getCategoryName = (category) => {
-  return categoryMap[category] || category
-}
-
-// 图片加载完成处理
+// 修复：图片加载完成处理
 const handleImageLoad = () => {
   imageLoaded.value = true
-  console.log('商品图片加载成功')
 }
 
-// 图片加载失败处理
+// 修复：图片加载失败处理
 const handleImageError = (event) => {
   console.warn('图片加载失败:', event.target.src)
-  event.target.src = '/assets/logo-BhwB2m9l.png'
+  // 使用在线图片作为备用
+  event.target.src = `https://picsum.photos/600/400?random=${product.value.id || 1}`
 }
 
-// 处理图片URL - 确保路径正确
+// 修复：处理图片URL - 关键修复
 const getImageUrl = (picturePath) => {
   if (!picturePath) {
-    console.warn('图片路径为空')
-    return '/assets/logo-BhwB2m9l.png'
+    return `https://picsum.photos/600/400?random=${product.value.id || 1}`
   }
   
   // 如果已经是完整URL，直接返回
@@ -116,55 +99,57 @@ const getImageUrl = (picturePath) => {
     return picturePath
   }
   
-  // 确保本地图片路径正确
-  if (picturePath.startsWith('/')) {
-    return picturePath
-  }
+  let finalPath = picturePath
   
   // 关键修复：处理 images/ 开头的路径
-  if (picturePath.startsWith('images/')) {
-    return '/' + picturePath
+  if (finalPath.startsWith('images/')) {
+    finalPath = '/' + finalPath
   }
   
   // 如果路径没有斜杠，添加斜杠
-  return `/${picturePath}`
-}
-
-// 从统一的服务加载商品数据
-const loadProduct = async (id) => {
-  loading.value = true
-  error.value = false
-  // 重置图片加载状态
-  imageLoaded.value = false
-  
-  try {
-    // 确保数据已加载
-    await productService.loadAllData()
-    
-    // 使用统一的服务获取商品
-    const foundProduct = productService.getProductById(id)
-    
-    if (foundProduct) {
-      product.value = foundProduct
-      // 为商品添加最大购买数量限制
-      product.value.maxPurchase = Math.min(product.value.stock || 30, 30)
-      
-      // 调试：打印商品信息和图片路径
-      console.log('加载的商品数据:', product.value)
-      console.log('商品图片路径:', product.value.picture)
-      console.log('处理后的图片路径:', getImageUrl(product.value.picture))
-    } else {
-      throw new Error('未找到该商品')
-    }
-  } catch (err) {
-    console.error('加载商品失败:', err)
-    error.value = true
-  } finally {
-    loading.value = false
+  if (!finalPath.startsWith('/')) {
+    finalPath = '/' + finalPath
   }
+  
+  return finalPath
 }
 
-// 初始化时加载购物车数据和商品数据
+// 修复：从统一的服务加载商品数据并确保数据完整性
+const loadProduct = async (id) => {
+    loading.value = true
+    error.value = false
+    imageLoaded.value = false
+    
+    try {
+      await productService.loadAllData()
+      const foundProduct = productService.getProductById(id)
+      
+      if (foundProduct) {
+        // 创建一个安全的商品数据副本，确保所有必要字段都存在
+        product.value = {
+          id: foundProduct.id,
+          name: foundProduct.name || '未知商品',
+          price: foundProduct.price || 0,
+          picture: foundProduct.picture || '',
+          // 处理描述字段，同时支持 desc 和 description
+          description: foundProduct.description || foundProduct.desc || '暂无描述',
+          // 确保有库存信息
+          stock: foundProduct.stock || 30,
+          // 添加最大购买数量限制
+          maxPurchase: Math.min(foundProduct.stock || 30, 30)
+        }
+      } else {
+        throw new Error('未找到该商品')
+      }
+    } catch (err) {
+      console.error('加载商品失败:', err)
+      error.value = true
+    } finally {
+      loading.value = false
+    }
+  }
+
+// 初始化
 onMounted(() => {
   cartStore.loadFromLocalStorage()
   
@@ -180,14 +165,12 @@ onMounted(() => {
 
 <template>
   <div class="product-detail-page">
-    <!-- 头部导航 -->
     <header class="detail-header">
       <button @click="$router.back()" class="back-btn">← 返回</button>
       <h1>商品详情</h1>
       <div class="header-actions">
         <button>分享</button>
         <button>收藏</button>
-        <!-- 购物车图标 -->
         <div class="cart-indicator" @click="goToCart">
           🛒
           <span v-if="cartItemCount > 0" class="cart-count">
@@ -197,74 +180,63 @@ onMounted(() => {
       </div>
     </header>
 
-    <!-- 加载状态 -->
     <div class="loading" v-if="loading">
       <p>正在加载商品信息...</p>
     </div>
 
-    <!-- 错误状态 -->
     <div class="error" v-if="error">
       <p>加载商品信息失败，请刷新页面重试</p>
     </div>
 
-    <!-- 商品内容区域 -->
     <main class="detail-content" v-if="!loading && !error && product.id">
-      <!-- 商品图片 - 使用懒加载 -->
+      <!-- 修复：商品图片使用修复后的路径处理 -->
       <div class="product-gallery">
-        <!-- 使用懒加载指令替换原来的 :src -->
         <img 
-          v-lazy="getImageUrl(product.picture)" 
+          :src="getImageUrl(product.picture)" 
           :alt="product.name" 
           class="main-image"
           @load="handleImageLoad"
           @error="handleImageError"
         />
-        <!-- 添加加载占位符 -->
-        <div v-if="!imageLoaded" class="loading-placeholder"></div>
+        <div v-if="!imageLoaded" class="loading-placeholder">
+          <p>图片加载中...</p>
+        </div>
       </div>
 
-      <!-- 商品信息 -->
       <div class="product-info">
-        <h2 class="product-title">{{ product.name }}</h2>
-        <p class="product-desc">{{ product.description || product.desc }}</p>
+        <h2 class="product-title">{{ product.name || '未知商品' }}</h2>
+        <p class="product-desc">{{ product.description || '暂无描述' }}</p>
         
-        <!-- 价格和数量区域 -->
         <div class="price-quantity-section">
           <div class="price-rating">
             <span class="current-price">¥{{ product.price?.toFixed(2) }}</span>
-            <!-- 评分 -->
             <div class="product-rating" v-if="product.rating">
               <span class="rating-stars">★★★★★</span>
               <span class="rating-value">{{ product.rating }}</span>
             </div>
           </div>
           
-          <!-- 数量选择 -->
           <div class="quantity-control-wrapper">
             <div class="quantity-control">
               <button @click="decreaseQuantity" :disabled="quantity <= 1">-</button>
               <span class="quantity">{{ quantity }}</span>
               <button @click="increaseQuantity" :disabled="quantity >= maxQuantity">+</button>
             </div>
-            <!-- 数量提示 -->
             <div class="quantity-hint" v-if="quantity >= maxQuantity">
               已达最大购买数量
             </div>
           </div>
         </div>
 
-        <!-- 库存信息 -->
         <div class="stock-info" v-if="product.stock !== undefined">
           库存: {{ product.stock }}件
         </div>
 
-        <!-- 添加成功提示 -->
         <div v-if="showSuccessMessage" class="success-message">
           ✅ 商品已成功添加到购物车！
         </div>
       </div>
 
-      <!-- 商品详情选项卡 -->
       <div class="detail-tabs">
         <button 
           v-for="tab in tabs" 
@@ -276,12 +248,10 @@ onMounted(() => {
         </button>
       </div>
 
-      <!-- 选项卡内容 -->
       <div class="tab-content">
         <div v-if="activeTab === 'detail'">
           <h3>商品详情</h3>
           <p>{{ product.description || product.desc }}</p>
-          <p>这是一款优质的{{ product.name }}，保证品质。</p>
         </div>
         <div v-if="activeTab === 'spec'">
           <h3>规格参数</h3>
@@ -289,10 +259,6 @@ onMounted(() => {
             <tr>
               <td class="spec-label">商品名称</td>
               <td>{{ product.name }}</td>
-            </tr>
-            <tr>
-              <td class="spec-label">商品分类</td>
-              <td>{{ getCategoryName(product.category) || product.categoryName }}</td>
             </tr>
             <tr>
               <td class="spec-label">价格</td>
@@ -310,22 +276,13 @@ onMounted(() => {
         </div>
         <div v-if="activeTab === 'review'">
           <h3>用户评价</h3>
-          <div class="review-summary" v-if="product.rating">
-            <div class="overall-rating">
-              <span class="rating-score">{{ product.rating }}</span>
-              <div class="rating-stars">★★★★★</div>
-              <span class="rating-count">(暂无评价)</span>
-            </div>
-          </div>
           <div class="no-reviews">
             <p>暂无用户评价</p>
-            <p>成为第一个评价此商品的人吧！</p>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- 底部操作栏 -->
     <footer class="detail-footer" v-if="!loading && !error && product.id">
       <button class="cart-btn" @click="addToCart" :disabled="isAddingToCart">
         <span v-if="!isAddingToCart">加入购物车</span>
@@ -339,6 +296,30 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.loading-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
 /* 整体页面样式优化 */
 .product-detail-page {
   min-height: 100vh;
