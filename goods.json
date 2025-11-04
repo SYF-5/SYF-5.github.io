@@ -115,14 +115,14 @@
           "name": "空调",
           "desc": "冷暖随心，静享舒适",
           "price": 1288.00,
-          "picture": "/images/list-01.jpg"
+          "picture": "images/list-01.jpg"
         },
         {
           "id": 2,
           "name": "四件套",
           "desc": "亲肤透气，安眠整晚",
           "price": 120.00,
-          "picture": "/images/list-02.jpg"
+          "picture": "images/list-02.jpg"
         },
         {
           "id": 3,
