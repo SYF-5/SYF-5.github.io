@@ -41,7 +41,7 @@
                 <!-- 使用处理后的图片路径 -->
                 <div class="image-container">
                   <img 
-                    :src="getImageUrl(product.picture)" 
+                    :src="getImageUrl(product.picture, product.id)" 
                     :alt="product.name" 
                     @load="handleImageLoad(product.id)"
                     @error="(event) => handleImageError(event, product.id)"
@@ -120,42 +120,77 @@ const fetchCategoryData = async (): Promise<void> => {
   }
 }
 
-// 图片路径处理函数 - 修正版本
-const getImageUrl = (path: string): string => {
-  if (!path) {
-    // 使用默认图片（在public目录）
-    return '/images/cx.svg'
+// 图片路径处理函数 - 支持多路径尝试
+const getImageUrl = (path: string, productId?: number): string => {
+  // 定义可能的图片路径模式
+  const possiblePaths = []
+  
+  // 如果有产品ID，尝试多个可能的图片路径
+  if (productId) {
+    // 尝试多种格式和路径组合
+    possiblePaths.push(
+      `/images/list-${String(productId).padStart(2, '0')}.jpg`,
+      `/images/list-${String(productId).padStart(2, '0')}.webp`,
+      `/images/products-${productId}.jpg`,
+      `/images/products-${productId}.webp`,
+      `/images/${productId}.jpg`,
+      `/images/${productId}.webp`
+    )
   }
   
-  // 如果已经是完整URL，直接返回
-  if (path.startsWith('http') || path.startsWith('//')) {
-    return path
+  // 如果提供了picture字段，也加入可能的路径列表
+  if (path) {
+    let picturePath = path
+    // 处理完整URL
+    if (picturePath.startsWith('http') || picturePath.startsWith('//')) {
+      possiblePaths.push(picturePath)
+    } else {
+      // 处理包含public前缀的路径
+      if (picturePath.includes('/public/')) {
+        picturePath = picturePath.replace('/public/', '/')
+      }
+      // 确保路径以/开头
+      if (!picturePath.startsWith('/')) {
+        picturePath = '/' + picturePath
+      }
+      possiblePaths.push(picturePath)
+    }
   }
   
-  // 处理包含public前缀的路径 - Vite中public目录的资源应该通过根路径访问
-  if (path.includes('/public/')) {
-    return path.replace('/public/', '/')
-  }
+  // 添加默认图片路径
+  possiblePaths.push('/images/cx.svg')
   
-  // 处理相对路径 - 假设商品图片都在public/images目录下
-  if (path.startsWith('images/')) {
-    // 转换为绝对路径（指向public目录）
-    return '/' + path
-  }
-  
-  // 确保所有路径都以/开头
-  if (!path.startsWith('/')) {
-    return '/' + path
-  }
-  
-  return path
+  // 返回第一个可能的路径
+  return possiblePaths[0]
 }
 
 // 图片加载失败处理
 const handleImageError = (event: Event, productId: number): void => {
-  console.error(`商品 ${productId} 图片加载失败:`, event)
+  console.log(`商品 ${productId} 图片加载失败，尝试其他路径`)
   const img = event.target as HTMLImageElement
-  img.src = '/src/assets/images/200.png' // 使用public目录下的默认图片
+  
+  // 定义失败时尝试的其他图片路径
+  const fallbackPaths = [
+    `/images/list-${String(productId).padStart(2, '0')}.webp`,
+    `/images/list-${String(productId).padStart(2, '0')}.jpg`,
+    `/images/products-${productId}.jpg`,
+    `/images/products-${productId}.webp`,
+    `/images/${productId}.jpg`,
+    `/images/${productId}.webp`,
+    '/images/cx.svg'
+  ]
+  
+  // 尝试从失败的图片中提取当前尝试的路径，避免重复尝试
+  const currentSrc = img.src
+  const filteredPaths = fallbackPaths.filter(path => !currentSrc.includes(path))
+  
+  // 如果还有其他路径可以尝试，使用下一个路径
+  if (filteredPaths.length > 0) {
+    img.src = filteredPaths[0]
+  } else {
+    // 如果所有本地路径都失败，使用备用默认图片
+    img.src = '/src/assets/images/200.png' 
+  }
 }
 
 // 处理子分类点击事件

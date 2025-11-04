@@ -13,36 +13,62 @@ class ProductService {
 
     try {
       console.log('开始加载商品数据...')
+      
+      // 定义多个可能的数据文件路径
+      const possiblePaths = [
+        './goods.json',         // 当前目录
+        '/goods.json',          // 根目录
+        '/public/goods.json',   // public目录
+        '/dist/goods.json'      // dist目录
+      ]
+      
+      let data = null
+      let loadSuccess = false
+      
+      // 尝试从多个路径加载数据
+      for (const path of possiblePaths) {
+        try {
+          console.log(`尝试从路径加载数据: ${path}`)
+          const response = await axios.get(path)
+          data = response.data
+          loadSuccess = true
+          console.log(`成功从 ${path} 加载JSON数据`)
+          break  // 成功后跳出循环
+        } catch (pathError) {
+          console.warn(`从 ${path} 加载失败:`, pathError.message)
+          // 继续尝试下一个路径
+        }
+      }
+      
+      if (loadSuccess && data) {
+        // 使用真实数据
+        this.products = data.products || []
+        this.categories = data.list || []
 
-      // 使用相对路径，确保在不同环境下都能正确访问
-      const response = await axios.get('./goods.json')
-      const data = response.data
+        // 构建分类映射
+        this.categoryGoodsMap = {}
+        if (data.list) {
+          data.list.forEach(category => {
+            if (category.goods) {
+              this.categoryGoodsMap[category.id] = category.goods
+            }
+          })
+        }
 
-      console.log('成功加载JSON数据:', data)
-
-      // 使用真实数据
-      this.products = data.products || []
-      this.categories = data.list || []
-
-      // 构建分类映射
-      this.categoryGoodsMap = {}
-      if (data.list) {
-        data.list.forEach(category => {
-          if (category.goods) {
-            this.categoryGoodsMap[category.id] = category.goods
-          }
+        this.loaded = true
+        console.log('真实数据加载完成', {
+          商品数量: this.products.length,
+          分类数量: this.categories.length
         })
+      } else {
+        console.error('所有路径尝试加载数据失败')
+        // 如果所有路径都加载失败，使用真实数据作为后备
+        this.setRealDataBackup()
       }
 
-      this.loaded = true
-      console.log('真实数据加载完成', {
-        商品数量: this.products.length,
-        分类数量: this.categories.length
-      })
-
     } catch (error) {
-      console.error('加载商品数据失败:', error)
-      // 如果加载失败，使用你提供的真实数据作为后备
+      console.error('加载商品数据过程中发生错误:', error)
+      // 如果加载过程中发生未知错误，使用真实数据作为后备
       this.setRealDataBackup()
     }
   }
