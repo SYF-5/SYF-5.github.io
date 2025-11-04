@@ -134,12 +134,26 @@ const fetchProducts = async () => {
 const getProductImageUrl = (product) => {
   // 优先使用本地图片
   if (product.picture) {
+    // 处理包含public前缀的路径 - Vite中public目录的资源应该通过根路径访问
+    if (product.picture.includes('/public/')) {
+      return product.picture.replace('/public/', '/')
+    }
+    
     // 处理相对路径
     if (product.picture.startsWith('images/')) {
       return '/' + product.picture
     }
+    
+    // 确保以/开头的绝对路径
+    if (!product.picture.startsWith('/')) {
+      return '/' + product.picture
+    }
+    
     return product.picture
   }
+  
+  // 如果没有图片，返回默认图片
+  return '/images/cx.svg'
 }
 
 // 图片加载失败处理

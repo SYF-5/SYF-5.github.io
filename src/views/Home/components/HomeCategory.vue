@@ -132,13 +132,18 @@ const getImageUrl = (path: string): string => {
     return path
   }
   
+  // 处理包含public前缀的路径 - Vite中public目录的资源应该通过根路径访问
+  if (path.includes('/public/')) {
+    return path.replace('/public/', '/')
+  }
+  
   // 处理相对路径 - 假设商品图片都在public/images目录下
   if (path.startsWith('images/')) {
     // 转换为绝对路径（指向public目录）
     return '/' + path
   }
   
-  // 其他情况也尝试从public目录加载
+  // 确保所有路径都以/开头
   if (!path.startsWith('/')) {
     return '/' + path
   }
