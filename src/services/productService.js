@@ -56,7 +56,7 @@ class ProductService {
         "id": 50,
         "name": "新鲜芹菜",
         "price": 10.5,
-        "picture": "images/products-50.jpg",
+        "picture": "/public/images/products-50.jpg",
         "description": "新鲜采摘的芹菜，清脆爽口",
         "category": "vegetables",
         "stock": 50,
@@ -192,18 +192,18 @@ class ProductService {
 
   getProductById(id) {
     id = Number(id)
-    
+
     // 1. 先从主产品列表查找
     let product = this.products.find(p => p.id === id)
     if (product) return product
-    
+
     // 2. 如果找不到，再从分类商品映射中查找
     for (const categoryId in this.categoryGoodsMap) {
       const goods = this.categoryGoodsMap[categoryId]
       product = goods.find(p => p.id === id)
       if (product) return product
     }
-    
+
     return null
   }
 

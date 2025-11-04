@@ -3,7 +3,7 @@
     <!-- 横幅区域 -->
     <div class="banner-container">
       <div class="banner">
-        <img src="/images/cx.svg" alt="小兔鲜促销横幅">
+        <img src="/src/assets/images/cx.jpg" alt="小兔鲜促销横幅">
       </div>
     </div>
     
