@@ -1,0 +1,86 @@
+{
+  "shipping": 15.00,
+  "discount": 30.00,
+  "products": [
+    {
+      "id": 50,
+      "name": "新鲜芹菜",
+      "price": 10.5,
+      "picture": "images/products-50.jpg",
+      "description": "新鲜采摘的芹菜，清脆爽口",
+      "category": "vegetables",
+      "stock": 50,
+      "rating": 4.5
+    },
+    {
+      "id": 51,
+      "name": "云南香蕉",
+      "price": 15.0,
+      "picture": "images/products-51.webp",
+      "description": "来自云南的优质香蕉，香甜可口",
+      "category": "fruits",
+      "stock": 30,
+      "rating": 4.8
+    },
+    {
+      "id": 52,
+      "name": "进口橙子",
+      "price": 20.0,
+      "picture": "images/products-52.jpg",
+      "description": "进口优质橙子，汁多味甜",
+      "category": "fruits",
+      "stock": 25,
+      "rating": 4.7
+    },
+    {
+      "id": 53,
+      "name": "新鲜鸡蛋",
+      "price": 12.0,
+      "picture": "images/products-53.webp",
+      "description": "优质小米，营养丰富",
+      "category": "grains",
+      "stock": 40,
+      "rating": 4.6
+    },
+    {
+      "id": 54,
+      "name": "优质小米",
+      "price": 18.0,
+      "picture": "images/products-54.webp",
+      "description": "农家散养鸡蛋，新鲜健康",
+      "category": "eggs",
+      "stock": 60,
+      "rating": 4.9
+    },
+    {
+      "id": 55,
+      "name": "有机花菜",
+      "price": 8.5,
+      "picture": "images/products-55.webp",
+      "description": "有机种植花菜，无农药残留",
+      "category": "vegetables",
+      "stock": 35,
+      "rating": 4.4
+    },
+    {
+      "id": 56,
+      "name": "金枕榴莲",
+      "price": 120,
+      "picture": "images/products-56.webp",
+      "description": "香甜可口，入口即化",
+      "category": "vegetables",
+      "stock": 35,
+      "rating": 4.4
+    },
+    {
+      "id": 57,
+      "name": "农家鸡",
+      "price": 120,
+      "picture": "images/products-57.jpg",
+      "description": "香甜可口，入口即化",
+      "category": "vegetables",
+      "stock": 35,
+      "rating": 4.4
+    }
+  ]
+}
