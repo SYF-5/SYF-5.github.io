@@ -140,10 +140,6 @@ const getProductImageUrl = (product) => {
     }
     return product.picture
   }
-  
-  // 使用在线图片作为后备
-  const productId = product.id || 1
-  return `https://picsum.photos/300/200?random=${productId}`
 }
 
 // 图片加载失败处理

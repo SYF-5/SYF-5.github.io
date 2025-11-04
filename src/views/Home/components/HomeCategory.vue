@@ -150,7 +150,7 @@ const getImageUrl = (path: string): string => {
 const handleImageError = (event: Event, productId: number): void => {
   console.error(`商品 ${productId} 图片加载失败:`, event)
   const img = event.target as HTMLImageElement
-  img.src = '/images/cx.svg' // 使用public目录下的默认图片
+  img.src = '/src/assets/images/200.png' // 使用public目录下的默认图片
 }
 
 // 处理子分类点击事件
