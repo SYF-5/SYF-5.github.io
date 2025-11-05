@@ -120,92 +120,139 @@ const fetchCategoryData = async (): Promise<void> => {
   }
 }
 
-// 图片路径处理函数 - 增强的多路径尝试
+// 硬编码的图片数据映射表 - 作为备选方案
+const hardcodedImages: Record<number, string> = {
+  1: '/images/list-01.jpg',
+  2: '/images/list-02.jpg',
+  3: '/images/list-03.jpg',
+  4: '/images/list-04.jpg',
+  5: '/images/list-05.jpg',
+  6: '/images/list-06.jpg',
+  7: '/images/list-07.webp',
+  8: '/images/list-08.jpg',
+  9: '/images/list-09.jpg',
+  10: '/images/list-10.jpg',
+  11: '/images/list-11.jpg',
+  12: '/images/list-12.jpg',
+  13: '/images/list-13.jpg',
+  14: '/images/list-14.jpg',
+  15: '/images/list-15.jpg',
+  50: '/images/list-45.jpg',
+  51: '/images/list-07.webp',
+  52: '/images/list-08.jpg',
+  53: '/images/list-25.jpg',
+  54: '/images/list-20.jpg',
+  55: '/images/list-28.jpg',
+  56: '/images/list-30.jpg',
+  57: '/images/list-33.jpg'
+}
+
+// 图片路径处理函数 - 优先使用goods数据中的图片路径
 const getImageUrl = (path: string, productId?: number): string => {
-  // 从检查结果看，项目中存在list-和products-前缀的图片文件
-  // 定义可能的图片路径模式，按照实际存在的文件优先排序
-  const possiblePaths = []
-  
   // 基础路径前缀
   const basePaths = ['', '/public', '/dist']
   
-  // 如果有产品ID，优先尝试list-和products-前缀的图片（这些在文件系统中存在）
+  // 1. 优先使用传入的path参数（来自goods数据）
+  if (path && typeof path === 'string') {
+    // 如果path已经是完整URL，直接返回
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      console.log(`为商品 ${productId} 使用完整URL: ${path}`)
+      return path
+    }
+    
+    // 检查是否是相对路径，如果不是，则添加images前缀
+    let adjustedPath = path
+    if (!path.startsWith('/') && !path.startsWith('images/')) {
+      adjustedPath = `images/${path}`
+    }
+    
+    // 尝试不同基础路径前缀的组合
+    for (const basePath of basePaths) {
+      const fullPath = adjustedPath.startsWith('/') 
+        ? adjustedPath 
+        : `${basePath}/${adjustedPath}`
+      
+      console.log(`为商品 ${productId} 尝试使用goods数据中的图片路径: ${fullPath}`)
+      return fullPath
+    }
+  }
+  
+  // 2. 如果goods数据中的图片路径无效或不存在，使用硬编码的图片映射
+  if (productId && hardcodedImages[productId]) {
+    const hardcodedPath = hardcodedImages[productId]
+    console.log(`为商品 ${productId} 使用硬编码图片路径: ${hardcodedPath}`)
+    return hardcodedPath
+  }
+  
+  // 3. 如果没有硬编码映射，生成基于ID的图片路径
   if (productId) {
-    // 优先尝试list系列命名，因为这些文件在检查中显示存在
     // 确保listNumber是有效数字且在合理范围内
     let listNumber = Math.abs(productId)
-    // 循环映射到1-45范围内，因为文件系统中存在这些图片
+    // 循环映射到1-45范围内
     listNumber = ((listNumber - 1) % 45) + 1
     const listFormattedNumber = String(listNumber).padStart(2, '0')
     
-    basePaths.forEach(basePath => {
-      // list系列图片 - 只尝试数字编号的图片
-      possiblePaths.push(
-        `${basePath}/images/list-${listFormattedNumber}.jpg`,
-        `${basePath}/images/list-${listFormattedNumber}.webp`
-      )
-      
-      // 直接使用ID的图片
-      possiblePaths.push(
-        `${basePath}/images/${productId}.jpg`,
-        `${basePath}/images/${productId}.webp`
-      )
-    })
+    const fallbackPath = `/images/list-${listFormattedNumber}.jpg`
+    console.log(`为商品 ${productId} 生成默认图片路径: ${fallbackPath}`)
+    return fallbackPath
   }
   
-  // 添加默认图片路径 - 始终作为备选
-  basePaths.forEach(basePath => {
-    possiblePaths.push(`${basePath}/images/cx.svg`)
-  })
-  
-  // 返回第一个可能的路径
-  const selectedPath = possiblePaths[0] || '/images/cx.svg'
-  console.log(`为商品 ${productId} 生成图片路径: ${selectedPath}`)
-  return selectedPath
+  // 4. 最终默认路径
+  const defaultPath = '/images/cx.svg'
+  console.log(`使用默认图片路径: ${defaultPath}`)
+  return defaultPath
 }
 
-// 图片加载失败处理 - 增强的多路径回退机制
+// 图片加载失败处理 - 增强的回退机制，优先使用硬编码数据
 const handleImageError = (event: Event, productId: number): void => {
-  console.log(`商品 ${productId} 图片加载失败，尝试其他路径`)
+  console.log(`商品 ${productId} 图片加载失败，尝试回退方案`)
   const img = event.target as HTMLImageElement
-  
-  // 生成不包含中文字符的回退路径列表
-  const fallbackPaths = []
-  const basePaths = ['', '/public', '/dist']
-  
-  // 为不同ID范围生成对应的list图片路径
-  for (let i = 1; i <= 45; i++) {
-    const listFormattedNumber = String(i).padStart(2, '0')
-    basePaths.forEach(basePath => {
-      fallbackPaths.push(
-        `${basePath}/images/list-${listFormattedNumber}.jpg`,
-        `${basePath}/images/list-${listFormattedNumber}.webp`
-      )
-    })
-  }
-  
-  // 添加默认图片和一些已知存在的图片
-  const knownImages = ['01.jpg', '02.jpg', '03.jpg', '05.jpg', '06.jpg', '08.jpg', '09.jpg', '11.jpg', '12.jpg', '13.jpg', '15.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg', '21.jpg', '22.png', '23.jpg', '24.jpg', '25.jpg', '28.jpg', '30.jpg', '33.jpg', 'cx.svg']
-  
-  knownImages.forEach(image => {
-    basePaths.forEach(basePath => {
-      fallbackPaths.push(`${basePath}/images/${image}`)
-    })
-  })
-  
-  // 尝试从失败的图片中提取当前尝试的路径，避免重复尝试
   const currentSrc = img.src
-  const filteredPaths = fallbackPaths.filter(path => !currentSrc.includes(path))
   
-  // 如果还有其他路径可以尝试，使用下一个路径
-  if (filteredPaths.length > 0) {
-    img.src = filteredPaths[0]
-    console.log(`尝试备用路径: ${filteredPaths[0]}`)
-  } else {
-    // 如果所有本地路径都失败，使用网络备用图
-    console.log('所有本地路径都失败，使用网络备用图')
-    img.src = `https://picsum.photos/id/${(productId * 3 + 10) % 100}/100/100`
+  // 1. 检查是否已有硬编码图片，如果有且未尝试，则使用它
+  if (productId && hardcodedImages[productId] && !currentSrc.includes(hardcodedImages[productId])) {
+    img.src = hardcodedImages[productId]
+    console.log(`尝试使用硬编码图片路径: ${hardcodedImages[productId]}`)
+    return
   }
+  
+  // 2. 生成基于ID的list图片路径作为备选
+  const listNumber = ((Math.abs(productId) - 1) % 45) + 1
+  const listFormattedNumber = String(listNumber).padStart(2, '0')
+  const listPaths = [
+    `/images/list-${listFormattedNumber}.jpg`,
+    `/images/list-${listFormattedNumber}.webp`
+  ]
+  
+  for (const listPath of listPaths) {
+    if (!currentSrc.includes(listPath)) {
+      img.src = listPath
+      console.log(`尝试list图片路径: ${listPath}`)
+      return
+    }
+  }
+  
+  // 3. 尝试一些已知存在的图片（轮询方式）
+  const knownImages = ['01.jpg', '02.jpg', '03.jpg', '05.jpg', '06.jpg', '08.jpg', '09.jpg', '11.jpg', '12.jpg', '13.jpg']
+  const fallbackIndex = Math.abs(productId) % knownImages.length
+  const fallbackImage = `/images/list-${knownImages[fallbackIndex]}`
+  
+  if (!currentSrc.includes(fallbackImage)) {
+    img.src = fallbackImage
+    console.log(`尝试已知存在图片: ${fallbackImage}`)
+    return
+  }
+  
+  // 4. 最终尝试默认图片
+  if (!currentSrc.includes('/images/cx.svg')) {
+    img.src = '/images/cx.svg'
+    console.log('使用默认图片: /images/cx.svg')
+    return
+  }
+  
+  // 5. 如果所有本地路径都失败，使用网络备用图
+  console.log('所有本地路径都失败，使用网络备用图')
+  img.src = `https://picsum.photos/id/${(productId * 7 + 23) % 100}/100/100`
 }
 
 // 处理子分类点击事件
