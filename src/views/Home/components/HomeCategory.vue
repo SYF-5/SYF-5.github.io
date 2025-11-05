@@ -125,18 +125,48 @@ const hardcodedImages: Record<number, string> = {
   1: '/images/list-01.jpg',
   2: '/images/list-02.jpg',
   3: '/images/list-03.jpg',
-  4: '/images/list-04.jpg',
+  4: '/images/list-04.webp',
   5: '/images/list-05.jpg',
   6: '/images/list-06.jpg',
   7: '/images/list-07.webp',
   8: '/images/list-08.jpg',
   9: '/images/list-09.jpg',
-  10: '/images/list-10.jpg',
+  10: '/images/list-10.webp',
   11: '/images/list-11.jpg',
   12: '/images/list-12.jpg',
   13: '/images/list-13.jpg',
-  14: '/images/list-14.jpg',
+  14: '/images/list-14.webp',
   15: '/images/list-15.jpg',
+  16: '/images/list-16.webp',
+  17: '/images/list-17.jpg',
+  18: '/images/list-18.jpg',
+  19: '/images/list-19.jpg',
+  20: '/images/list-20.jpg',
+  21: '/images/list-21.jpg',
+  22: '/images/list-22.png',
+  23: '/images/list-23.jpg',
+  24: '/images/list-24.jpg',
+  25: '/images/list-25.jpg',
+  26: '/images/list-26.webp',
+  27: '/images/list-27.webp',
+  28: '/images/list-28.jpg',
+  29: '/images/list-29.webp',
+  30: '/images/list-30.jpg',
+  31: '/images/list-31.webp',
+  32: '/images/list-32.webp',
+  33: '/images/list-33.jpg',
+  34: '/images/list-34.jpg',
+  35: '/images/list-35.webp',
+  36: '/images/list-36.webp',
+  37: '/images/list-37.webp',
+  38: '/images/list-38.webp',
+  39: '/images/list-39.webp',
+  40: '/images/list-40.jpg',
+  41: '/images/list-41.webp',
+  42: '/images/list-42.webp',
+  43: '/images/list-43.webp',
+  44: '/images/list-44.webp',
+  45: '/images/list-45.jpg',
   50: '/images/list-45.jpg',
   51: '/images/list-07.webp',
   52: '/images/list-08.jpg',
@@ -147,44 +177,90 @@ const hardcodedImages: Record<number, string> = {
   57: '/images/list-33.jpg'
 }
 
-// 图片路径处理函数 - 优先使用goods数据中的图片路径
-const getImageUrl = (path: string, productId?: number): string => {
-  // 基础路径前缀
-  const basePaths = ['', '/public', '/dist']
+// 请求限流管理
+const imageRequestQueue: { id: number; timestamp: number }[] = []
+const MAX_REQUESTS_PER_SECOND = 10 // 每秒最大请求数
+const REQUEST_TIMEOUT = 1000 // 1秒
+
+// 检查是否应该限制请求
+const shouldLimitRequest = (productId: number): boolean => {
+  const now = Date.now()
+  // 清理过期的请求记录
+  const validRequests = imageRequestQueue.filter(
+    req => now - req.timestamp < REQUEST_TIMEOUT
+  )
+  imageRequestQueue.splice(0, imageRequestQueue.length, ...validRequests)
   
-  // 1. 优先使用传入的path参数（来自goods数据）
-  if (path && typeof path === 'string') {
-    // 如果path已经是完整URL，直接返回
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-      console.log(`为商品 ${productId} 使用完整URL: ${path}`)
-      return path
-    }
-    
-    // 检查是否是相对路径，如果不是，则添加images前缀
-    let adjustedPath = path
-    if (!path.startsWith('/') && !path.startsWith('images/')) {
-      adjustedPath = `images/${path}`
-    }
-    
-    // 尝试不同基础路径前缀的组合
-    for (const basePath of basePaths) {
-      const fullPath = adjustedPath.startsWith('/') 
-        ? adjustedPath 
-        : `${basePath}/${adjustedPath}`
-      
-      console.log(`为商品 ${productId} 尝试使用goods数据中的图片路径: ${fullPath}`)
-      return fullPath
-    }
+  // 检查是否已经有太多请求
+  if (validRequests.length >= MAX_REQUESTS_PER_SECOND) {
+    console.log(`限制图片请求: ${productId}，请求过于频繁`)
+    return true
   }
   
-  // 2. 如果goods数据中的图片路径无效或不存在，使用硬编码的图片映射
+  // 记录新请求
+  imageRequestQueue.push({ id: productId, timestamp: now })
+  return false
+}
+
+// 防抖函数
+const debounce = <F extends (...args: any[]) => any>(
+  func: F,
+  delay: number
+): ((...args: Parameters<F>) => void) => {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null
+  return (...args: Parameters<F>) => {
+    if (timeoutId) clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => func(...args), delay)
+  }
+}
+
+// 图片路径处理函数 - 优化版，避免429错误和中文路径问题
+const getImageUrl = (path: string, productId?: number): string => {
+  // 1. 检查是否应该限制请求
+  if (productId && shouldLimitRequest(productId)) {
+    // 返回默认图片，稍后通过错误处理再加载
+    return '/images/cx.svg'
+  }
+  
+  // 2. 优先使用硬编码的图片映射（最可靠）
   if (productId && hardcodedImages[productId]) {
     const hardcodedPath = hardcodedImages[productId]
     console.log(`为商品 ${productId} 使用硬编码图片路径: ${hardcodedPath}`)
     return hardcodedPath
   }
   
-  // 3. 如果没有硬编码映射，生成基于ID的图片路径
+  // 3. 使用传入的path参数（来自goods数据）
+  if (path && typeof path === 'string') {
+    // 避免中文路径问题
+    if (path.match(/[\u4e00-\u9fa5]/)) {
+      console.warn(`检测到中文路径，避免使用: ${path}`)
+    } else {
+      // 如果path已经是完整URL，直接返回
+      if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path
+      }
+      
+      // 确保路径格式正确
+      let fullPath = path
+      if (!path.startsWith('/')) {
+        fullPath = `/${path}`
+      }
+      
+      // 检查是否需要添加images前缀
+      if (!fullPath.startsWith('/images/') && !fullPath.startsWith('/public/') && !fullPath.startsWith('/dist/')) {
+        if (path.startsWith('images/')) {
+          fullPath = `/${path}`
+        } else {
+          fullPath = `/images/${path}`
+        }
+      }
+      
+      console.log(`为商品 ${productId} 使用goods数据中的图片路径: ${fullPath}`)
+      return fullPath
+    }
+  }
+  
+  // 4. 如果没有硬编码映射，生成基于ID的图片路径
   if (productId) {
     // 确保listNumber是有效数字且在合理范围内
     let listNumber = Math.abs(productId)
@@ -192,67 +268,78 @@ const getImageUrl = (path: string, productId?: number): string => {
     listNumber = ((listNumber - 1) % 45) + 1
     const listFormattedNumber = String(listNumber).padStart(2, '0')
     
+    // 优先使用已知存在的list图片
     const fallbackPath = `/images/list-${listFormattedNumber}.jpg`
     console.log(`为商品 ${productId} 生成默认图片路径: ${fallbackPath}`)
     return fallbackPath
   }
   
-  // 4. 最终默认路径
-  const defaultPath = '/images/cx.svg'
-  console.log(`使用默认图片路径: ${defaultPath}`)
-  return defaultPath
+  // 5. 最终默认路径
+  return '/images/cx.svg'
 }
 
-// 图片加载失败处理 - 增强的回退机制，优先使用硬编码数据
-const handleImageError = (event: Event, productId: number): void => {
+// 防抖处理图片加载错误
+const debouncedImageErrorHandler = debounce((img: HTMLImageElement, productId: number, currentSrc: string) => {
   console.log(`商品 ${productId} 图片加载失败，尝试回退方案`)
-  const img = event.target as HTMLImageElement
-  const currentSrc = img.src
   
-  // 1. 检查是否已有硬编码图片，如果有且未尝试，则使用它
+  // 1. 确保使用硬编码图片
   if (productId && hardcodedImages[productId] && !currentSrc.includes(hardcodedImages[productId])) {
-    img.src = hardcodedImages[productId]
     console.log(`尝试使用硬编码图片路径: ${hardcodedImages[productId]}`)
+    img.src = hardcodedImages[productId]
     return
   }
   
-  // 2. 生成基于ID的list图片路径作为备选
+  // 2. 尝试不同格式的图片
   const listNumber = ((Math.abs(productId) - 1) % 45) + 1
   const listFormattedNumber = String(listNumber).padStart(2, '0')
-  const listPaths = [
-    `/images/list-${listFormattedNumber}.jpg`,
-    `/images/list-${listFormattedNumber}.webp`
-  ]
   
-  for (const listPath of listPaths) {
-    if (!currentSrc.includes(listPath)) {
-      img.src = listPath
-      console.log(`尝试list图片路径: ${listPath}`)
+  // 尝试不同的文件格式
+  const extensions = ['.jpg', '.webp', '.png', '.jpeg']
+  for (const ext of extensions) {
+    const altPath = `/images/list-${listFormattedNumber}${ext}`
+    if (!currentSrc.includes(altPath)) {
+      console.log(`尝试不同格式: ${altPath}`)
+      img.src = altPath
       return
     }
   }
   
   // 3. 尝试一些已知存在的图片（轮询方式）
-  const knownImages = ['01.jpg', '02.jpg', '03.jpg', '05.jpg', '06.jpg', '08.jpg', '09.jpg', '11.jpg', '12.jpg', '13.jpg']
-  const fallbackIndex = Math.abs(productId) % knownImages.length
+  const knownImages = [
+    '01.jpg', '02.jpg', '03.jpg', '05.jpg', '06.jpg', 
+    '08.jpg', '09.jpg', '11.jpg', '12.jpg', '13.jpg',
+    '15.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg',
+    '21.jpg', '22.png', '23.jpg', '24.jpg', '25.jpg',
+    '28.jpg', '30.jpg', '33.jpg'
+  ]
+  
+  // 使用商品ID生成一个更分散的索引
+  const fallbackIndex = (Math.abs(productId) * 7) % knownImages.length
   const fallbackImage = `/images/list-${knownImages[fallbackIndex]}`
   
   if (!currentSrc.includes(fallbackImage)) {
-    img.src = fallbackImage
     console.log(`尝试已知存在图片: ${fallbackImage}`)
+    img.src = fallbackImage
     return
   }
   
-  // 4. 最终尝试默认图片
+  // 4. 避免使用网络图片，直接使用默认图片（减少429错误）
   if (!currentSrc.includes('/images/cx.svg')) {
-    img.src = '/images/cx.svg'
     console.log('使用默认图片: /images/cx.svg')
+    img.src = '/images/cx.svg'
     return
   }
   
-  // 5. 如果所有本地路径都失败，使用网络备用图
-  console.log('所有本地路径都失败，使用网络备用图')
-  img.src = `https://picsum.photos/id/${(productId * 7 + 23) % 100}/100/100`
+  console.log(`商品 ${productId} 所有图片尝试都失败`)
+}, 100)
+
+// 图片加载失败处理 - 优化版，增加防抖避免频繁重试
+const handleImageError = (event: Event, productId: number): void => {
+  const img = event.target as HTMLImageElement
+  const currentSrc = img.src
+  
+  // 使用防抖处理错误，避免频繁重试导致429错误
+  debouncedImageErrorHandler(img, productId, currentSrc)
 }
 
 // 处理子分类点击事件
