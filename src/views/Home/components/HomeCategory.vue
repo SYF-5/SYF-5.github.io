@@ -214,7 +214,7 @@ const debounce = <F extends (...args: any[]) => any>(
   }
 }
 
-// 图片路径处理函数 - 优化版，避免429错误和中文路径问题
+// 图片路径处理函数 - 优化版，适应绝对路径
 const getImageUrl = (path: string, productId?: number): string => {
   // 1. 检查是否应该限制请求
   if (productId && shouldLimitRequest(productId)) {
@@ -229,7 +229,7 @@ const getImageUrl = (path: string, productId?: number): string => {
     return hardcodedPath
   }
   
-  // 3. 使用传入的path参数（来自goods数据）
+  // 3. 使用传入的path参数（来自goods数据，现在已是绝对路径）
   if (path && typeof path === 'string') {
     // 避免中文路径问题
     if (path.match(/[\u4e00-\u9fa5]/)) {
@@ -240,23 +240,9 @@ const getImageUrl = (path: string, productId?: number): string => {
         return path
       }
       
-      // 确保路径格式正确
-      let fullPath = path
-      if (!path.startsWith('/')) {
-        fullPath = `/${path}`
-      }
-      
-      // 检查是否需要添加images前缀
-      if (!fullPath.startsWith('/images/') && !fullPath.startsWith('/public/') && !fullPath.startsWith('/dist/')) {
-        if (path.startsWith('images/')) {
-          fullPath = `/${path}`
-        } else {
-          fullPath = `/images/${path}`
-        }
-      }
-      
-      console.log(`为商品 ${productId} 使用goods数据中的图片路径: ${fullPath}`)
-      return fullPath
+      // 由于goods.json已改为绝对路径，直接返回
+      console.log(`为商品 ${productId} 使用goods数据中的绝对路径: ${path}`)
+      return path
     }
   }
   
@@ -268,7 +254,7 @@ const getImageUrl = (path: string, productId?: number): string => {
     listNumber = ((listNumber - 1) % 45) + 1
     const listFormattedNumber = String(listNumber).padStart(2, '0')
     
-    // 优先使用已知存在的list图片
+    // 优先使用已知存在的list图片，使用绝对路径
     const fallbackPath = `/images/list-${listFormattedNumber}.jpg`
     console.log(`为商品 ${productId} 生成默认图片路径: ${fallbackPath}`)
     return fallbackPath
