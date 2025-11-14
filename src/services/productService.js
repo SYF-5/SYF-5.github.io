@@ -41,17 +41,28 @@ class ProductService {
       }
       
       if (loadSuccess && data) {
-        // 使用真实数据
-        this.products = data.products || []
+        // 使用真实数据并标准化图片路径为根相对路径
+        this.products = (data.products || []).map(product => ({
+          ...product,
+          // 确保图片路径是根相对路径
+          picture: product.picture && !product.picture.startsWith('/') 
+            ? `/${product.picture}` 
+            : product.picture
+        }))
         this.categories = data.list || []
 
-        // 构建分类映射
-        this.categoryGoodsMap = {}
+        // 构建分类映射并标准化商品图片路径
+        this.categoryGoodsMap = {};
         if (data.list) {
           data.list.forEach(category => {
             if (category.goods) {
-              this.categoryGoodsMap[category.id] = category.goods
-            }
+              this.categoryGoodsMap[category.id] = category.goods.map(good => ({
+                ...good,
+                // 确保图片路径是根相对路径
+                picture: good.picture && !good.picture.startsWith('/')
+                  ? `/${good.picture}`
+                  : good.picture
+              }))            }
           })
         }
 
@@ -76,13 +87,13 @@ class ProductService {
   setRealDataBackup() {
     console.log('使用真实数据备份')
 
-    // 使用你提供的真实数据
+    // 使用真实数据备份并确保图片路径为根相对路径
     this.products = [
       {
         "id": 50,
         "name": "新鲜芹菜",
         "price": 10.5,
-        "picture": "images/list-45.jpg",
+        "picture": "/images/list-45.jpg",
         "description": "新鲜采摘的芹菜，清脆爽口",
         "category": "vegetables",
         "stock": 50,
@@ -92,7 +103,7 @@ class ProductService {
         "id": 51,
         "name": "云南香蕉",
         "price": 15.0,
-        "picture": "images/list-07.webp",
+        "picture": "/images/list-07.webp",
         "description": "来自云南的优质香蕉，香甜可口",
         "category": "fruits",
         "stock": 30,

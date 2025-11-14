@@ -81,17 +81,17 @@ const handleImageLoad = () => {
   imageLoaded.value = true
 }
 
-// 优化：图片加载失败处理
+// 修复：图片加载失败处理
 const handleImageError = (event) => {
   console.warn('图片加载失败:', event.target.src)
-  // 使用本地默认图片作为备用
-  event.target.src = './images/cx.svg'
+  // 使用根相对路径的默认图片作为备用
+  event.target.src = '/images/cx.svg'
 }
 
 // 优化：处理图片URL并支持懒加载
 const getImageUrl = (picturePath) => {
   if (!picturePath) {
-    return './images/cx.svg'
+    return '/images/cx.svg'
   }
   
   // 如果已经是完整URL，直接返回
@@ -99,22 +99,23 @@ const getImageUrl = (picturePath) => {
     return picturePath
   }
   
-  // 处理绝对路径，改为相对路径
+  // 已经是根相对路径，直接返回
   if (picturePath.startsWith('/')) {
-    return `.${picturePath}`
+    return picturePath
   }
   
-  // 对于只有文件名的情况，添加正确的路径前缀
+  // 对于只有文件名的情况，添加正确的根相对路径前缀
   if (!picturePath.includes('/')) {
-    return `./images/${picturePath}`
+    return `/images/${picturePath}`
   }
   
   // 如果以list-开头，确保路径正确
   if (picturePath.startsWith('list-')) {
-    return `./images/${picturePath}`
+    return `/images/${picturePath}`
   }
   
-  return `./${picturePath}`
+  // 对于其他情况，确保使用根相对路径
+  return `/${picturePath}`
 }
 
 // 修复：从统一的服务加载商品数据并确保数据完整性

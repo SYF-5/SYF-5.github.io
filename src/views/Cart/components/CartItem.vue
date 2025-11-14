@@ -81,7 +81,7 @@ const handleImageLoad = (itemId: number) => {
 // 图片路径处理函数
 const getImageUrl = (picturePath: string) => {
   if (!picturePath) {
-    return './images/cx.svg'
+    return '/images/cx.svg'
   }
   
   // 如果已经是完整URL，直接返回
@@ -91,28 +91,28 @@ const getImageUrl = (picturePath: string) => {
   
   // 处理相对路径
   if (picturePath.startsWith('/')) {
-    // 如果是绝对路径，改为相对路径
-    return `.${picturePath}`
+    // 保留根相对路径
+    return `${picturePath}`
   }
   
   // 对于只有文件名的情况，添加正确的路径前缀
   if (!picturePath.includes('/')) {
-    return `./images/${picturePath}`
+    return `/images/${picturePath}`
   }
   
   // 如果以list-开头，确保路径正确
   if (picturePath.startsWith('list-')) {
-    return `./images/${picturePath}`
+    return `/images/${picturePath}`
   }
   
-  return `./${picturePath}`
+  return `/${picturePath}`
 }
 
 // 处理图片加载错误
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   // 设置默认图片
-  img.src = './images/cx.svg'
+  img.src = '/images/cx.svg'
   
   // 标记为已加载，隐藏占位符
   const itemId = Object.keys(imageLoadedStates).find(key => 

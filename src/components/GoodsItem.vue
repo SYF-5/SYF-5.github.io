@@ -17,35 +17,36 @@ const isAddingToCart = ref(false)
 
 // 优化的图片URL处理
 const getImageUrl = (path) => {
-  if (!path) return './images/cx.svg'
+  if (!path) return '/images/cx.svg'
   
   // 如果已经是完整URL，直接返回
   if (path.startsWith('http') || path.startsWith('//')) {
     return path
   }
   
-  // 处理绝对路径，改为相对路径
+  // 已经是根相对路径，直接返回
   if (path.startsWith('/')) {
-    return `.${path}`
+    return path
   }
   
-  // 对于只有文件名的情况，添加正确的路径前缀
+  // 对于只有文件名的情况，添加正确的根相对路径前缀
   if (!path.includes('/')) {
-    return `./images/${path}`
+    return `/images/${path}`
   }
   
   // 如果以list-开头，确保路径正确
   if (path.startsWith('list-')) {
-    return `./images/${path}`
+    return `/images/${path}`
   }
   
-  return `./${path}`
+  // 对于其他情况，确保使用根相对路径
+  return `/${path}`
 }
 
 // 图片加载失败处理
 const handleImageError = (event) => {
   console.warn('图片加载失败:', event.target.src)
-  event.target.src = './images/cx.svg'
+  event.target.src = '/images/cx.svg'
 }
 
 // 添加到购物车
