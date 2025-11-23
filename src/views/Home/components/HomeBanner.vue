@@ -1,81 +1,49 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElCarousel, ElCarouselItem } from 'element-plus'
-import axios from 'axios'
 
 interface BannerItem {
   id?: number
   picture: string
   alt?: string
+  title?: string
+  link?: string
 }
 
 // 响应式数据存储轮播图数据
 const bannerList = ref<BannerItem[]>([])
 const loading = ref(true)
 
-// 获取轮播图数据
-const fetchBannerData = async (): Promise<void> => {
-  try {
-    loading.value = true
-    
-    // 直接尝试从多个可能的路径获取数据
-    const possiblePaths = [
-      '/goods.json',
-      './goods.json',
-      '/src/data/goods.json'
-    ]
-    
-    let success = false
-    
-    for (const path of possiblePaths) {
-      try {
-        console.log(`尝试从路径获取轮播图数据: ${path}`)
-        const response = await axios.get(path)
-        
-        if (response.data && response.data.Banner) {
-          bannerList.value = response.data.Banner
-          console.log('成功获取轮播图数据:', bannerList.value)
-          success = true
-          break
-        }
-      } catch (err: unknown) {
-        // 修复错误类型问题
-        const error = err as Error
-        console.log(`路径 ${path} 失败:`, error.message)
-      }
-    }
-    
-    // 如果所有路径都失败，使用默认数据
-    if (!success) {
-      console.warn('所有路径都失败，使用默认轮播图数据')
-      bannerList.value = [
-        {
-          picture: "https://bpic.588ku.com/templet_pic/24/07/29/248e4d2449e3c57163547b6ad600487d.jpg!/fw/750/quality/90/unsharp/true/compress/true",
-          alt: "小兔鲜生促销活动"
-        },
-        {
-          picture: "https://via.placeholder.com/1224x500/4ecdc4/ffffff?text=新鲜食材直达",
-          alt: "新鲜食材直达"
-        }
-      ]
-    }
-  } catch (error: unknown) {
-    console.error('获取轮播图数据失败:', error)
-    // 使用默认数据
-    bannerList.value = [
-      {
-        picture: "https://bpic.588ku.com/templet_pic/24/07/29/248e4d2449e3c57163547b6ad600487d.jpg!/fw/750/quality/90/unsharp/true/compress/true",
-        alt: "默认横幅"
-      }
-    ]
-  } finally {
-    loading.value = false
-  }
-}
-
-// 组件挂载时获取数据
+// 组件挂载时设置硬编码的轮播图数据
 onMounted(() => {
-  fetchBannerData()
+  loading.value = true
+  
+  // 使用硬编码数据
+  bannerList.value = [
+    {
+      id: 1,
+      title: '新鲜水果特惠',
+      picture: '/images/Banner-1.jpg',
+      alt: '小兔鲜生促销活动',
+      link: '/category/2'
+    },
+    {
+      id: 2,
+      title: '生鲜蔬菜直达',
+      picture: '/images/Banner-2.jpg',
+      alt: '新鲜食材直达',
+      link: '/category/1'
+    },
+    {
+      id: 3,
+      title: '精选食品促销',
+      picture: '/images/list-11.jpg',
+      alt: '精选食品促销',
+      link: '/category/3'
+    }
+  ]
+  
+  loading.value = false
 })
 </script>
 

@@ -248,6 +248,30 @@ class ProductService {
   isLoaded() {
     return this.loaded
   }
+
+  getBanners() {
+    // 返回轮播图数据，使用根相对路径的本地图片
+    return [
+      {
+        id: 1,
+        title: '新鲜水果特惠',
+        picture: '/images/Banner-1.jpg',
+        link: '/category/2'
+      },
+      {
+        id: 2,
+        title: '生鲜蔬菜直达',
+        picture: '/images/Banner-2.jpg',
+        link: '/category/1'
+      },
+      {
+        id: 3,
+        title: '精选食品促销',
+        picture: '/images/list-11.jpg',
+        link: '/category/3'
+      }
+    ]
+  }
 }
 
 export default new ProductService()

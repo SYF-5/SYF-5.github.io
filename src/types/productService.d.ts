@@ -16,6 +16,14 @@ declare module '@/services/productService.js' {
     children: string[]
   }
 
+  interface Banner {
+    id?: number
+    picture: string
+    alt?: string
+    title?: string
+    link?: string
+  }
+
   class ProductService {
     loadAllData(): Promise<void>
     getProductById(id: number): Product | null
@@ -25,6 +33,7 @@ declare module '@/services/productService.js' {
     getNewProducts(): Product[]
     getProductsByCategoryName(categoryName: string): Product[]
     isLoaded(): boolean
+    getBanners(): Banner[]
   }
 
   const productService: ProductService
