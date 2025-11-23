@@ -85,19 +85,19 @@
   ],
   "Banner": [
     {
-      "picture": "/src/assets/images/Banner-1.jpg",
+      "picture": "/images/Banner-1.jpg",
       "link": "/category/1"
     },
     {
-      "picture": "/src/assets/images/Banner-2.jpg",
+      "picture": "/images/Banner-2.jpg",
       "link": "/category/2"
     },
     {
-      "picture": "/src/assets/images/Banner-3.webp",
+      "picture": "/images/Banner-3.webp",
       "link": "/category/3"
     },
     {
-      "picture": "/src/assets/images/Banner-4.webp",
+      "picture": "/images/Banner-4.webp",
       "link": "/category/4"
     }
   ],
@@ -115,7 +115,7 @@
           "name": "空调",
           "desc": "冷暖随心，静享舒适",
           "price": 1288.00,
-          "picture": "/src/assets/images/list-01.jpg"
+          "picture": "/images/list-01.jpg"
         },
         {
           "id": 2,
