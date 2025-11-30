@@ -11,7 +11,7 @@ interface BannerItem {
 // 使用硬编码的轮播图数据
 const bannerList = ref<BannerItem[]>([
   {
-    picture: '/images/Banner-1.jpg',
+    picture: 'https://pic.nximg.cn/file/20201204/32335089_215518889000_2.jpg',
     alt: '小兔鲜生促销活动'
   },
   {
@@ -41,7 +41,6 @@ onMounted(() => {
         <img 
           :src="item.picture" 
           :alt="item.alt || 'Banner'" 
-        
         />
       </el-carousel-item>
     </el-carousel>
