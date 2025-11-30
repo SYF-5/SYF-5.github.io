@@ -11,13 +11,21 @@ interface BannerItem {
 // 使用绝对可靠的网络图片测试
 const bannerList = ref<BannerItem[]>([
   {
-    picture: 'https://fastly.jsdelivr.net/npm/@vant/assets/apple-1.jpeg',
+    picture: 'https://syf-5.github.io/images/Banner-1.jpg',
     alt: '测试图片1'
   },
   {
-    picture: 'https://fastly.jsdelivr.net/npm/@vant/assets/apple-2.jpeg',
+    picture: 'https://syf-5.github.io/images/Banner-2.jpg',
     alt: '测试图片2'
-  }
+  }, 
+   {
+    picture: 'https://syf-5.github.io/images/Banner-3.webp',
+    alt: '测试图片1'
+  },
+  {
+    picture: 'https://syf-5.github.io/images/Banner-4.webp',
+    alt: '测试图片1'
+  },
 ])
 
 onMounted(() => {
