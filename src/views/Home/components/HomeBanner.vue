@@ -11,20 +11,20 @@ interface BannerItem {
 // 使用绝对可靠的网络图片测试
 const bannerList = ref<BannerItem[]>([
   {
-    picture: 'https://syf-5.github.io/images/Banner-1.jpg',
+    picture: './images/Banner-1.jpg',
     alt: '测试图片1'
   },
   {
-    picture: 'https://syf-5.github.io/images/Banner-2.jpg',
+    picture: 'https://syf-5.github.io/dist/public/images/Banner-2.jpg',
     alt: '测试图片2'
   }, 
    {
-    picture: 'https://syf-5.github.io/images/Banner-3.webp',
-    alt: '测试图片1'
+    picture: 'https://syf-5.github.io/public/images/Banner-3.webp',
+    alt: '测试图片3'
   },
   {
-    picture: 'https://syf-5.github.io/images/Banner-4.webp',
-    alt: '测试图片1'
+    picture: 'https://syf-5.github.io/dist/images/Banner-4.webp',
+    alt: '测试图片4'
   },
 ])
 
