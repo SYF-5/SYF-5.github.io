@@ -8,18 +8,18 @@ interface BannerItem {
   alt?: string
 }
 
-// 使用硬编码的轮播图数据 - 前两张用本地图片，后两张用网络图片
+// 使用硬编码的轮播图数据
 const bannerList = ref<BannerItem[]>([
   {
     picture: '/images/Banner-1.jpg',
     alt: '小兔鲜生促销活动'
   },
   {
-    picture: '/public/images/Banner-2.jpg', 
+    picture: '/images/Banner-2.jpg', 
     alt: '新鲜食材直达'
   },
   {
-    picture: 'https://pic.nximg.cn/file/20201204/32335089_215518889000_2.jpg',
+    picture: 'https://via.placeholder.com/1224x500/409eff/ffffff?text=Banner-3',
     alt: '优质商品推荐'
   },
   {
