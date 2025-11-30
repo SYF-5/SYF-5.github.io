@@ -13,7 +13,7 @@ class ProductService {
 
     try {
       console.log('开始加载商品数据...')
-      
+
       // 定义多个可能的数据文件路径
       const possiblePaths = [
         './goods.json',         // 当前目录
@@ -21,10 +21,10 @@ class ProductService {
         '/public/goods.json',   // public目录
         '/dist/goods.json'      // dist目录
       ]
-      
+
       let data = null
       let loadSuccess = false
-      
+
       // 尝试从多个路径加载数据
       for (const path of possiblePaths) {
         try {
@@ -39,7 +39,7 @@ class ProductService {
           // 继续尝试下一个路径
         }
       }
-      
+
       if (loadSuccess && data) {
         // 使用真实数据
         this.products = data.products || []
@@ -82,7 +82,7 @@ class ProductService {
         "id": 50,
         "name": "新鲜芹菜",
         "price": 10.5,
-        "picture": "images/list-45.jpg",
+        "picture": "/images/products-50.jpg",
         "description": "新鲜采摘的芹菜，清脆爽口",
         "category": "vegetables",
         "stock": 50,
@@ -92,7 +92,7 @@ class ProductService {
         "id": 51,
         "name": "云南香蕉",
         "price": 15.0,
-        "picture": "images/list-07.webp",
+        "picture": "images/products-52.jpg",
         "description": "来自云南的优质香蕉，香甜可口",
         "category": "fruits",
         "stock": 30,
@@ -171,7 +171,7 @@ class ProductService {
             "name": "空调",
             "desc": "冷暖随心，静享舒适",
             "price": 1288.00,
-            "picture": "images/list-01.jpg"
+            "picture": "/images/list-01.jpg"
           },
           {
             "id": 2,
@@ -249,29 +249,6 @@ class ProductService {
     return this.loaded
   }
 
-  getBanners() {
-    // 返回轮播图数据，使用根相对路径的本地图片
-    return [
-      {
-        id: 1,
-        title: '新鲜水果特惠',
-        picture: '/images/Banner-1.jpg',
-        link: '/category/2'
-      },
-      {
-        id: 2,
-        title: '生鲜蔬菜直达',
-        picture: '/images/Banner-2.jpg',
-        link: '/category/1'
-      },
-      {
-        id: 3,
-        title: '精选食品促销',
-        picture: '/images/list-11.jpg',
-        link: '/category/3'
-      }
-    ]
-  }
 }
 
 export default new ProductService()

@@ -15,7 +15,7 @@ const bannerList = ref<BannerItem[]>([
     alt: '小兔鲜生促销活动'
   },
   {
-    picture: '/images/Banner-2.jpg', 
+    picture: 'images/Banner-2.jpg', 
     alt: '新鲜食材直达'
   },
   {
