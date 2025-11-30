@@ -18,7 +18,7 @@ const loading = ref(true)
 onMounted(() => {
   loading.value = true
   
-  // 使用硬编码数据
+  // 使用硬编码数据 - 更新为使用public/images目录中的更多Banner图片
   bannerList.value = [
     {
       id: 1,
@@ -37,9 +37,30 @@ onMounted(() => {
     {
       id: 3,
       title: '精选食品促销',
-      picture: '/images/list-11.jpg',
-      alt: '精选食品促销',
+      picture: '/images/Banner-3.webp',
+      alt: '精选食品促销活动',
       link: '/category/3'
+    },
+    {
+      id: 4,
+      title: '家电特惠专场',
+      picture: '/images/Banner-4.webp',
+      alt: '家电特惠专场',
+      link: '/category/4'
+    },
+    {
+      id: 5,
+      title: '家居生活用品',
+      picture: '/images/list-01.jpg',
+      alt: '家居生活用品展示',
+      link: '/category/5'
+    },
+    {
+      id: 6,
+      title: '服装新品上市',
+      picture: '/images/list-11.jpg',
+      alt: '服装新品展示',
+      link: '/category/6'
     }
   ]
   
