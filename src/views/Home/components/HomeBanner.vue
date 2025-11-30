@@ -8,27 +8,18 @@ interface BannerItem {
   alt?: string
 }
 
-// 使用硬编码的轮播图数据
+// 使用绝对可靠的网络图片测试
 const bannerList = ref<BannerItem[]>([
   {
-    picture: '/images/Banner-1.jpg',
-    alt: '小兔鲜生促销活动'
+    picture: 'https://fastly.jsdelivr.net/npm/@vant/assets/apple-1.jpeg',
+    alt: '测试图片1'
   },
   {
-    picture: '/images/Banner-2.jpg', 
-    alt: '新鲜食材直达'
-  },
-  {
-    picture: 'https://via.placeholder.com/1224x500/409eff/ffffff?text=Banner-3',
-    alt: '优质商品推荐'
-  },
-  {
-    picture: 'https://via.placeholder.com/1224x500/67c23a/ffffff?text=Banner-4',
-    alt: '会员专享优惠'
+    picture: 'https://fastly.jsdelivr.net/npm/@vant/assets/apple-2.jpeg',
+    alt: '测试图片2'
   }
 ])
 
-// 组件挂载时直接使用硬编码数据
 onMounted(() => {
   console.log('轮播图数据已加载:', bannerList.value)
 })
@@ -55,11 +46,13 @@ onMounted(() => {
   left: 0;
   top: 0;
   z-index: 98;
+  background: #f5f5f5; // 添加背景色以便查看容器
 
   img {
     width: 100%;
     height: 500px;
     object-fit: cover;
+    display: block; // 确保图片正常显示
   }
   
   // 自定义指示器样式
