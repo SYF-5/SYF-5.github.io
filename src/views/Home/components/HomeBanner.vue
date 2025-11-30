@@ -6,77 +6,43 @@ interface BannerItem {
   id?: number
   picture: string
   alt?: string
-  title?: string
-  link?: string
 }
 
-// 响应式数据存储轮播图数据
-const bannerList = ref<BannerItem[]>([])
-const loading = ref(true)
+// 使用硬编码的轮播图数据
+const bannerList = ref<BannerItem[]>([
+  {
+    picture: '/images/Banner-1.jpg',
+    alt: '小兔鲜生促销活动'
+  },
+  {
+    picture: '/images/Banner-2.jpg', 
+    alt: '新鲜食材直达'
+  },
+  {
+    picture: '/images/Banner-3.webp',
+    alt: '优质商品推荐'
+  },
+  {
+    picture: '/images/Banner-4.webp',
+    alt: '会员专享优惠'
+  }
+])
 
-// 组件挂载时设置硬编码的轮播图数据
+// 组件挂载时直接使用硬编码数据
 onMounted(() => {
-  loading.value = true
-  
-  // 使用硬编码数据 - 更新为使用public/images目录中的更多Banner图片
-  bannerList.value = [
-    {
-      id: 1,
-      title: '新鲜水果特惠',
-      picture: '/images/Banner-1.jpg',
-      alt: '小兔鲜生促销活动',
-      link: '/category/2'
-    },
-    {
-      id: 2,
-      title: '生鲜蔬菜直达',
-      picture: '/images/Banner-2.jpg',
-      alt: '新鲜食材直达',
-      link: '/category/1'
-    },
-    {
-      id: 3,
-      title: '精选食品促销',
-      picture: '/images/Banner-3.webp',
-      alt: '精选食品促销活动',
-      link: '/category/3'
-    },
-    {
-      id: 4,
-      title: '家电特惠专场',
-      picture: '/images/Banner-4.webp',
-      alt: '家电特惠专场',
-      link: '/category/4'
-    },
-    {
-      id: 5,
-      title: '家居生活用品',
-      picture: '/images/list-01.jpg',
-      alt: '家居生活用品展示',
-      link: '/category/5'
-    },
-    {
-      id: 6,
-      title: '服装新品上市',
-      picture: '/images/list-11.jpg',
-      alt: '服装新品展示',
-      link: '/category/6'
-    }
-  ]
-  
-  loading.value = false
+  console.log('轮播图数据已加载:', bannerList.value)
 })
 </script>
 
 <template>
   <div class="home-banner">
-    <!-- 加载状态 -->
-    <div v-if="loading" class="loading">
-      轮播图加载中...
-    </div>
-    <el-carousel v-else height="500px" :interval="4000" indicator-position="outside">
+    <el-carousel height="500px" :interval="4000" indicator-position="outside">
       <el-carousel-item v-for="(item, index) in bannerList" :key="index">
-        <img :src="item.picture" :alt="item.alt || 'Banner'" />
+        <img 
+          :src="item.picture" 
+          :alt="item.alt || 'Banner'" 
+        
+        />
       </el-carousel-item>
     </el-carousel>
   </div>
@@ -90,17 +56,6 @@ onMounted(() => {
   left: 0;
   top: 0;
   z-index: 98;
-
-  .loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    font-size: 18px;
-    color: #666;
-    background: #f5f5f5;
-    border-radius: 8px;
-  }
 
   img {
     width: 100%;
@@ -146,5 +101,5 @@ onMounted(() => {
       color: white;
     }
   }
-}
+}  
 </style>
