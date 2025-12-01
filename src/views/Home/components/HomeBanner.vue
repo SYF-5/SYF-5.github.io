@@ -15,7 +15,7 @@ const bannerList = ref<BannerItem[]>([
     alt: '测试图片1'
   },
   {
-    picture: 'https://syf-5.github.io/dist/public/images/Banner-2.jpg',
+    picture: './images/Banner-2.jpg',
     alt: '测试图片2'
   }, 
    {

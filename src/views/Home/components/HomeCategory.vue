@@ -122,10 +122,10 @@ const fetchCategoryData = async (): Promise<void> => {
 
 // 硬编码的图片数据映射表 - 作为备选方案
 const hardcodedImages: Record<number, string> = {
-  1: '/images/list-01.jpg',
-  2: '/images/list-02.jpg',
-  3: '/images/list-03.jpg',
-  4: '/images/list-04.webp',
+  1: './images/list-01.jpg',
+  2: './images/list-02.jpg',
+  3: './images/list-03.jpg',
+  4: './images/list-04.webp',
   5: '/images/list-05.jpg',
   6: '/images/list-06.jpg',
   7: '/images/list-07.webp',
