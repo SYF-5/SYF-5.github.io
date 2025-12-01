@@ -82,7 +82,7 @@ class ProductService {
         "id": 50,
         "name": "新鲜芹菜",
         "price": 10.5,
-        "picture": "/images/products-50.jpg",
+        "picture": "./images/products-50.jpg",
         "description": "新鲜采摘的芹菜，清脆爽口",
         "category": "vegetables",
         "stock": 50,
@@ -92,7 +92,7 @@ class ProductService {
         "id": 51,
         "name": "云南香蕉",
         "price": 15.0,
-        "picture": "images/products-52.jpg",
+        "picture": "https://syf-5.github.io/dist/images/products-52.jpg",
         "description": "来自云南的优质香蕉，香甜可口",
         "category": "fruits",
         "stock": 30,
@@ -171,14 +171,14 @@ class ProductService {
             "name": "空调",
             "desc": "冷暖随心，静享舒适",
             "price": 1288.00,
-            "picture": "/images/list-01.jpg"
+            "picture": "./images/list-01.jpg"
           },
           {
             "id": 2,
             "name": "四件套",
             "desc": "亲肤透气，安眠整晚",
             "price": 120.00,
-            "picture": "images/list-02.jpg"
+            "picture": "https://syf-5.github.io/dist/images/list-02.jpg"
           }
         ]
       },
