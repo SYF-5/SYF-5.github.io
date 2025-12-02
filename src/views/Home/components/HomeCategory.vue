@@ -12,7 +12,13 @@
       </li>
       
       <!-- 遍历分类数据 -->
-      <li v-for="category in categoryList" :key="category.id">
+      <li 
+        v-for="(category, index) in categoryList" 
+        :key="category.id"
+        :class="{ 'is-active': activeCategoryIndex === index }"
+        @mouseenter="onMouseEnter(index)"
+        @mouseleave="onMouseLeave"
+      >
         <!-- 主分类 -->
         <RouterLink to="/category">{{ category.name }}</RouterLink>
         
@@ -28,7 +34,10 @@
         </a>
         
         <!-- 弹层layer位置 -->
-        <div class="layer">
+        <div 
+          v-if="activeCategoryIndex === index"
+          class="layer"
+        >
           <h4>分类推荐 <small>根据您的购买或浏览记录推荐</small></h4>
           <ul>
             <!-- 遍历该分类的商品数据 -->
@@ -66,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import productService from '@/services/productService.js'
 
@@ -92,6 +101,29 @@ const categoryList = ref<Category[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const imageLoadedStates = ref<Record<number, boolean>>({})
+const activeCategoryIndex = ref<number | null>(null)
+let leaveTimer: ReturnType<typeof setTimeout> | null = null
+
+// 鼠标进入分类项
+const onMouseEnter = (index: number) => {
+  if (leaveTimer) {
+    clearTimeout(leaveTimer)
+    leaveTimer = null
+  }
+  activeCategoryIndex.value = index
+  
+  // 当鼠标悬停时，预加载当前分类的图片
+  if (categoryList.value[index]) {
+    preloadCategoryImages(categoryList.value[index].id)
+  }
+}
+
+// 鼠标离开分类项
+const onMouseLeave = () => {
+  leaveTimer = setTimeout(() => {
+    activeCategoryIndex.value = null
+  }, 150)
+}
 
 // 获取分类数据
 const fetchCategoryData = async (): Promise<void> => {
@@ -108,6 +140,13 @@ const fetchCategoryData = async (): Promise<void> => {
     if (categories && categories.length > 0) {
       categoryList.value = categories
       console.log('成功设置分类数据:', categoryList.value.length, '个分类')
+      
+      // 数据加载完成后，预加载第一个分类的图片
+      if (categoryList.value.length > 0) {
+        setTimeout(() => {
+          idlePreloadFirstCategory()
+        }, 1000)
+      }
     } else {
       console.warn('没有获取到分类数据')
       error.value = '暂无分类数据'
@@ -120,212 +159,67 @@ const fetchCategoryData = async (): Promise<void> => {
   }
 }
 
-// 硬编码的图片数据映射表 - 作为备选方案
-const hardcodedImages: Record<number, string> = {
-  1: './images/list-01.jpg',
-  2: './images/list-02.jpg',
-  3: './images/list-03.jpg',
-  4: './images/list-04.webp',
+// 保留确认存在的图片映射
+const essentialImageMap: Record<number, string> = {
+  1: '/images/list-01.jpg',
+  2: '/images/list-02.jpg',
+  3: '/images/list-03.jpg',
+  4: '/images/list-04.webp',
   5: '/images/list-05.jpg',
   6: '/images/list-06.jpg',
   7: '/images/list-07.webp',
   8: '/images/list-08.jpg',
   9: '/images/list-09.jpg',
   10: '/images/list-10.webp',
-  11: '/images/list-11.jpg',
-  12: '/images/list-12.jpg',
-  13: '/images/list-13.jpg',
-  14: '/images/list-14.webp',
-  15: '/images/list-15.jpg',
-  16: '/images/list-16.webp',
-  17: '/images/list-17.jpg',
-  18: '/images/list-18.jpg',
-  19: '/images/list-19.jpg',
-  20: '/images/list-20.jpg',
-  21: '/images/list-21.jpg',
-  22: '/images/list-22.png',
-  23: '/images/list-23.jpg',
-  24: '/images/list-24.jpg',
-  25: '/images/list-25.jpg',
-  26: '/images/list-26.webp',
-  27: '/images/list-27.webp',
-  28: '/images/list-28.jpg',
-  29: '/images/list-29.webp',
-  30: '/images/list-30.jpg',
-  31: '/images/list-31.webp',
-  32: '/images/list-32.webp',
-  33: '/images/list-33.jpg',
-  34: '/images/list-34.jpg',
-  35: '/images/list-35.webp',
-  36: '/images/list-36.webp',
-  37: '/images/list-37.webp',
-  38: '/images/list-38.webp',
-  39: '/images/list-39.webp',
-  40: '/images/list-40.jpg',
-  41: '/images/list-41.webp',
-  42: '/images/list-42.webp',
-  43: '/images/list-43.webp',
-  44: '/images/list-44.webp',
-  45: '/images/list-45.jpg',
-  50: '/images/list-45.jpg',
-  51: '/images/list-07.webp',
-  52: '/images/list-08.jpg',
-  53: '/images/list-25.jpg',
-  54: '/images/list-20.jpg',
-  55: '/images/list-28.jpg',
-  56: '/images/list-30.jpg',
-  57: '/images/list-33.jpg'
 }
 
-// 请求限流管理
-const imageRequestQueue: { id: number; timestamp: number }[] = []
-const MAX_REQUESTS_PER_SECOND = 10 // 每秒最大请求数
-const REQUEST_TIMEOUT = 1000 // 1秒
-
-// 检查是否应该限制请求
-const shouldLimitRequest = (productId: number): boolean => {
-  const now = Date.now()
-  // 清理过期的请求记录
-  const validRequests = imageRequestQueue.filter(
-    req => now - req.timestamp < REQUEST_TIMEOUT
-  )
-  imageRequestQueue.splice(0, imageRequestQueue.length, ...validRequests)
-  
-  // 检查是否已经有太多请求
-  if (validRequests.length >= MAX_REQUESTS_PER_SECOND) {
-    console.log(`限制图片请求: ${productId}，请求过于频繁`)
-    return true
-  }
-  
-  // 记录新请求
-  imageRequestQueue.push({ id: productId, timestamp: now })
-  return false
-}
-
-// 防抖函数
-const debounce = <F extends (...args: any[]) => any>(
-  func: F,
-  delay: number
-): ((...args: Parameters<F>) => void) => {
-  let timeoutId: ReturnType<typeof setTimeout> | null = null
-  return (...args: Parameters<F>) => {
-    if (timeoutId) clearTimeout(timeoutId)
-    timeoutId = setTimeout(() => func(...args), delay)
-  }
-}
-
-// 图片路径处理函数 - 优化版，适应绝对路径
+// 简化的图片路径处理函数
 const getImageUrl = (path: string, productId?: number): string => {
-  // 1. 检查是否应该限制请求
-  if (productId && shouldLimitRequest(productId)) {
-    // 返回默认图片，稍后通过错误处理再加载
-    return '/images/cx.svg'
-  }
-  
-  // 2. 优先使用硬编码的图片映射（最可靠）
-  if (productId && hardcodedImages[productId]) {
-    const hardcodedPath = hardcodedImages[productId]
-    console.log(`为商品 ${productId} 使用硬编码图片路径: ${hardcodedPath}`)
-    return hardcodedPath
-  }
-  
-  // 3. 使用传入的path参数（来自goods数据，现在已是绝对路径）
+  // 1. 优先使用传入的path（来自goods数据）
   if (path && typeof path === 'string') {
-    // 避免中文路径问题
-    if (path.match(/[\u4e00-\u9fa5]/)) {
-      console.warn(`检测到中文路径，避免使用: ${path}`)
-    } else {
-      // 如果path已经是完整URL，直接返回
-      if (path.startsWith('http://') || path.startsWith('https://')) {
-        return path
-      }
-      
-      // 由于goods.json已改为绝对路径，直接返回
-      console.log(`为商品 ${productId} 使用goods数据中的绝对路径: ${path}`)
+    // 如果已经是完整URL，直接返回
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('/')) {
       return path
+    }
+    // 如果是相对路径，转换为绝对路径
+    if (!path.startsWith('/')) {
+      return `/${path}`
     }
   }
   
-  // 4. 如果没有硬编码映射，生成基于ID的图片路径
-  if (productId) {
-    // 确保listNumber是有效数字且在合理范围内
-    let listNumber = Math.abs(productId)
-    // 循环映射到1-45范围内
-    listNumber = ((listNumber - 1) % 45) + 1
-    const listFormattedNumber = String(listNumber).padStart(2, '0')
-    
-    // 优先使用已知存在的list图片，使用绝对路径
-    const fallbackPath = `/images/list-${listFormattedNumber}.jpg`
-    console.log(`为商品 ${productId} 生成默认图片路径: ${fallbackPath}`)
-    return fallbackPath
+  // 2. 如果有确认的硬编码映射
+  if (productId && essentialImageMap[productId]) {
+    return essentialImageMap[productId]
   }
   
-  // 5. 最终默认路径
+  // 3. 基于ID生成图片路径（智能回退）
+  if (productId) {
+    // 使用确认为存在的图片ID循环
+    const knownExistingIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    const safeIndex = (productId - 1) % knownExistingIds.length
+    const safeId = knownExistingIds[safeIndex]
+    const extension = essentialImageMap[safeId]?.endsWith('.webp') ? '.webp' : '.jpg'
+    return `/images/list-${String(safeId).padStart(2, '0')}${extension}`
+  }
+  
+  // 4. 最终回退
   return '/images/cx.svg'
 }
 
-// 防抖处理图片加载错误
-const debouncedImageErrorHandler = debounce((img: HTMLImageElement, productId: number, currentSrc: string) => {
-  console.log(`商品 ${productId} 图片加载失败，尝试回退方案`)
-  
-  // 1. 确保使用硬编码图片
-  if (productId && hardcodedImages[productId] && !currentSrc.includes(hardcodedImages[productId])) {
-    console.log(`尝试使用硬编码图片路径: ${hardcodedImages[productId]}`)
-    img.src = hardcodedImages[productId]
-    return
-  }
-  
-  // 2. 尝试不同格式的图片
-  const listNumber = ((Math.abs(productId) - 1) % 45) + 1
-  const listFormattedNumber = String(listNumber).padStart(2, '0')
-  
-  // 尝试不同的文件格式
-  const extensions = ['.jpg', '.webp', '.png', '.jpeg']
-  for (const ext of extensions) {
-    const altPath = `/images/list-${listFormattedNumber}${ext}`
-    if (!currentSrc.includes(altPath)) {
-      console.log(`尝试不同格式: ${altPath}`)
-      img.src = altPath
-      return
-    }
-  }
-  
-  // 3. 尝试一些已知存在的图片（轮询方式）
-  const knownImages = [
-    '01.jpg', '02.jpg', '03.jpg', '05.jpg', '06.jpg', 
-    '08.jpg', '09.jpg', '11.jpg', '12.jpg', '13.jpg',
-    '15.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg',
-    '21.jpg', '22.png', '23.jpg', '24.jpg', '25.jpg',
-    '28.jpg', '30.jpg', '33.jpg'
-  ]
-  
-  // 使用商品ID生成一个更分散的索引
-  const fallbackIndex = (Math.abs(productId) * 7) % knownImages.length
-  const fallbackImage = `/images/list-${knownImages[fallbackIndex]}`
-  
-  if (!currentSrc.includes(fallbackImage)) {
-    console.log(`尝试已知存在图片: ${fallbackImage}`)
-    img.src = fallbackImage
-    return
-  }
-  
-  // 4. 避免使用网络图片，直接使用默认图片（减少429错误）
-  if (!currentSrc.includes('/images/cx.svg')) {
-    console.log('使用默认图片: /images/cx.svg')
-    img.src = '/images/cx.svg'
-    return
-  }
-  
-  console.log(`商品 ${productId} 所有图片尝试都失败`)
-}, 100)
-
-// 图片加载失败处理 - 优化版，增加防抖避免频繁重试
+// 图片加载失败处理
 const handleImageError = (event: Event, productId: number): void => {
   const img = event.target as HTMLImageElement
-  const currentSrc = img.src
   
-  // 使用防抖处理错误，避免频繁重试导致429错误
-  debouncedImageErrorHandler(img, productId, currentSrc)
+  // 记录错误
+  console.warn(`商品 ${productId} 图片加载失败: ${img.src}`)
+  
+  // 直接使用默认图片
+  img.src = '/images/cx.svg'
+  
+  // 标记为已加载，避免显示占位符
+  if (imageLoadedStates.value[productId] === false) {
+    imageLoadedStates.value[productId] = true
+  }
 }
 
 // 处理子分类点击事件
@@ -367,12 +261,125 @@ const getCategoryGoods = (categoryId: number): Product[] => {
   return displayGoods
 }
 
+// 预加载分类图片
+const preloadCategoryImages = (categoryId: number) => {
+  const goods = getCategoryGoods(categoryId)
+  if (!goods || goods.length === 0) return
+  
+  // 只预加载前3张最重要的图片
+  const importantGoods = goods.slice(0, 3)
+  
+  importantGoods.forEach(product => {
+    const imgUrl = getImageUrl(product.picture, product.id)
+    
+    // 如果图片已经在缓存中，跳过
+    if (isImageCached(imgUrl)) {
+      return
+    }
+    
+    // 使用Image对象预加载
+    const img = new Image()
+    img.src = imgUrl
+    
+    img.onload = () => {
+      console.log(`预加载成功: ${product.id}`)
+      // 标记为已加载，当真正显示时可以立即显示
+      imageLoadedStates.value[product.id] = true
+    }
+    
+    img.onerror = () => {
+      console.log(`预加载失败: ${product.id}`)
+    }
+  })
+}
+
+// 检查图片是否已缓存
+const isImageCached = (url: string): boolean => {
+  try {
+    const img = new Image()
+    img.src = url
+    return img.complete
+  } catch {
+    return false
+  }
+}
+
+// 空闲时预加载第一个分类
+const idlePreloadFirstCategory = () => {
+  // 使用 requestIdleCallback 如果可用
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => {
+      if (categoryList.value.length > 0) {
+        console.log('空闲时间预加载第一个分类图片')
+        preloadCategoryImages(categoryList.value[0].id)
+      }
+    }, { timeout: 2000 }) // 最多等待2秒
+  } else {
+    // 回退方案：在页面加载完成后2秒执行
+    setTimeout(() => {
+      if (categoryList.value.length > 0) {
+        console.log('定时器预加载第一个分类图片')
+        preloadCategoryImages(categoryList.value[0].id)
+      }
+    }, 2000)
+  }
+}
+
+// 添加一个函数，在页面空闲时预加载更多分类
+const setupIdlePreloading = () => {
+  if ('requestIdleCallback' in window) {
+    const preloadNextCategory = (deadline: IdleDeadline) => {
+      // 查找还没有预加载的分类
+      const categoriesToPreload = categoryList.value.filter((_, index) => {
+        return index > 0 // 跳过第一个已经预加载的
+      })
+      
+      let i = 0
+      while (deadline.timeRemaining() > 0 && i < categoriesToPreload.length) {
+        const category = categoriesToPreload[i]
+        // 预加载当前分类的关键图片（只加载第一张）
+        const goods = productService.getGoodsByCategoryId(category.id) || []
+        if (goods.length > 0) {
+          const firstProduct = goods[0]
+          const imgUrl = getImageUrl(firstProduct.picture, firstProduct.id)
+          
+          if (!isImageCached(imgUrl)) {
+            const img = new Image()
+            img.src = imgUrl
+          }
+        }
+        i++
+      }
+      
+      // 如果还有未处理的分类，继续调度
+      if (i < categoriesToPreload.length) {
+        requestIdleCallback(preloadNextCategory)
+      }
+    }
+    
+    // 等待主内容加载完成后再开始
+    setTimeout(() => {
+      requestIdleCallback(preloadNextCategory)
+    }, 3000)
+  }
+}
+
 onMounted(() => {
   console.log('侧边列表组件已挂载')
-  fetchCategoryData()
+  fetchCategoryData().then(() => {
+    // 设置空闲时预加载更多分类
+    setTimeout(() => {
+      setupIdlePreloading()
+    }, 3000)
+  })
+})
+
+onUnmounted(() => {
+  if (leaveTimer) {
+    clearTimeout(leaveTimer)
+  }
 })
 </script>
-
 <style scoped lang='scss'>
 .home-category {
   width: 250px;
