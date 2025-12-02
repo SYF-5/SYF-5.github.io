@@ -36,7 +36,7 @@
       "id": 53,
       "name": "新鲜鸡蛋",
       "price": 12.0,
-      "picture": "/images/products-53.webp",
+      "picture": "https://syf-5.github.io/public/images/products-53.webp",
       "description": "优质小米，营养丰富",
       "category": "grains",
       "stock": 40,
