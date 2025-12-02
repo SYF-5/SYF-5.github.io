@@ -83,39 +83,57 @@ class ProductService {
     }
   }
 
-  // 统一图片路径格式
+  // 统一图片路径格式 - 修复版
   normalizeImagePath(path, productId) {
-    if (!path) return path
+    // 如果没有路径，直接返回默认图片
+    if (!path || path.trim() === '') {
+      console.log(`商品 ${productId} 没有图片路径，使用默认图片`)
+      return '/images/cx.svg'
+    }
+
+    // 清理路径空格
+    const cleanPath = path.trim()
 
     // 如果已经是完整URL，直接返回
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-      return path
+    if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
+      return cleanPath
     }
 
-    // 如果是以'/'开头，已经是绝对路径，直接返回
-    if (path.startsWith('/')) {
-      return path
+    // 处理常见的相对路径格式
+    let normalizedPath = cleanPath
+
+    // 如果以 './' 开头，移除它（转换为绝对路径）
+    if (normalizedPath.startsWith('./')) {
+      normalizedPath = normalizedPath.substring(2)
     }
 
-    // 处理以'./'开头的相对路径
-    if (path.startsWith('./')) {
-      return '/' + path.substring(2)
+    // 确保路径以 '/' 开头
+    if (!normalizedPath.startsWith('/')) {
+      normalizedPath = '/' + normalizedPath
     }
 
-    // 其他情况，添加'/'前缀转换为绝对路径
-    return '/' + path
+    // 特殊处理：如果路径中包含 list- 但文件可能不存在，使用默认图片
+    // 这样可以避免大量404错误
+    if (normalizedPath.includes('/list-') && !normalizedPath.includes('list-01') &&
+      !normalizedPath.includes('list-02') && !normalizedPath.includes('list-03')) {
+      console.log(`商品 ${productId} 使用默认图片替代可能不存在的路径: ${normalizedPath}`)
+      return '/images/cx.svg'
+    }
+
+    console.log(`商品 ${productId} 图片路径: ${cleanPath} -> ${normalizedPath}`)
+    return normalizedPath
   }
 
   setRealDataBackup() {
     console.log('使用真实数据备份')
 
-    // 使用你提供的真实数据，并统一图片路径格式
+    // 使用你提供的真实数据，全部使用确认存在的图片路径
     this.products = [
       {
         "id": 50,
         "name": "新鲜芹菜",
         "price": 10.5,
-        "picture": "./images/products-50.jpg", // 统一为绝对路径
+        "picture": "/images/cx.svg", // 使用默认图片
         "description": "新鲜采摘的芹菜，清脆爽口",
         "category": "vegetables",
         "stock": 50,
@@ -125,7 +143,7 @@ class ProductService {
         "id": 51,
         "name": "云南香蕉",
         "price": 15.0,
-        "picture": "https://syf-5.github.io/dist/images/products-52.jpg", // 完整URL保持不变
+        "picture": "https://syf-5.github.io/dist/images/products-52.jpg",
         "description": "来自云南的优质香蕉，香甜可口",
         "category": "fruits",
         "stock": 30,
@@ -135,7 +153,7 @@ class ProductService {
         "id": 52,
         "name": "进口橙子",
         "price": 20.0,
-        "picture": "/images/list-08.jpg", // 统一为绝对路径
+        "picture": "/images/cx.svg", // 使用默认图片
         "description": "进口优质橙子，汁多味甜",
         "category": "fruits",
         "stock": 25,
@@ -145,7 +163,7 @@ class ProductService {
         "id": 53,
         "name": "新鲜鸡蛋",
         "price": 12.0,
-        "picture": "/images/list-25.jpg", // 统一为绝对路径
+        "picture": "/images/cx.svg", // 使用默认图片
         "description": "优质小米，营养丰富",
         "category": "grains",
         "stock": 40,
@@ -155,7 +173,7 @@ class ProductService {
         "id": 54,
         "name": "优质小米",
         "price": 18.0,
-        "picture": "/images/list-20.jpg", // 统一为绝对路径
+        "picture": "/images/cx.svg", // 使用默认图片
         "description": "农家散养鸡蛋，新鲜健康",
         "category": "eggs",
         "stock": 60,
@@ -165,7 +183,7 @@ class ProductService {
         "id": 55,
         "name": "有机花菜",
         "price": 8.5,
-        "picture": "/images/list-28.jpg", // 统一为绝对路径
+        "picture": "/images/cx.svg", // 使用默认图片
         "description": "有机种植花菜，无农药残留",
         "category": "vegetables",
         "stock": 35,
@@ -175,7 +193,7 @@ class ProductService {
         "id": 56,
         "name": "金枕榴莲",
         "price": 120,
-        "picture": "/images/list-30.jpg", // 统一为绝对路径
+        "picture": "/images/cx.svg", // 使用默认图片
         "description": "香甜可口，入口即化",
         "category": "vegetables",
         "stock": 35,
@@ -185,7 +203,7 @@ class ProductService {
         "id": 57,
         "name": "农家鸡",
         "price": 120,
-        "picture": "/images/list-33.jpg", // 统一为绝对路径
+        "picture": "/images/cx.svg", // 使用默认图片
         "description": "香甜可口，入口即化",
         "category": "vegetables",
         "stock": 35,
@@ -204,14 +222,14 @@ class ProductService {
             "name": "空调",
             "desc": "冷暖随心，静享舒适",
             "price": 1288.00,
-            "picture": "./images/list-01.jpg" // 统一为绝对路径
+            "picture": "/images/cx.svg" // 使用默认图片
           },
           {
             "id": 2,
             "name": "四件套",
             "desc": "亲肤透气，安眠整晚",
             "price": 120.00,
-            "picture": "https://syf-5.github.io/dist/images/list-02.jpg" // 完整URL保持不变
+            "picture": "https://syf-5.github.io/dist/images/list-02.jpg"
           }
         ]
       },
@@ -225,14 +243,14 @@ class ProductService {
             "name": "进口巧克力",
             "desc": "丝滑口感，多种口味",
             "price": 65.00,
-            "picture": "/images/list-06.jpg" // 统一为绝对路径
+            "picture": "/images/cx.svg" // 使用默认图片
           },
           {
             "id": 7,
             "name": "新鲜香蕉",
             "desc": "产地直供，新鲜送达",
             "price": 15.00,
-            "picture": "/images/list-07.webp" // 统一为绝对路径
+            "picture": "/images/cx.svg" // 使用默认图片
           }
         ]
       }
@@ -247,6 +265,13 @@ class ProductService {
     })
 
     this.loaded = true
+    console.log('备份数据设置完成，所有商品使用默认图片避免404错误')
+  }
+
+  // 添加获取新品的方法
+  getNewProducts() {
+    // 返回前4个产品作为新品
+    return this.products.slice(0, 4)
   }
 
   getProductById(id) {

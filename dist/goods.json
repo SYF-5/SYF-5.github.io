@@ -160,35 +160,35 @@
           "name": "进口巧克力",
           "desc": "丝滑口感，多种口味",
           "price": 65.00,
-          "picture": "/images/list-06.jpg"
+          "picture": "https://syf-5.github.io/public/images/list-06.jpg"
         },
         {
           "id": 7,
           "name": "新鲜香蕉",
           "desc": "产地直供，新鲜送达",
           "price": 15.00,
-          "picture": "/images/list-07.webp"
+          "picture": "https://syf-5.github.io/public/images/list-07.webp"
         },
         {
           "id": 8,
           "name": "新鲜蔬菜",
           "desc": "新鲜有机，健康蔬菜",
           "price": 5.00,
-          "picture": "/images/list-08.jpg"
+          "picture": "https://syf-5.github.io/public/images/list-08.jpg"
         },
         {
           "id": 9,
           "name": "品质肉类",
           "desc": "新鲜肉质，拒绝冷冻",
           "price": 28.00,
-          "picture": "/images/list-09.jpg"
+          "picture": "https://syf-5.github.io/public/images/list-09.jpg"
         },
         {
           "id": 10,
           "name": "牛奶",
           "desc": "奶香醇厚，回味无穷",
           "price": 10.00,
-          "picture": "/images/list-10.webp"
+          "picture": "https://syf-5.github.io/public/images/list-10.webp"
         }
       ]
     },
@@ -205,7 +205,7 @@
           "name": "时尚连衣裙",
           "desc": "剪裁利落，优雅气质",
           "price": 299.00,
-          "picture": "https://syf-5.github.io/public/images//list-11.jpg"
+          "picture": "https://syf-5.github.io/public/images/list-11.jpg"
         },
         {
           "id": 12,
