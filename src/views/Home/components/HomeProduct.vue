@@ -38,10 +38,14 @@
             <div class="product-item" v-for="product in featuredProducts" :key="product.id" @click="goToProductDetail(product)">
               <div class="product-image">
                 <img 
-                  :src="getProductImageUrl(product)" 
+                  :src="getImageUrl(product.picture, product.id)" 
                   :alt="product.name"
-                  @error="handleImageError"
-                >
+                  @load="() => handleImageLoad(product.id)"
+                  @error="(event) => handleImageError(event, product.id)"
+                  :class="{ 'loaded': imageLoadedStates[product.id] }"
+                />
+                <!-- 加载占位符 -->
+                <div v-if="!imageLoadedStates[product.id]" class="loading-placeholder"></div>
               </div>
               <div class="product-info">
                 <h3>{{ product.name }}</h3>
@@ -60,10 +64,14 @@
             <div class="product-item" v-for="product in remainingProducts" :key="product.id" @click="goToProductDetail(product)">
               <div class="product-image">
                 <img 
-                  :src="getProductImageUrl(product)" 
+                  :src="getImageUrl(product.picture, product.id)" 
                   :alt="product.name"
-                  @error="handleImageError"
-                >
+                  @load="() => handleImageLoad(product.id)"
+                  @error="(event) => handleImageError(event, product.id)"
+                  :class="{ 'loaded': imageLoadedStates[product.id] }"
+                />
+                <!-- 加载占位符 -->
+                <div v-if="!imageLoadedStates[product.id]" class="loading-placeholder"></div>
               </div>
               <div class="product-info">
                 <h3>{{ product.name }}</h3>
@@ -90,6 +98,7 @@ const router = useRouter()
 const loading = ref(false)
 const error = ref(null)
 const productList = ref([])
+const imageLoadedStates = ref({}) // 图片加载状态
 
 // 计算属性
 const featuredProducts = computed(() => {
@@ -102,6 +111,59 @@ const remainingProducts = computed(() => {
 
 // 分类数据 - 使用你提供的分类
 const categories = ['蔬菜', '水果', '肉类', '粮油', '奶制品', '零食']
+
+// 简化的图片路径处理函数（与其他组件保持一致）
+const getImageUrl = (path, productId) => {
+  // 1. 如果路径为空，直接返回默认图片
+  if (!path || path.trim() === '') {
+    return '/images/cx.svg'
+  }
+  
+  // 清理路径空格
+  const cleanPath = path.trim()
+  
+  // 2. 如果已经是完整URL，直接返回
+  if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
+    return cleanPath
+  }
+  
+  // 3. 确保路径以 '/' 开头
+  let normalizedPath = cleanPath
+  if (normalizedPath.startsWith('./')) {
+    normalizedPath = normalizedPath.substring(2)
+  }
+  if (!normalizedPath.startsWith('/')) {
+    normalizedPath = '/' + normalizedPath
+  }
+  
+  // 4. 特殊处理：如果路径中包含可能不存在的list图片，使用默认图片
+  // 这样可以避免大量404错误
+  if (normalizedPath.includes('/list-') && !normalizedPath.includes('list-01') && 
+      !normalizedPath.includes('list-02') && !normalizedPath.includes('list-03')) {
+    return '/images/cx.svg'
+  }
+  
+  return normalizedPath
+}
+
+// 图片加载错误处理
+const handleImageError = (event, productId) => {
+  const img = event.target
+  console.warn(`商品 ${productId} 图片加载失败: ${img.src}`)
+  
+  // 直接使用默认图片
+  img.src = '/images/cx.svg'
+  
+  // 标记为已加载，避免显示占位符
+  if (imageLoadedStates.value[productId] === false) {
+    imageLoadedStates.value[productId] = true
+  }
+}
+
+// 图片加载完成处理
+const handleImageLoad = (productId) => {
+  imageLoadedStates.value[productId] = true
+}
 
 // 获取商品数据
 const fetchProducts = async () => {
@@ -117,6 +179,12 @@ const fetchProducts = async () => {
     
     if (products && products.length > 0) {
       productList.value = products
+      
+      // 初始化所有商品的图片加载状态
+      products.forEach(product => {
+        imageLoadedStates.value[product.id] = false
+      })
+      
       console.log('成功设置真实商品列表，数量:', products.length)
     } else {
       error.value = '暂无商品数据'
@@ -127,77 +195,6 @@ const fetchProducts = async () => {
     error.value = '数据加载失败: ' + err.message
   } finally {
     loading.value = false
-  }
-}
-
-// 商品图片URL处理
-const getProductImageUrl = (product) => {
-  // 定义可能的图片路径模式
-  const possiblePaths = []
-  
-  // 如果有产品ID，尝试多个可能的图片路径
-  if (product.id) {
-    const productId = product.id
-    // 尝试多种格式和路径组合
-    possiblePaths.push(
-      `/images/list-${String(productId).padStart(2, '0')}.jpg`,
-      `/images/list-${String(productId).padStart(2, '0')}.webp`,
-      `/images/products-${productId}.jpg`,
-      `/images/products-${productId}.webp`,
-      `/images/${productId}.jpg`,
-      `/images/${productId}.webp`
-    )
-  }
-  
-  // 如果提供了picture字段，也加入可能的路径列表
-  if (product.picture) {
-    let picturePath = product.picture
-    // 处理包含public前缀的路径
-    if (picturePath.includes('/public/')) {
-      picturePath = picturePath.replace('/public/', '/')
-    }
-    // 确保路径以/开头
-    if (!picturePath.startsWith('/')) {
-      picturePath = '/' + picturePath
-    }
-    possiblePaths.push(picturePath)
-  }
-  
-  // 添加默认图片路径
-  possiblePaths.push('/images/cx.svg')
-  
-  // 由于我们不能在这里直接进行异步请求来测试路径是否有效
-  // 我们将返回第一个可能的路径，并在handleImageError中尝试其他路径
-  // 或者，在模板中使用v-for循环遍历所有可能的图片路径，直到找到有效的
-  return possiblePaths[0]
-}
-
-// 图片加载失败处理
-const handleImageError = (event) => {
-  console.log('图片加载失败，尝试其他路径')
-  const productId = event.target.alt || 'default'
-  
-  // 定义失败时尝试的其他图片路径
-  const fallbackPaths = [
-    `/images/list-${String(productId).padStart(2, '0')}.webp`,
-    `/images/list-${String(productId).padStart(2, '0')}.jpg`,
-    `/images/products-${productId}.jpg`,
-    `/images/products-${productId}.webp`,
-    `/images/${productId}.jpg`,
-    `/images/${productId}.webp`,
-    '/images/cx.svg'
-  ]
-  
-  // 尝试从失败的图片中提取当前尝试的路径，避免重复尝试
-  const currentSrc = event.target.src
-  const filteredPaths = fallbackPaths.filter(path => !currentSrc.includes(path))
-  
-  // 如果还有其他路径可以尝试，使用下一个路径
-  if (filteredPaths.length > 0) {
-    event.target.src = filteredPaths[0]
-  } else {
-    // 如果所有本地路径都失败，使用在线图片作为最后手段
-    event.target.src = `https://picsum.photos/300/200?random=${productId}`
   }
 }
 
