@@ -115,7 +115,7 @@ class ProductService {
         "id": 50,
         "name": "新鲜芹菜",
         "price": 10.5,
-        "picture": "/images/products-50.jpg", // 统一为绝对路径
+        "picture": "./images/products-50.jpg", // 统一为绝对路径
         "description": "新鲜采摘的芹菜，清脆爽口",
         "category": "vegetables",
         "stock": 50,
@@ -204,7 +204,7 @@ class ProductService {
             "name": "空调",
             "desc": "冷暖随心，静享舒适",
             "price": 1288.00,
-            "picture": "/images/list-01.jpg" // 统一为绝对路径
+            "picture": "./images/list-01.jpg" // 统一为绝对路径
           },
           {
             "id": 2,
