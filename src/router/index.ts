@@ -1,11 +1,5 @@
 // router/index.ts
 import { createRouter, createWebHashHistory } from "vue-router";
-import Login from "@/views/Login/index.vue";
-import Layout from "@/views/Layout/index.vue";
-import Home from "@/views/Home/index.vue"
-import Category from "@/views/Category/index.vue"
-import ProductDetail from "@/views/ProductDetail/index.vue"
-import Cart from "@/views/Cart/index.vue"
 
 const router = createRouter({
   // 关键：必须使用 hash 模式
@@ -13,30 +7,30 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: Layout,
+      component: () => import('@/views/Layout/index.vue'),
       children: [
         {
           path: '',
-          component: Home
+          component: () => import('@/views/Home/index.vue')
         },
         {
           path: 'category',
-          component: Category
+          component: () => import('@/views/Category/index.vue')
         },
         {
           path: 'cart',
-          component: Cart
+          component: () => import('@/views/Cart/index.vue')
         },
         {
           path: 'product/:id',
-          component: ProductDetail,
+          component: () => import('@/views/ProductDetail/index.vue'),
           props: true
         }
       ]
     },
     {
       path: '/login',
-      component: Login
+      component: () => import('@/views/Login/index.vue')
     }
   ]
 })
