@@ -1,0 +1,411 @@
+{
+  "shipping": 15.00,
+  "discount": 30.00,
+  "list": [
+    {
+      "id": 1,
+      "name": "居家",
+      "children": [
+        "家纺厨具",
+        "家具家电"
+      ],
+      "goods": [
+        {
+          "id": 1,
+          "name": "空调",
+          "desc": "冷暖随心，静享舒适",
+          "price": 1288.00,
+          "picture": "images/list-01.jpg"
+        },
+        {
+          "id": 2,
+          "name": "四件套",
+          "desc": "亲肤透气，安眠整晚",
+          "price": 120.00,
+          "picture": "images/list-02.jpg"
+        },
+        {
+          "id": 3,
+          "name": "沙发",
+          "desc": "承托有力，久坐不累",
+          "price": 500.00,
+          "picture": "images/list-03.jpg"
+        },
+        {
+          "id": 4,
+          "name": "收纳柜",
+          "desc": "分区合理，告别杂乱",
+          "price": 45.00,
+          "picture": "images/list-04.webp"
+        },
+        {
+          "id": 5,
+          "name": "炒锅",
+          "desc": "导热迅速，轻油烟",
+          "price": 68.00,
+          "picture": "images/list-05.jpg"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "美食",
+      "children": [
+        "南北干货",
+        "水果蔬菜"
+      ],
+      "goods": [
+        {
+          "id": 6,
+          "name": "进口巧克力",
+          "desc": "丝滑口感，多种口味",
+          "price": 65.00,
+          "picture": "images/list-06.jpg"
+        },
+        {
+          "id": 7,
+          "name": "新鲜香蕉",
+          "desc": "产地直供，新鲜送达",
+          "price": 15.00,
+          "picture": "images/list-07.webp"
+        },
+        {
+          "id": 8,
+          "name": "新鲜蔬菜",
+          "desc": "新鲜有机，健康蔬菜",
+          "price": 5.00,
+          "picture": "images/list-08.jpg"
+        },
+        {
+          "id": 9,
+          "name": "品质肉类",
+          "desc": "新鲜肉质，拒绝冷冻",
+          "price": 28.00,
+          "picture": "images/list-09.jpg"
+        },
+        {
+          "id": 10,
+          "name": "牛奶",
+          "desc": "奶香醇厚，回味无穷",
+          "price": 10.00,
+          "picture": "images/list-10.webp"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "服饰",
+      "children": [
+        "男装女装",
+        "鞋靴箱包"
+      ],
+      "goods": [
+        {
+          "id": 11,
+          "name": "时尚连衣裙",
+          "desc": "剪裁利落，优雅气质",
+          "price": 299.00,
+          "picture": "images/list-11.jpg"
+        },
+        {
+          "id": 12,
+          "name": "休闲裤",
+          "desc": "面料柔软，自在出行",
+          "price": 99.00,
+          "picture": "images/list-12.jpg"
+        },
+        {
+          "id": 13,
+          "name": "运动鞋",
+          "desc": "回弹缓震，畅快运动",
+          "price": 199.00,
+          "picture": "images/list-13.jpg"
+        },
+        {
+          "id": 14,
+          "name": "通勤包",
+          "desc": "简约有容，商务伴侣",
+          "price": 119.00,
+          "picture": "images/list-14.webp"
+        },
+        {
+          "id": 15,
+          "name": "羽绒服",
+          "desc": "锁温保暖，无惧严寒",
+          "price": 199.00,
+          "picture": "images/list-15.jpg"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "母婴",
+      "children": [
+        "奶粉尿裤",
+        "童装玩具"
+      ],
+      "goods": [
+        {
+          "id": 16,
+          "name": "婴儿奶粉",
+          "desc": "春营养全面，助力成长夏新款，优雅时尚",
+          "price": 299.00,
+          "picture": "images/list-16.webp"
+        },
+        {
+          "id": 17,
+          "name": "纸尿裤 ",
+          "desc": "透气干爽，呵护屁屁",
+          "price": 79.00,
+          "picture": "images/list-17.jpg"
+        },
+        {
+          "id": 18,
+          "name": "连体衣 ",
+          "desc": "穿脱方便，温和亲肤",
+          "price": 89.00,
+          "picture": "images/list-18.jpg"
+        },
+        {
+          "id": 19,
+          "name": "积木玩具 ",
+          "desc": "安全益智，激发创意",
+          "price": 39.00,
+          "picture": "images/list-19.jpg"
+        },
+        {
+          "id": 20,
+          "name": "婴儿推车 ",
+          "desc": "推行顺滑，安睡摇篮",
+          "price": 129.00,
+          "picture": "images/list-20.jpg"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "手机",
+      "children": [
+        "新款手机",
+        "手机挂件"
+      ],
+      "goods": [
+        {
+          "id": 21,
+          "name": "手机壳",
+          "desc": "春个性防护，耐摔防刮夏新款，优雅时尚",
+          "price": 25.00,
+          "picture": "images/list-21.jpg"
+        },
+        {
+          "id": 22,
+          "name": "充电宝",
+          "desc": "舒适透气大容量，随时续航，适合运动",
+          "price": 128.00,
+          "picture": "images/list-22.png"
+        },
+        {
+          "id": 23,
+          "name": "蓝牙耳机",
+          "desc": "舒适透气， 无线畅听，沉浸音质适合运动",
+          "price": 150.00,
+          "picture": "images/list-23.jpg"
+        },
+        {
+          "id": 24,
+          "name": "数据线",
+          "desc": "快充传输，坚韧耐用",
+          "price": 199.00,
+          "picture": "images/list-24.jpg"
+        },
+        {
+          "id": 25,
+          "name": "钢化膜",
+          "desc": "高清护眼，防爆防窥",
+          "price": 19.00,
+          "picture": "images/list-25.jpg"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "美妆",
+      "children": [
+        "彩妆护肤",
+        "香氛美妆"
+      ],
+      "goods": [
+        {
+          "id": 26,
+          "name": "口红",
+          "desc": "显色持妆，提亮气色",
+          "price": 259.00,
+          "picture": "images/list-26.webp"
+        },
+        {
+          "id": 27,
+          "name": "粉底液",
+          "desc": "轻薄遮瑕，持妆贴服",
+          "price": 199.00,
+          "picture": "images/list-27.webp"
+        },
+        {
+          "id": 28,
+          "name": "精华液",
+          "desc": "深润修护，焕活肌肤",
+          "price": 98.00,
+          "picture": "images/list-28.jpg"
+        },
+        {
+          "id": 29,
+          "name": "淡香氛",
+          "desc": "清新留香，愉悦自我",
+          "price": 59.00,
+          "picture": "images/list-29.webp"
+        },
+        {
+          "id": 30,
+          "name": "面膜",
+          "desc": "密集补水，即刻水润",
+          "price": 20.00,
+          "picture": "images/list-30.jpg"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "电脑",
+      "children": [
+        "整机配件",
+        "办公外设"
+      ],
+      "goods": [
+        {
+          "id": 31,
+          "name": "笔记本电脑",
+          "desc": "轻薄高性能，随行创作",
+          "price": 5999.00,
+          "picture": "images/list-31.webp"
+        },
+        {
+          "id": 32,
+          "name": "机械键盘",
+          "desc": "手感清脆，响应迅捷",
+          "price": 199.00,
+          "picture": "images/list-32.webp"
+        },
+        {
+          "id": 33,
+          "name": "显示器 ",
+          "desc": "广色域，护眼低蓝光",
+          "price": 1500.00,
+          "picture": "images/list-33.jpg"
+        },
+        {
+          "id": 34,
+          "name": " 鼠标",
+          "desc": "符合人体工学，精准定位",
+          "price": 156.00,
+          "picture": "images/list-34.jpg"
+        },
+        {
+          "id": 35,
+          "name": "U盘",
+          "desc": "大空间，传输稳定",
+          "price": 39.00,
+          "picture": "images/list-35.webp"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "饰品",
+      "children": [
+        "时尚首饰",
+        "精品腕表"
+      ],
+      "goods": [
+        {
+          "id": 36,
+          "name": "项链",
+          "desc": "精致链坠，点缀颈间",
+          "price": 799.00,
+          "picture": "images/list-36.webp"
+        },
+        {
+          "id": 37,
+          "name": "手链",
+          "desc": "简约设计，腕上风情",
+          "price": 59.00,
+          "picture": "images/list-37.webp"
+        },
+        {
+          "id": 38,
+          "name": "耳钉",
+          "desc": "小巧点睛，闪耀耳畔",
+          "price": 59.00,
+          "picture": "images/list-38.webp"
+        },
+        {
+          "id": 39,
+          "name": "石英表",
+          "desc": "走时精准，简约时尚",
+          "price": 599.00,
+          "picture": "images/list-39.webp"
+        },
+        {
+          "id": 40,
+          "name": "时尚戒指",
+          "desc": "个性宣言，摩登搭配",
+          "price": 999.00,
+          "picture": "images/list-40.jpg"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "医药",
+      "children": [
+        "滋补保健",
+        "常备药品"
+      ],
+      "goods": [
+        {
+          "id": 41,
+          "name": "维生素C ",
+          "desc": "增强免疫，日常必备",
+          "price": 49.00,
+          "picture": "images/list-41.webp"
+        },
+        {
+          "id": 42,
+          "name": "创可贴",
+          "desc": "防水护创，快速愈合",
+          "price": 10.00,
+          "picture": "images/list-42.webp"
+        },
+        {
+          "id": 43,
+          "name": "感冒冲剂 ",
+          "desc": "缓解症状，身心舒畅",
+          "price": 13.90,
+          "picture": "images/list-43.webp"
+        },
+        {
+          "id": 44,
+          "name": "枸杞",
+          "desc": "滋补养生，元气之选",
+          "price": 30.00,
+          "picture": "images/list-44.webp"
+        },
+        {
+          "id": 45,
+          "name": "体温计",
+          "desc": "精准测量，一秒读数",
+          "price": 19.00,
+          "picture": "images/list-45.jpg"
+        }
+      ]
+    }
+  ]
+}

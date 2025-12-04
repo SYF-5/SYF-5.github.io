@@ -31,7 +31,15 @@ const router = createRouter({
     {
       path: '/login',
       component: () => import('@/views/Login/index.vue')
+    },
+    {
+      path: '/search',
+      component: () => import('@/views/Search/index.vue'),
+      meta: {
+        title: '搜索结果'
+      }
     }
+
   ]
 })
 
