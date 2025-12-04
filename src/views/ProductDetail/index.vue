@@ -2,12 +2,14 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
+import { useUserStore } from '@/stores/user'
 import productService from '@/services/productService.js'
 import type { Product } from '@/types/index'
 
 const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
+const userStore = useUserStore()
 
 // 数据定义
 const product = ref<Product>({} as Product)
@@ -75,6 +77,12 @@ const addToCart = async () => {
 }
 
 const buyNow = () => {
+  if (!userStore.isLogin) {
+    if (confirm('请先登录，点击确定跳转到登录页')) {
+      router.push('/login')
+    }
+    return
+  }
   addToCart().then(() => {
     router.push('/cart')
   })

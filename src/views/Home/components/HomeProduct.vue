@@ -185,14 +185,16 @@ const fetchProducts = async () => {
       console.log('获取到的真实商品:', products)
       
       if (products && products.length > 0) {
-        productList.value = products
+        // 只显示前12个商品数据
+        const limitedProducts = products.slice(0, 12)
+        productList.value = limitedProducts
         
         // 初始化所有商品的图片加载状态
-        products.forEach(product => {
+        limitedProducts.forEach(product => {
           imageLoadedStates.value[product.id] = false
         })
         
-        console.log('成功设置真实商品列表，数量:', products.length)
+        console.log('成功设置真实商品列表，数量:', limitedProducts.length)
       } else {
         error.value = '暂无商品数据'
         console.log('没有获取到商品数据')
