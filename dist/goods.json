@@ -231,22 +231,6 @@
           "price": 10.00,
           "category": "食品",
           "picture": "https://syf-5.github.io/public/images/list-10.webp"
-        },
-        {
-          "id": 58,
-          "name": "麒麟西瓜",
-          "price": 29.99,
-          "picture": "https://pic.nximg.cn/file/20201126/30607871_101448185035_2.jpg",
-          "desc": "新鲜西瓜，汁水充足",
-          "category": "水果"
-        },
-        {
-          "id": 59,
-          "name": "文旦柚",
-          "price": 115.00,
-          "picture": "https://pic.nximg.cn/file/20201125/30607871_183745530032_2.jpg",
-          "desc": "鲜美可口，容易剥皮",
-          "category": "水果"
         }
       ]
     },
@@ -263,7 +247,7 @@
           "name": "时尚连衣裙",
           "desc": "剪裁利落，优雅气质",
           "price": 299.00,
-          "category": "食品",
+          "category": "服饰",
           "picture": "https://syf-5.github.io/public/images/list-11.jpg"
         },
         {
@@ -405,14 +389,6 @@
           "price": 19.00,
           "category": "数码",
           "picture": "https://syf-5.github.io/public/images/list-25.jpg"
-        },
-        {
-          "id": 62,
-          "name": "相机",
-          "price": 2899.00,
-          "picture": "https://cbu01.alicdn.com/img/ibank/2018/161/522/9508225161_1856062052.jpg",
-          "desc": "高清图像，拍摄清晰",
-          "category": "数码"
         }
       ]
     },

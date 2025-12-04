@@ -1,0 +1,1 @@
+import{D as a,r as u,c as r}from"./index-CAZUSK-b.js";const g=a("user",()=>{const o=u(null),e=u(!1),l=u(null),s=r(()=>e.value);return{userInfo:o,isLogin:e,getUserStatus:s,token:l,login:(t,n)=>{o.value=t,l.value=n,e.value=!0},logout:()=>{o.value=null,l.value=null,e.value=!1}}});export{g as u};

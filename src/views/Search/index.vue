@@ -56,11 +56,16 @@
       </div>
     </div>
   
+  <!-- 加入购物车成功消息 -->
+  <div v-if="showSuccessMessage" class="success-message">
+    ✅ 商品已成功添加到购物车！
+  </div>
+  
   <LayoutFooter />
 </template>
 
 <script setup lang="ts">
-  import { computed, watch, onMounted } from 'vue'
+  import { computed, watch, onMounted, ref } from 'vue'
   import { useRoute } from 'vue-router'
   import { useRouter } from 'vue-router'
   import { useSearchStore } from '@/stores/search'
@@ -85,6 +90,9 @@
   const results = computed(() => searchStore.results)
   const isLoading = computed(() => searchStore.isLoading)
   const hotKeywords = computed(() => searchStore.hotKeywords)
+  
+  // 加入购物车成功消息
+  const showSuccessMessage = ref(false)
 
   // 监听路由变化，当搜索关键词变化时执行搜索
   watch(
@@ -116,6 +124,13 @@
     // 从产品对象中提取所需属性，不包含quantity
     const { quantity, ...productWithoutQuantity } = product;
     cartStore.addToCart(productWithoutQuantity);
+    
+    // 显示成功消息
+    showSuccessMessage.value = true;
+    // 3秒后自动隐藏
+    setTimeout(() => {
+      showSuccessMessage.value = false;
+    }, 3000);
   }
 
   // 页面加载时初始化
@@ -333,5 +348,32 @@
     font-size: 60px;
     margin-bottom: 20px;
     opacity: 0.3;
+  }
+  
+  /* 成功消息样式，与商品详情页保持一致 */
+  .success-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+    padding: 24px 32px;
+    border-radius: 16px;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(72, 187, 120, 0.4);
+    animation: slideIn 0.5s ease;
+    z-index: 1000;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
   }
 </style>

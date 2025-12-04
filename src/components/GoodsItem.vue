@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue'
 import { useCartStore } from '@/stores/cart'
-import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
@@ -14,6 +13,7 @@ const props = defineProps({
 const cartStore = useCartStore()
 const router = useRouter()
 const isAddingToCart = ref(false)
+const showSuccessMessage = ref(false)
 
 // 优化的图片URL处理
 const getImageUrl = (path) => {
@@ -56,9 +56,12 @@ const handleAddToCart = async () => {
   
   try {
     await cartStore.addToCart(props.product, 1)
-    ElMessage.success(`"${props.product.name}" 已添加到购物车`)
+    showSuccessMessage.value = true
+    setTimeout(() => {
+      showSuccessMessage.value = false
+    }, 3000)
   } catch (error) {
-    ElMessage.error('添加失败，请重试')
+    alert('添加失败，请重试')
   } finally {
     isAddingToCart.value = false
   }
@@ -93,6 +96,9 @@ const handleItemClick = () => {
           <span v-if="!isAddingToCart">+</span>
           <span v-else class="loading-spinner">●</span>
         </button>
+      </div>
+      <div v-if="showSuccessMessage" class="success-message">
+        ✅ 商品已成功添加到购物车！
       </div>
     </div>
   </div>
@@ -227,5 +233,29 @@ const handleItemClick = () => {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* 成功消息样式 */
+.success-message {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 16px;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

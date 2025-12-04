@@ -52,6 +52,9 @@
                 <p class="desc">{{ product.desc || product.description }}</p>
                 <p class="price">¥{{ product.price?.toFixed(2) }}</p>
                 <button class="add-cart-btn" @click.stop="addToCart(product)">加入购物车</button>
+                <div v-if="showSuccessMessage[product.id]" class="success-message">
+                  ✅ 商品已成功添加到购物车！
+                </div>
               </div>
             </div>
           </div>
@@ -91,14 +94,17 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import productService from '@/services/productService.js'
+import { useCartStore } from '@/stores/cart'
 
 const router = useRouter()
+const cartStore = useCartStore()
 
 // 响应式数据
 const loading = ref(false)
 const error = ref(null)
 const productList = ref([])
 const imageLoadedStates = ref({}) // 图片加载状态
+const showSuccessMessage = ref({}) // 每个商品独立的成功消息状态
 
 // 计算属性
 const featuredProducts = computed(() => {
@@ -211,10 +217,16 @@ const goToProductDetail = (product) => {
 }
 
 // 添加到购物车
-const addToCart = (product) => {
+const addToCart = async (product) => {
   console.log('添加到购物车:', product.name)
-  // 这里可以调用购物车store
-  alert(`已添加 ${product.name} 到购物车`)
+  // 调用购物车store
+  await cartStore.addToCart(product, 1)
+  
+  // 显示成功消息
+  showSuccessMessage.value[product.id] = true
+  setTimeout(() => {
+    showSuccessMessage.value[product.id] = false
+  }, 3000)
 }
 
 const getCategoryIcon = (category) => {
@@ -423,6 +435,30 @@ onMounted(() => {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* 成功消息样式 */
+.success-message {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 16px;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .error-state {
