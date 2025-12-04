@@ -136,6 +136,8 @@ const selectSuggestion = (suggestion: string) => {
   background: #409eff;
   color: white;
   margin-right: 5px;
+  white-space: nowrap; /* 确保文字不换行 */
+  min-width: 60px; /* 设置最小宽度确保文字能显示完整 */
 }
 
 .search-btn:hover {

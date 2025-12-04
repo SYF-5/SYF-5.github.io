@@ -2,10 +2,7 @@
   <LayoutNav />
   <LayoutHeader />
   
-  <!-- 顶部搜索框 -->
-  <div class="search-header">
-    <SearchBar />
-  </div>
+  <!-- 移除了顶部搜索框 -->
 
   <!-- 搜索结果内容 -->
   <div class="results-content">
@@ -38,12 +35,15 @@
         </div>
 
         <div class="product-list">
-        <div v-for="product in results" :key="product.id" class="product-card" @click="goToProduct(product.id)">
-          <img :src="product.picture" :alt="product.name" class="product-image" />
+        <div v-for="product in results" :key="product.id" class="product-card">
+          <div class="product-image-wrapper" @click="goToProduct(product.id)">
+            <img :src="product.picture" :alt="product.name" class="product-image" />
+          </div>
           <div class="product-info">
-            <h3 class="product-name">{{ product.name }}</h3>
+            <h3 class="product-name" @click="goToProduct(product.id)">{{ product.name }}</h3>
             <p class="product-desc">{{ product.desc }}</p>
             <div class="product-price">¥{{ product.price.toFixed(2) }}</div>
+            <button class="add-to-cart-btn" @click.stop="addToCart(product)">加入购物车</button>
           </div>
         </div>
       </div>
@@ -63,8 +63,8 @@
   import { computed, watch, onMounted } from 'vue'
   import { useRoute } from 'vue-router'
   import { useRouter } from 'vue-router'
-  import SearchBar from '@/components/SearchBar.vue'
   import { useSearchStore } from '@/stores/search'
+  import { useCartStore } from '@/stores/cart'
   import { getQueryString } from '@/utils/route'
   import LayoutNav from '@/views/Layout/components/LayoutNav.vue'
   import LayoutHeader from '@/views/Layout/components/LayoutHeader.vue'
@@ -73,6 +73,7 @@
   const route = useRoute()
   const router = useRouter()
   const searchStore = useSearchStore()
+  const cartStore = useCartStore()
 
   // 从URL参数获取搜索关键词 - 使用类型安全的方法
   const keyword = computed(() => {
@@ -108,6 +109,17 @@
   // 跳转到商品详情页
   const goToProduct = (productId: number) => {
     router.push(`/product/${productId}`)
+  }
+
+  // 加入购物车
+  const addToCart = (product: any) => {
+    cartStore.addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      picture: product.picture,
+      quantity: 1
+    })
   }
 
   // 页面加载时初始化
@@ -244,8 +256,31 @@
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .product-image-wrapper {
+    cursor: pointer;
+  }
+
+  .product-name {
+    cursor: pointer;
+  }
+
+  .add-to-cart-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #f56c6c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+  }
+
+  .add-to-cart-btn:hover {
+    background-color: #f78989;
   }
 
   .product-card:hover {

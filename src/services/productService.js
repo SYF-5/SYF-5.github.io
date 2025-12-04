@@ -300,7 +300,29 @@ class ProductService {
   }
 
   getAllProducts() {
-    return this.products
+    // 先获取主产品列表
+    const mainProducts = [...this.products]
+    
+    // 再从分类商品中获取所有商品并添加到列表中
+    for (const categoryId in this.categoryGoodsMap) {
+      const goods = this.categoryGoodsMap[categoryId]
+      if (goods && Array.isArray(goods)) {
+        // 添加每个商品，并确保id唯一（如果有重复id，使用主产品列表中的商品）
+        goods.forEach(good => {
+          // 检查是否已存在相同id的商品
+          if (!mainProducts.some(product => product.id === good.id)) {
+            // 如果不存在，添加到列表中，并确保有必要的字段
+            mainProducts.push({
+              ...good,
+              category: good.category || '',
+              description: good.desc || good.description || ''
+            })
+          }
+        })
+      }
+    }
+    
+    return mainProducts
   }
 
   isLoaded() {
