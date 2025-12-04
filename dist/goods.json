@@ -174,7 +174,8 @@
           "name": "新鲜蔬菜",
           "desc": "新鲜有机，健康蔬菜",
           "price": 5.00,
-          "picture": "https://syf-5.github.io/public/images/list-08.jpg"
+          "picture": "https://syf-5.github.io/public/images/list-08.jpg",
+          "category": "vegetables"
         },
         {
           "id": 9,

@@ -1,12 +1,14 @@
 <template>
-  <div class="search-results-page">
-    <!-- 顶部搜索框 -->
-    <div class="search-header">
-      <SearchBar />
-    </div>
+  <LayoutNav />
+  <LayoutHeader />
+  
+  <!-- 顶部搜索框 -->
+  <div class="search-header">
+    <SearchBar />
+  </div>
 
-    <!-- 搜索结果内容 -->
-    <div class="results-content">
+  <!-- 搜索结果内容 -->
+  <div class="results-content">
       <!-- 搜索状态 -->
       <div v-if="isLoading" class="loading-state">
         <div class="spinner"></div>
@@ -40,7 +42,7 @@
           <img :src="product.picture" :alt="product.name" class="product-image" />
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
-            <p class="product-category">{{ getCategoryName(product.category) }}</p>
+            <p class="product-desc">{{ product.desc }}</p>
             <div class="product-price">¥{{ product.price.toFixed(2) }}</div>
           </div>
         </div>
@@ -53,7 +55,8 @@
         <p>请输入关键词搜索商品</p>
       </div>
     </div>
-  </div>
+  
+  <LayoutFooter />
 </template>
 
 <script setup lang="ts">
@@ -63,6 +66,9 @@
   import SearchBar from '@/components/SearchBar.vue'
   import { useSearchStore } from '@/stores/search'
   import { getQueryString } from '@/utils/route'
+  import LayoutNav from '@/views/Layout/components/LayoutNav.vue'
+  import LayoutHeader from '@/views/Layout/components/LayoutHeader.vue'
+  import LayoutFooter from '@/views/Layout/components/LayoutFooter.vue'
 
   const route = useRoute()
   const router = useRouter()
@@ -104,18 +110,6 @@
     router.push(`/product/${productId}`)
   }
 
-  // 获取中文分类名称
-  const getCategoryName = (category: string): string => {
-    const categoryMap: Record<string, string> = {
-      'fruits': '水果',
-      'vegetables': '蔬菜',
-      'grains': '谷物',
-      'eggs': '蛋类',
-      'clothing': '服饰'
-    }
-    return categoryMap[category] || category
-  }
-
   // 页面加载时初始化
   onMounted(() => {
     // 如果有搜索关键词，执行搜索
@@ -127,15 +121,18 @@
 </script>
 
 <style scoped>
-  .search-results-page {
-    min-height: 80vh;
+  .search-header {
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
+    margin-bottom: 30px;
   }
 
-  .search-header {
-    margin-bottom: 30px;
+  .results-content {
+    min-height: 80vh;
+    padding: 0 20px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   .loading-state {
@@ -275,10 +272,15 @@
     white-space: nowrap;
   }
 
-  .product-category {
+  .product-desc {
     margin-bottom: 10px;
     color: #909399;
     font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
   .product-price {

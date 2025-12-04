@@ -12,7 +12,6 @@
         @keyup.enter="executeSearch"
       />
       <button @click="executeSearch" class="search-btn">搜索</button>
-      <button @click="clearSearch" class="clear-btn">清空</button>
     </div>
     
     <!-- 搜索历史 -->
@@ -90,11 +89,7 @@ const clearAllHistory = () => {
   searchStore.clearHistory()
 }
 
-// 清空搜索
-const clearSearch = () => {
-  keyword.value = ''
-  showHistory.value = false
-}
+// 移除了清空按钮功能
 
 const handleBlur = () => {
   setTimeout(() => {
