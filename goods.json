@@ -7,7 +7,7 @@
       "name": "新鲜芹菜",
       "price": 10.5,
       "picture": "https://syf-5.github.io/public/images/products-50.jpg",
-      "description": "新鲜采摘的芹菜，清脆爽口",
+      "desc": "新鲜采摘的芹菜，清脆爽口",
       "category": "vegetables",
       "stock": 50,
       "rating": 4.5
