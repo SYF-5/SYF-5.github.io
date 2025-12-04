@@ -6,7 +6,8 @@
         v-model="keyword"
         type="text"
         placeholder="搜索商品..."
-        @focus="showHistory = true"
+        @focus="showHistory = true; showSuggestions = true"
+        @input="showSuggestions = true"
         @blur="handleBlur"
         @keyup.enter="executeSearch"
       />
@@ -51,6 +52,7 @@ const router = useRouter()
 const searchStore = useSearchStore()
 const keyword = ref('')
 const showHistory = ref(false)
+const showSuggestions = ref(false)
 
 // 执行搜索
 const executeSearch = () => {
@@ -97,10 +99,16 @@ const clearSearch = () => {
 const handleBlur = () => {
   setTimeout(() => {
     showHistory.value = false
+    showSuggestions.value = false
   }, 200)
 }
 
-
+// 选择搜索建议
+const selectSuggestion = (suggestion: string) => {
+  keyword.value = suggestion
+  showSuggestions.value = false
+  executeSearch()
+}
 </script>
 
 <style scoped>
