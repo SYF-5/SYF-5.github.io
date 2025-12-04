@@ -7,6 +7,7 @@ declare module '@/services/productService.js' {
     desc: string
     categoryId?: number
     categoryName?: string
+    category?: string
     dataSource?: string
   }
 

@@ -9,9 +9,10 @@ export interface SearchProduct {
   name: string
   price: number
   picture: string
-  desc: string
+  desc?: string
   categoryId?: number
   categoryName?: string
+  category?: string
   dataSource?: string
 }
 
@@ -114,13 +115,27 @@ export const useSearchStore = defineStore('search', () => {
 
     // 根据关键词过滤商品
     const lowerKeyword = searchKeyword.toLowerCase()
+    
+    // 中文到英文的分类映射
+    const categoryMap: Record<string, string> = {
+      '水果': 'fruits',
+      '蔬菜': 'vegetables',
+      '谷物': 'grains',
+      '蛋类': 'eggs',
+      '服饰': 'clothing'
+    }
+    
+    // 获取对应的英文分类名（如果有）
+    const englishCategory = categoryMap[searchKeyword]?.toLowerCase() || ''
+    
     return allProducts.filter(product => {
       const productName = product.name.toLowerCase()
-      const productCategoryName = product.categoryName?.toLowerCase() || ''
+      const productCategory = (product.category || product.categoryName || '')?.toLowerCase() || ''
       
-      // 匹配商品名称或分类名称
+      // 匹配商品名称、分类名或中文分类对应的英文分类
       return productName.includes(lowerKeyword) ||
-             productCategoryName.includes(lowerKeyword)
+             productCategory.includes(lowerKeyword) ||
+             productCategory === englishCategory
     }) as unknown as SearchProduct[]
   }
 
