@@ -90,19 +90,20 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import productService from '@/services/productService.js'
 import { useCartStore } from '@/stores/cart'
+import type { Product } from '@/types/index'
 
 const router = useRouter()
 const cartStore = useCartStore()
 
 // 响应式数据
 const loading = ref(false)
-const error = ref(null)
-const productList = ref([])
+const error = ref<string | null>(null)
+const productList = ref<Product[]>([])
 const imageLoadedStates = ref({}) // 图片加载状态
 const showSuccessMessage = ref({}) // 每个商品独立的成功消息状态
 
@@ -179,7 +180,7 @@ const fetchProducts = async () => {
     
     try {
       await productService.loadAllData()
-      const products = productService.getProductsOnly() // 只获取products数组中的商品数据
+      const products = productService.getAllProducts() // 获取所有商品数据
       
       console.log('获取到的真实商品:', products)
       
@@ -219,14 +220,26 @@ const goToProductDetail = (product) => {
 // 添加到购物车
 const addToCart = async (product) => {
   console.log('添加到购物车:', product.name)
-  // 调用购物车store
-  await cartStore.addToCart(product, 1)
   
-  // 显示成功消息
-  showSuccessMessage.value[product.id] = true
-  setTimeout(() => {
-    showSuccessMessage.value[product.id] = false
-  }, 3000)
+  try {
+    // 调用购物车store
+    await cartStore.addToCart(product, 1)
+    
+    // 显示成功消息
+    showSuccessMessage.value[product.id] = true
+    setTimeout(() => {
+      showSuccessMessage.value[product.id] = false
+    }, 3000)
+  } catch (error) {
+    const err = error as any
+    if (err.message === '请先登录') {
+      if (confirm('请先登录，点击确定跳转到登录页')) {
+        router.push('/login')
+      }
+    } else {
+      alert(err.message || '添加商品失败，请重试')
+    }
+  }
 }
 
 const getCategoryIcon = (category) => {

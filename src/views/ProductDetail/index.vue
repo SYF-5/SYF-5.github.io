@@ -1,15 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import productService from '@/services/productService.js'
+import type { Product } from '@/types/index'
 
 const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
 
 // 数据定义
-const product = ref({})
+const product = ref<Product>({} as Product)
 const quantity = ref(1)
 const activeTab = ref('detail')
 const loading = ref(true)
@@ -60,7 +61,14 @@ const addToCart = async () => {
     }, 3000)
     
   } catch (error) {
-    alert(error.message || '添加商品失败，请重试')
+    const err = error as any
+    if (err.message === '请先登录') {
+      if (confirm('请先登录，点击确定跳转到登录页')) {
+        router.push('/login')
+      }
+    } else {
+      alert(err.message || '添加商品失败，请重试')
+    }
   } finally {
     isAddingToCart.value = false
   }
@@ -125,7 +133,7 @@ const loadProduct = async (id) => {
     
     try {
       await productService.loadAllData()
-      const foundProduct = productService.getProductById(id)
+      const foundProduct: Product | null = productService.getProductById(id)
       
       if (foundProduct) {
         // 创建一个安全的商品数据副本，确保所有必要字段都存在

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from './user'
 
 export interface CartItem {
   id: number
@@ -80,6 +81,12 @@ export const useCartStore = defineStore('cart', {
 
     // 添加商品到购物车
     addToCart(product: Omit<CartItem, 'quantity'>, quantity: number = 1) {
+      // 检查用户登录状态
+      const userStore = useUserStore()
+      if (!userStore.isLogin) {
+        throw new Error('请先登录')
+      }
+      
       const existingItem = this.cartItems.find(item => item.id === product.id)
 
       if (existingItem) {

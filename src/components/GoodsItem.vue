@@ -1,14 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useCartStore } from '@/stores/cart'
 import { useRouter } from 'vue-router'
+import type { Product } from '@/types/index'
 
-const props = defineProps({
-  product: {
-    type: Object,
-    required: true
-  }
-})
+const props = defineProps<{
+  product: Product
+}>()
 
 const cartStore = useCartStore()
 const router = useRouter()
@@ -61,7 +59,14 @@ const handleAddToCart = async () => {
       showSuccessMessage.value = false
     }, 3000)
   } catch (error) {
-    alert('添加失败，请重试')
+    const err = error as any
+    if (err.message === '请先登录') {
+      if (confirm('请先登录，点击确定跳转到登录页')) {
+        router.push('/login')
+      }
+    } else {
+      alert(err.message || '添加失败，请重试')
+    }
   } finally {
     isAddingToCart.value = false
   }

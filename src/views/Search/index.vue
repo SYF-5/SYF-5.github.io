@@ -120,17 +120,28 @@
   }
 
   // 加入购物车
-  const addToCart = (product: any) => {
-    // 从产品对象中提取所需属性，不包含quantity
-    const { quantity, ...productWithoutQuantity } = product;
-    cartStore.addToCart(productWithoutQuantity);
-    
-    // 显示成功消息
-    showSuccessMessage.value = true;
-    // 3秒后自动隐藏
-    setTimeout(() => {
-      showSuccessMessage.value = false;
-    }, 3000);
+  const addToCart = async (product: any) => {
+    try {
+      // 从产品对象中提取所需属性，不包含quantity
+      const { quantity, ...productWithoutQuantity } = product;
+      await cartStore.addToCart(productWithoutQuantity);
+      
+      // 显示成功消息
+      showSuccessMessage.value = true;
+      // 3秒后自动隐藏
+      setTimeout(() => {
+        showSuccessMessage.value = false;
+      }, 3000);
+    } catch (error) {
+      const err = error as any
+      if (err.message === '请先登录') {
+        if (confirm('请先登录，点击确定跳转到登录页')) {
+          router.push('/login');
+        }
+      } else {
+        alert(err.message || '添加到购物车失败');
+      }
+    }
   }
 
   // 页面加载时初始化
