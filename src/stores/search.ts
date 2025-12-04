@@ -116,13 +116,13 @@ export const useSearchStore = defineStore('search', () => {
     // 根据关键词过滤商品
     const lowerKeyword = searchKeyword.toLowerCase()
     
-    // 中文到英文的分类映射
+    // 中文分类映射（保持中文值）
     const categoryMap: Record<string, string> = {
-      '水果': 'fruits',
-      '蔬菜': 'vegetables',
-      '谷物': 'grains',
-      '蛋类': 'eggs',
-      '服饰': 'clothing'
+      '水果': '水果',
+      '蔬菜': '蔬菜',
+      '谷物': '谷物',
+      '蛋类': '蛋类',
+      '服饰': '服饰'
     }
     
     // 获取对应的英文分类名（如果有）
