@@ -16,7 +16,7 @@
       "id": 51,
       "name": "云南香蕉",
       "price": 15.0,
-      "picture": "https://syf-5.github.io/public/images/products-51.webp",
+      "desc": "https://syf-5.github.io/public/images/products-51.webp",
       "description": "来自云南的优质香蕉，香甜可口",
       "category": "fruits",
       "stock": 30,
@@ -27,7 +27,7 @@
       "name": "进口橙子",
       "price": 20.0,
       "picture": "https://syf-5.github.io/public/images/products-52.jpg",
-      "description": "进口优质橙子，汁多味甜",
+      "desc": "进口优质橙子，汁多味甜",
       "category": "fruits",
       "stock": 25,
       "rating": 4.7
@@ -37,8 +37,8 @@
       "name": "新鲜鸡蛋",
       "price": 12.0,
       "picture": "https://syf-5.github.io/public/images/products-53.webp",
-      "description": "优质小米，营养丰富",
-      "category": "grains",
+      "desc": "优质小米，营养丰富",
+      "category": "food",
       "stock": 40,
       "rating": 4.6
     },
@@ -47,8 +47,8 @@
       "name": "优质小米",
       "price": 18.0,
       "picture": "https://syf-5.github.io/public/images/products-54.webp",
-      "description": "农家散养鸡蛋，新鲜健康",
-      "category": "eggs",
+      "desc": "农家散养鸡蛋，新鲜健康",
+      "category": "food",
       "stock": 60,
       "rating": 4.9
     },
@@ -57,7 +57,7 @@
       "name": "有机花菜",
       "price": 8.5,
       "picture": "https://syf-5.github.io/public/images/products-55.webp",
-      "description": "有机种植花菜，无农药残留",
+      "desc": "有机种植花菜，无农药残留",
       "category": "vegetables",
       "stock": 35,
       "rating": 4.4
@@ -67,8 +67,8 @@
       "name": "金枕榴莲",
       "price": 120,
       "picture": "https://syf-5.github.io/public/images/products-56.webp",
-      "description": "香甜可口，入口即化",
-      "category": "vegetables",
+      "desc": "香甜可口，入口即化",
+      "category": "fruits",
       "stock": 35,
       "rating": 4.4
     },
@@ -77,8 +77,8 @@
       "name": "农家鸡",
       "price": 120,
       "picture": "https://syf-5.github.io/public/images/products-57.jpg",
-      "description": "香甜可口，入口即化",
-      "category": "vegetables",
+      "desc": "香甜可口，入口即化",
+      "category": "food",
       "stock": 35,
       "rating": 4.4
     }
@@ -115,6 +115,7 @@
           "name": "空调",
           "desc": "冷暖随心，静享舒适",
           "price": 1288.00,
+          "category": "Furniture",
           "picture": "https://syf-5.github.io/public/images/list-01.jpg"
         },
         {
@@ -122,6 +123,7 @@
           "name": "四件套",
           "desc": "亲肤透气，安眠整晚",
           "price": 120.00,
+          "category": "Furniture",
           "picture": "https://syf-5.github.io/public/images/list-02.jpg"
         },
         {
@@ -129,6 +131,7 @@
           "name": "沙发",
           "desc": "承托有力，久坐不累",
           "price": 500.00,
+          "category": "Furniture",
           "picture": "https://syf-5.github.io/public/images/list-03.jpg"
         },
         {
@@ -136,6 +139,7 @@
           "name": "收纳柜",
           "desc": "分区合理，告别杂乱",
           "price": 45.00,
+          "category": "Furniture",
           "picture": "https://syf-5.github.io/public/images/list-04.webp"
         },
         {
@@ -143,6 +147,7 @@
           "name": "炒锅",
           "desc": "导热迅速，轻油烟",
           "price": 68.00,
+          "category": "Furniture",
           "picture": "https://syf-5.github.io/public/images/list-05.jpg"
         }
       ]
@@ -160,6 +165,7 @@
           "name": "进口巧克力",
           "desc": "丝滑口感，多种口味",
           "price": 65.00,
+          "category": "food",
           "picture": "https://syf-5.github.io/public/images/list-06.jpg"
         },
         {
@@ -167,6 +173,7 @@
           "name": "新鲜香蕉",
           "desc": "产地直供，新鲜送达",
           "price": 15.00,
+          "category": "food",
           "picture": "https://syf-5.github.io/public/images/list-07.webp"
         },
         {
@@ -174,14 +181,15 @@
           "name": "新鲜蔬菜",
           "desc": "新鲜有机，健康蔬菜",
           "price": 5.00,
-          "picture": "https://syf-5.github.io/public/images/list-08.jpg",
-          "category": "vegetables"
+          "category": "food",
+          "picture": "https://syf-5.github.io/public/images/list-08.jpg"
         },
         {
           "id": 9,
           "name": "品质肉类",
           "desc": "新鲜肉质，拒绝冷冻",
           "price": 28.00,
+          "category": "food",
           "picture": "https://syf-5.github.io/public/images/list-09.jpg"
         },
         {
@@ -189,6 +197,7 @@
           "name": "牛奶",
           "desc": "奶香醇厚，回味无穷",
           "price": 10.00,
+          "category": "food",
           "picture": "https://syf-5.github.io/public/images/list-10.webp"
         }
       ]
@@ -206,6 +215,7 @@
           "name": "时尚连衣裙",
           "desc": "剪裁利落，优雅气质",
           "price": 299.00,
+          "category": "food",
           "picture": "https://syf-5.github.io/public/images/list-11.jpg"
         },
         {
@@ -213,6 +223,7 @@
           "name": "休闲裤",
           "desc": "面料柔软，自在出行",
           "price": 99.00,
+          "category": "Clothing",
           "picture": "https://syf-5.github.io/public/images/list-12.jpg"
         },
         {
@@ -220,6 +231,7 @@
           "name": "运动鞋",
           "desc": "回弹缓震，畅快运动",
           "price": 199.00,
+          "category": "Clothing",
           "picture": "https://syf-5.github.io/public/images/list-13.jpg"
         },
         {
@@ -227,6 +239,7 @@
           "name": "通勤包",
           "desc": "简约有容，商务伴侣",
           "price": 119.00,
+          "category": "Clothing",
           "picture": "https://syf-5.github.io/public/images/list-14.webp"
         },
         {
@@ -234,6 +247,7 @@
           "name": "羽绒服",
           "desc": "锁温保暖，无惧严寒",
           "price": 199.00,
+          "category": "Clothing",
           "picture": "https://syf-5.github.io/public/images/list-15.jpg"
         }
       ]
@@ -251,6 +265,7 @@
           "name": "婴儿奶粉",
           "desc": "春营养全面，助力成长夏新款，优雅时尚",
           "price": 299.00,
+          "category": "baby",
           "picture": "https://syf-5.github.io/public/images/list-16.webp"
         },
         {
@@ -258,6 +273,7 @@
           "name": "纸尿裤 ",
           "desc": "透气干爽，呵护屁屁",
           "price": 79.00,
+          "category": "baby",
           "picture": "https://syf-5.github.io/public/images/list-17.jpg"
         },
         {
@@ -265,6 +281,7 @@
           "name": "连体衣 ",
           "desc": "穿脱方便，温和亲肤",
           "price": 89.00,
+          "category": "Clothing",
           "picture": "https://syf-5.github.io/public/images/list-18.jpg"
         },
         {
@@ -272,6 +289,7 @@
           "name": "积木玩具 ",
           "desc": "安全益智，激发创意",
           "price": 39.00,
+          "category": "baby",
           "picture": "https://syf-5.github.io/public/images/list-19.jpg"
         },
         {
@@ -279,6 +297,7 @@
           "name": "婴儿推车 ",
           "desc": "推行顺滑，安睡摇篮",
           "price": 129.00,
+          "category": "baby",
           "picture": "https://syf-5.github.io/public/images/list-20.jpg"
         }
       ]
@@ -296,6 +315,7 @@
           "name": "手机壳",
           "desc": "春个性防护，耐摔防刮夏新款，优雅时尚",
           "price": 25.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-21.jpg"
         },
         {
@@ -303,6 +323,7 @@
           "name": "充电宝",
           "desc": "舒适透气大容量，随时续航，适合运动",
           "price": 128.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-22.png"
         },
         {
@@ -310,6 +331,7 @@
           "name": "蓝牙耳机",
           "desc": "舒适透气， 无线畅听，沉浸音质适合运动",
           "price": 150.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-23.jpg"
         },
         {
@@ -317,6 +339,7 @@
           "name": "数据线",
           "desc": "快充传输，坚韧耐用",
           "price": 199.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-24.jpg"
         },
         {
@@ -324,6 +347,7 @@
           "name": "钢化膜",
           "desc": "高清护眼，防爆防窥",
           "price": 19.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-25.jpg"
         }
       ]
@@ -341,6 +365,7 @@
           "name": "口红",
           "desc": "显色持妆，提亮气色",
           "price": 259.00,
+          "category": "Beauty",
           "picture": "https://syf-5.github.io/public/images/list-26.webp"
         },
         {
@@ -348,6 +373,7 @@
           "name": "粉底液",
           "desc": "轻薄遮瑕，持妆贴服",
           "price": 199.00,
+          "category": "Beauty",
           "picture": "https://syf-5.github.io/public/images/list-27.webp"
         },
         {
@@ -355,6 +381,7 @@
           "name": "精华液",
           "desc": "深润修护，焕活肌肤",
           "price": 98.00,
+          "category": "Beauty",
           "picture": "https://syf-5.github.io/public/images/list-28.jpg"
         },
         {
@@ -362,6 +389,7 @@
           "name": "淡香氛",
           "desc": "清新留香，愉悦自我",
           "price": 59.00,
+          "category": "Beauty",
           "picture": "https://syf-5.github.io/public/images/list-29.webp"
         },
         {
@@ -369,6 +397,7 @@
           "name": "面膜",
           "desc": "密集补水，即刻水润",
           "price": 20.00,
+          "category": "Beauty",
           "picture": "https://syf-5.github.io/public/images/list-30.jpg"
         }
       ]
@@ -386,6 +415,7 @@
           "name": "笔记本电脑",
           "desc": "轻薄高性能，随行创作",
           "price": 5999.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-31.webp"
         },
         {
@@ -393,6 +423,7 @@
           "name": "机械键盘",
           "desc": "手感清脆，响应迅捷",
           "price": 199.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-32.webp"
         },
         {
@@ -400,6 +431,7 @@
           "name": "显示器 ",
           "desc": "广色域，护眼低蓝光",
           "price": 1500.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-33.jpg"
         },
         {
@@ -407,6 +439,7 @@
           "name": " 鼠标",
           "desc": "符合人体工学，精准定位",
           "price": 156.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-34.jpg"
         },
         {
@@ -414,6 +447,7 @@
           "name": "U盘",
           "desc": "大空间，传输稳定",
           "price": 39.00,
+          "category": "Digital",
           "picture": "https://syf-5.github.io/public/images/list-35.webp"
         }
       ]
@@ -431,6 +465,7 @@
           "name": "项链",
           "desc": "精致链坠，点缀颈间",
           "price": 799.00,
+          "category": "Jewelry",
           "picture": "https://syf-5.github.io/public/images/list-36.webp"
         },
         {
@@ -438,6 +473,7 @@
           "name": "手链",
           "desc": "简约设计，腕上风情",
           "price": 59.00,
+          "category": "Jewelry",
           "picture": "https://syf-5.github.io/public/images/list-37.webp"
         },
         {
@@ -445,6 +481,7 @@
           "name": "耳钉",
           "desc": "小巧点睛，闪耀耳畔",
           "price": 59.00,
+          "category": "Jewelry",
           "picture": "https://syf-5.github.io/public/images/list-38.webp"
         },
         {
@@ -452,6 +489,7 @@
           "name": "石英表",
           "desc": "走时精准，简约时尚",
           "price": 599.00,
+          "category": "Jewelry",
           "picture": "https://syf-5.github.io/public/images/list-39.webp"
         },
         {
@@ -459,6 +497,7 @@
           "name": "时尚戒指",
           "desc": "个性宣言，摩登搭配",
           "price": 999.00,
+          "category": "Jewelry",
           "picture": "https://syf-5.github.io/public/images/list-40.jpg"
         }
       ]
@@ -476,6 +515,7 @@
           "name": "维生素C ",
           "desc": "增强免疫，日常必备",
           "price": 49.00,
+          "category": "Medicine",
           "picture": "https://syf-5.github.io/public/images/list-41.webp"
         },
         {
@@ -483,6 +523,7 @@
           "name": "创可贴",
           "desc": "防水护创，快速愈合",
           "price": 10.00,
+          "category": "Medicine",
           "picture": "https://syf-5.github.io/public/images/list-42.webp"
         },
         {
@@ -490,6 +531,7 @@
           "name": "感冒冲剂 ",
           "desc": "缓解症状，身心舒畅",
           "price": 13.90,
+          "category": "Medicine",
           "picture": "https://syf-5.github.io/public/images/list-43.webp"
         },
         {
@@ -497,6 +539,7 @@
           "name": "枸杞",
           "desc": "滋补养生，元气之选",
           "price": 30.00,
+          "category": "food",
           "picture": "https://syf-5.github.io/public/images/list-44.webp"
         },
         {
@@ -504,9 +547,60 @@
           "name": "体温计",
           "desc": "精准测量，一秒读数",
           "price": 19.00,
+          "category": "Medicine",
           "picture": "https://syf-5.github.io/public/images/list-45.jpg"
         }
       ]
+    }
+  ],
+  "goods": [
+    {
+      "id": 58,
+      "name": "麒麟西瓜",
+      "price": 29.99,
+      "picture": "https://pic.nximg.cn/file/20201126/30607871_101448185035_2.jpg",
+      "desc": "新鲜西瓜，汁水充足",
+      "category": "fruits"
+    },
+    {
+      "id": 59,
+      "name": "文旦柚",
+      "price": 115.00,
+      "picture": "https://pic.nximg.cn/file/20201125/30607871_183745530032_2.jpg",
+      "desc": "鲜美可口，容易剥皮",
+      "category": "fruits"
+    },
+    {
+      "id": 60,
+      "name": "油麦菜",
+      "price": 3.99,
+      "picture": "https://img95.699pic.com/photo/50049/9207.jpg_wh860.jpg",
+      "desc": "新鲜有机，无农药",
+      "category": "vegetables"
+    },
+    {
+      "id": 58,
+      "name": "萝卜",
+      "price": 12.99,
+      "picture": "https://img95.699pic.com/photo/60082/0402.jpg_wh860.jpg",
+      "desc": "新鲜脆口",
+      "category": "vegetables"
+    },
+    {
+      "id": 58,
+      "name": "相机",
+      "price": 2899.00,
+      "picture": "https://cbu01.alicdn.com/img/ibank/2018/161/522/9508225161_1856062052.jpg",
+      "desc": "高清图像，拍摄清晰",
+      "category": "fruits"
+    },
+    {
+      "id": 58,
+      "name": "简约短袖",
+      "price": 59.00,
+      "picture": "https://img95.699pic.com/photo/60079/7420.jpg_wh300.jpg",
+      "desc": "时尚简约，干净整洁",
+      "category": "Clothing"
     }
   ]
 }

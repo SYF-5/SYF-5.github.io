@@ -324,6 +324,11 @@ class ProductService {
     
     return mainProducts
   }
+  
+  // 只获取products数组中的商品数据
+  getProductsOnly() {
+    return [...this.products]
+  }
 
   isLoaded() {
     return this.loaded

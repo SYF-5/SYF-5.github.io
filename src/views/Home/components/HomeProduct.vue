@@ -167,36 +167,36 @@ const handleImageLoad = (productId) => {
 
 // 获取商品数据
 const fetchProducts = async () => {
-  console.log('开始获取商品数据...')
-  loading.value = true
-  error.value = null
-  
-  try {
-    await productService.loadAllData()
-    const products = productService.getAllProducts()
+    console.log('开始获取商品数据...')
+    loading.value = true
+    error.value = null
     
-    console.log('获取到的真实商品:', products)
-    
-    if (products && products.length > 0) {
-      productList.value = products
+    try {
+      await productService.loadAllData()
+      const products = productService.getProductsOnly() // 只获取products数组中的商品数据
       
-      // 初始化所有商品的图片加载状态
-      products.forEach(product => {
-        imageLoadedStates.value[product.id] = false
-      })
+      console.log('获取到的真实商品:', products)
       
-      console.log('成功设置真实商品列表，数量:', products.length)
-    } else {
-      error.value = '暂无商品数据'
-      console.log('没有获取到商品数据')
+      if (products && products.length > 0) {
+        productList.value = products
+        
+        // 初始化所有商品的图片加载状态
+        products.forEach(product => {
+          imageLoadedStates.value[product.id] = false
+        })
+        
+        console.log('成功设置真实商品列表，数量:', products.length)
+      } else {
+        error.value = '暂无商品数据'
+        console.log('没有获取到商品数据')
+      }
+    } catch (err) {
+      console.error('获取商品失败:', err)
+      error.value = '数据加载失败: ' + err.message
+    } finally {
+      loading.value = false
     }
-  } catch (err) {
-    console.error('获取商品失败:', err)
-    error.value = '数据加载失败: ' + err.message
-  } finally {
-    loading.value = false
   }
-}
 
 // 分类点击处理
 const handleCategoryClick = (category) => {
