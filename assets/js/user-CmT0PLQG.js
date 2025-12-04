@@ -1,1 +1,0 @@
-import{D as r,r as t,c as a}from"./index-DB0qcCBv.js";const f=r("user",()=>{const o=t(null),e=t(!1),s=t(null),l=a(()=>e.value);return{userInfo:o,isLogin:e,getUserStatus:l,token:s,login:(u,n)=>{o.value=u,s.value=n,e.value=!0},logout:()=>{o.value=null,s.value=null,e.value=!1}}},{persist:{key:"user-store",paths:["userInfo","isLogin","token"],storage:localStorage}});export{f as u};

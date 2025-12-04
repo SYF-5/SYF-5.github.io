@@ -1,0 +1,22 @@
+{
+  "shipping": 15.00,
+  "discount": 30.00,
+  "Banner": [
+    {
+      "picture": "images/Banner-1.jpg",
+      "link": "/category/1"
+    },
+    {
+      "picture": "images/Banner-2.jpg",
+      "link": "/category/2"
+    },
+    {
+      "picture": "images/Banner-3.webp",
+      "link": "/category/3"
+    },
+    {
+      "picture": "images/Banner-4.webp",
+      "link": "/category/4"
+    }
+  ]
+}
