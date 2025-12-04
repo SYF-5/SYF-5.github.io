@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { ElMessage } from 'element-plus'
 
 export interface CartItem {
   id: number
@@ -115,6 +116,11 @@ export const useCartStore = defineStore('cart', {
       }
 
       this.saveToLocalStorage()
+      // 显示添加成功提示
+      ElMessage.success({
+        message: '加入购物车成功',
+        duration: 2000 // 2秒后自动消失
+      })
     },
 
     // 增加商品数量

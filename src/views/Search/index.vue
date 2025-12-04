@@ -113,13 +113,9 @@
 
   // 加入购物车
   const addToCart = (product: any) => {
-    cartStore.addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      picture: product.picture,
-      quantity: 1
-    })
+    // 从产品对象中提取所需属性，不包含quantity
+    const { quantity, ...productWithoutQuantity } = product;
+    cartStore.addToCart(productWithoutQuantity);
   }
 
   // 页面加载时初始化

@@ -22,9 +22,7 @@ export const useSearchStore = defineStore('search', () => {
 
   // 热门搜索关键词
   const hotKeywords = ref<string[]>([
-    '手机', '电脑', '耳机', '键盘',
-    '衣服', '鞋子', '包包', '化妆品',
-    '食品', '饮料', '零食', '平板'
+    '水果', '蔬菜', '数码', '饰品', '食品', '母婴'
   ])
 
   // 搜索建议
