@@ -36,15 +36,15 @@
         </div>
 
         <div class="product-list">
-          <div v-for="product in results" :key="product.id" class="product-card" @click="goToProduct(product.id)">
-            <img :src="product.image" :alt="product.name" class="product-image" />
-            <div class="product-info">
-              <h3 class="product-name">{{ product.name }}</h3>
-              <p class="product-category">{{ product.category }}</p>
-              <div class="product-price">¥{{ product.price }}</div>
-            </div>
+        <div v-for="product in results" :key="product.id" class="product-card" @click="goToProduct(product.id)">
+          <img :src="product.picture" :alt="product.name" class="product-image" />
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-category">{{ getCategoryName(product.category) }}</p>
+            <div class="product-price">¥{{ product.price.toFixed(2) }}</div>
           </div>
         </div>
+      </div>
       </div>
 
       <!-- 初始状态（未搜索） -->
@@ -102,6 +102,18 @@
   // 跳转到商品详情页
   const goToProduct = (productId: number) => {
     router.push(`/product/${productId}`)
+  }
+
+  // 获取中文分类名称
+  const getCategoryName = (category: string): string => {
+    const categoryMap: Record<string, string> = {
+      'fruits': '水果',
+      'vegetables': '蔬菜',
+      'grains': '谷物',
+      'eggs': '蛋类',
+      'clothing': '服饰'
+    }
+    return categoryMap[category] || category
   }
 
   // 页面加载时初始化

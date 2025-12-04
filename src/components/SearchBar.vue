@@ -6,11 +6,12 @@
         v-model="keyword"
         type="text"
         placeholder="搜索商品..."
-        @input="handleSearch"
         @focus="showHistory = true"
         @blur="handleBlur"
+        @keyup.enter="executeSearch"
       />
-      <button @click="clearSearch">清空</button>
+      <button @click="executeSearch" class="search-btn">搜索</button>
+      <button @click="clearSearch" class="clear-btn">清空</button>
     </div>
     
     <!-- 搜索历史 -->
@@ -43,30 +44,27 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { useDebounceFn } from '@vueuse/core'
+import { useRouter } from 'vue-router'
 import { useSearchStore } from '@/stores/search'
 
+const router = useRouter()
 const searchStore = useSearchStore()
 const keyword = ref('')
 const showHistory = ref(false)
-const showSuggestions = ref(false)
 
-// 防抖搜索
-const handleSearch = useDebounceFn(() => {
-  if (!keyword.value.trim()) {
-    showSuggestions.value = false
-    return
-  }
+// 执行搜索
+const executeSearch = () => {
+  if (!keyword.value.trim()) return
   
   // 保存到历史记录
   searchStore.addToHistory(keyword.value)
   
-  // 触发搜索
-  searchStore.searchProducts(keyword.value)
-  
-  // 显示搜索结果页面
-  showSuggestions.value = true
-}, 500)
+  // 跳转到搜索结果页面
+  router.push({
+    path: '/search',
+    query: { q: keyword.value }
+  })
+}
 
 // 获取搜索历史
 const searchHistory = computed(() => searchStore.history)
@@ -77,8 +75,7 @@ const suggestions = computed(() => searchStore.suggestions)
 // 选择历史记录
 const selectHistory = (item: string) => {
   keyword.value = item
-  searchStore.searchProducts(item)
-  showHistory.value = false
+  executeSearch()
 }
 
 // 删除单条历史
@@ -95,7 +92,6 @@ const clearAllHistory = () => {
 const clearSearch = () => {
   keyword.value = ''
   showHistory.value = false
-  showSuggestions.value = false
 }
 
 const handleBlur = () => {
@@ -104,10 +100,7 @@ const handleBlur = () => {
   }, 200)
 }
 
-const selectSuggestion = (suggestion: string) => {
-  keyword.value = suggestion
-  handleSearch()
-}
+
 </script>
 
 <style scoped>
@@ -127,6 +120,31 @@ const selectSuggestion = (suggestion: string) => {
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+.search-box button {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-btn {
+  background: #409eff;
+  color: white;
+  margin-right: 5px;
+}
+
+.search-btn:hover {
+  background: #66b1ff;
+}
+
+.clear-btn {
+  background: #f5f5f5;
+}
+
+.clear-btn:hover {
+  background: #e8e8e8;
 }
 
 .search-history {

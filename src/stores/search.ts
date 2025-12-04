@@ -1,14 +1,18 @@
 // src/stores/search.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import productService from '@/services/productService.js'
 
 // 定义商品接口
 export interface SearchProduct {
   id: number
   name: string
   price: number
-  image: string
-  category: string
+  picture: string
+  desc: string
+  categoryId?: number
+  categoryName?: string
+  dataSource?: string
 }
 
 export const useSearchStore = defineStore('search', () => {
@@ -83,43 +87,41 @@ export const useSearchStore = defineStore('search', () => {
 
   // 生成搜索建议
   const generateSuggestions = (searchKeyword: string) => {
-    const allKeywords = [
+    const categoryKeywords = [
+      '水果', '蔬菜', '谷物', '蛋类', '服饰',
       '手机', '电脑', '平板', '耳机',
-      '衣服', '鞋子', '包包',
+      '衣服', '鞋子', '包包', '美妆',
       '食品', '饮料', '零食'
     ]
 
-    suggestions.value = allKeywords
+    suggestions.value = categoryKeywords
       .filter(item => item.includes(searchKeyword))
       .slice(0, 5)
   }
 
-  // 模拟搜索商品（生成一些示例数据）
-  const generateMockResults = (searchKeyword: string): SearchProduct[] => {
-    const mockProducts: SearchProduct[] = [
-      { id: 1, name: '华为手机', price: 3999, image: 'https://picsum.photos/200/150?random=1', category: '手机' },
-      { id: 2, name: '苹果手机', price: 5999, image: 'https://picsum.photos/200/150?random=2', category: '手机' },
-      { id: 3, name: '小米手机', price: 1999, image: 'https://picsum.photos/200/150?random=3', category: '手机' },
-      { id: 4, name: '手机壳', price: 49, image: 'https://picsum.photos/200/150?random=4', category: '配件' },
-      { id: 5, name: '手机充电器', price: 99, image: 'https://picsum.photos/200/150?random=5', category: '配件' },
-      { id: 6, name: '笔记本电脑', price: 7999, image: 'https://picsum.photos/200/150?random=6', category: '电脑' },
-      { id: 7, name: '平板电脑', price: 2999, image: 'https://picsum.photos/200/150?random=7', category: '平板' },
-      { id: 8, name: '无线耳机', price: 499, image: 'https://picsum.photos/200/150?random=8', category: '耳机' },
-      { id: 9, name: '男士T恤', price: 99, image: 'https://picsum.photos/200/150?random=9', category: '衣服' },
-      { id: 10, name: '运动鞋', price: 299, image: 'https://picsum.photos/200/150?random=10', category: '鞋子' }
-    ]
-
+  // 从真实数据中搜索商品
+  const searchRealProducts = async (searchKeyword: string): Promise<SearchProduct[]> => {
+    // 确保商品数据已加载
+    await productService.loadAllData()
+    
+    // 获取所有商品数据
+    const allProducts = productService.getAllProducts()
+    
     // 如果关键词为空，返回所有商品
     if (!searchKeyword.trim()) {
-      return mockProducts
+      return allProducts as unknown as SearchProduct[]
     }
 
     // 根据关键词过滤商品
     const lowerKeyword = searchKeyword.toLowerCase()
-    return mockProducts.filter(product =>
-      product.name.toLowerCase().includes(lowerKeyword) ||
-      product.category.toLowerCase().includes(lowerKeyword)
-    )
+    return allProducts.filter(product => {
+      const productName = product.name.toLowerCase()
+      const productCategoryName = product.categoryName?.toLowerCase() || ''
+      
+      // 匹配商品名称或分类名称
+      return productName.includes(lowerKeyword) ||
+             productCategoryName.includes(lowerKeyword)
+    }) as unknown as SearchProduct[]
   }
 
   // 搜索商品
@@ -128,16 +130,13 @@ export const useSearchStore = defineStore('search', () => {
     isLoading.value = true
     keyword.value = searchKeyword
 
-    // 模拟API请求延迟
-    await new Promise(resolve => setTimeout(resolve, 500))
-
     try {
       // 生成搜索建议
       generateSuggestions(searchKeyword)
 
-      // 生成搜索结果
-      const mockResults = generateMockResults(searchKeyword)
-      results.value = mockResults
+      // 从真实数据中搜索商品
+      const realResults = await searchRealProducts(searchKeyword)
+      results.value = realResults
 
       // 添加到历史记录
       if (searchKeyword.trim()) {
