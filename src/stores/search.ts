@@ -1,4 +1,3 @@
-// src/stores/search.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import productService from '@/services/productService.js'
@@ -102,10 +101,10 @@ export const useSearchStore = defineStore('search', () => {
   const searchRealProducts = async (searchKeyword: string): Promise<SearchProduct[]> => {
     // 确保商品数据已加载
     await productService.loadAllData()
-    
+
     // 获取所有商品数据
     const allProducts = productService.getAllProducts()
-    
+
     // 如果关键词为空，返回所有商品
     if (!searchKeyword.trim()) {
       return allProducts as unknown as SearchProduct[]
@@ -113,7 +112,7 @@ export const useSearchStore = defineStore('search', () => {
 
     // 根据关键词过滤商品
     const lowerKeyword = searchKeyword.toLowerCase()
-    
+
     // 中文分类映射（保持中文值）
     const categoryMap: Record<string, string> = {
       '水果': '水果',
@@ -122,18 +121,18 @@ export const useSearchStore = defineStore('search', () => {
       '蛋类': '蛋类',
       '服饰': '服饰'
     }
-    
+
     // 获取对应的英文分类名（如果有）
     const englishCategory = categoryMap[searchKeyword]?.toLowerCase() || ''
-    
+
     return allProducts.filter(product => {
       const productName = product.name.toLowerCase()
       const productCategory = (product.category || product.categoryName || '')?.toLowerCase() || ''
-      
+
       // 匹配商品名称、分类名或中文分类对应的英文分类
       return productName.includes(lowerKeyword) ||
-             productCategory.includes(lowerKeyword) ||
-             productCategory === englishCategory
+        productCategory.includes(lowerKeyword) ||
+        productCategory === englishCategory
     }) as unknown as SearchProduct[]
   }
 

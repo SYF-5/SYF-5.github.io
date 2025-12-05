@@ -2,8 +2,6 @@
   <LayoutNav />
   <LayoutHeader />
   
-  <!-- 移除了顶部搜索框 -->
-
   <!-- 搜索结果内容 -->
   <div class="results-content">
       <!-- 搜索状态 -->

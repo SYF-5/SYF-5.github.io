@@ -1,4 +1,3 @@
-// src/directives/lazyLoad.ts
 import { App, DirectiveBinding } from 'vue';
 
 // 存储所有观察器实例

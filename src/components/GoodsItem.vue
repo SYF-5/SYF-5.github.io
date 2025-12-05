@@ -109,7 +109,6 @@ const handleItemClick = () => {
   </div>
 </template>
 
-<!-- 样式保持不变 -->
 <style scoped>
 .goods-item {
   position: relative;
