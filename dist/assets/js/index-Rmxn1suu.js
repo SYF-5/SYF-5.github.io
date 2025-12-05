@@ -1,0 +1,1 @@
+import{L as a,a as t,b as o}from"./LayoutFooter-CtBvF3QY.js";import{_ as r,f as s,e,u as n,R as _,F as c,g as p}from"./index-BHaF4bqM.js";import"./productService-DLGyYyOD.js";import"./cart-DNnsDUIy.js";const u={__name:"index",setup(m){return(f,i)=>(p(),s(c,null,[e(a),e(t),e(n(_)),e(o)],64))}},y=r(u,[["__scopeId","data-v-3273831f"]]);export{y as default};
